@@ -1,0 +1,59 @@
+//JavaCCオプション
+options {
+	STATIC = false; //マルチスレッド環境で使えるようにするため、falseに
+	DEBUG_PARSER = true; //デバッグ情報の出力
+	UNICODE_INPUT = true; //日本語を処理する
+	JDK_VERSION = "1.6";
+}
+
+//パーサクラス
+PARSER_BEGIN(Parser)
+PARSER_END(Parser)
+
+//スキャナの記述
+
+//文のキーワード
+TOKEN: {
+	  <INT      : "int">
+	| <IF       : "if">
+	| <ELSE     : "else">
+	| <WHILE    : "while">
+	| <FOR      : "for">
+	| <RETURN   : "return">
+	| <BREAK    : "break">
+}
+
+//識別子
+TOKEN: {
+	<IDENTIFIER: ["A"-"Z", "a"-"z", "_"] (["A"-"Z", "a"-"z", "_", "0"-"9"])*>
+}
+
+//整数
+TOKEN: {
+	<INTEGER: ["1"-"9"] (["0"-"9"])*
+			| "0"
+	>
+}
+
+//空白類
+SPECIAL_TOKEN: {
+	<WHITESPACE: ([" ", "\f", "\n", "\r", "\t"])+>
+}
+
+//一行コメント
+//"//"、改行以外の文字（0回以上の繰り返し）、改行文字（省略可能）
+SPECIAL_TOKEN: {
+	<LINE_COMMENT: "//" (~["\n", "\r"])* ("\n" | "\r\n" | "\r")?>
+}
+
+//文字列リテラル
+MORE: { <"\""> : IN_STRING }
+	<IN_STRING> MORE: {
+		  <(~["\"", "\\", "\n", "\r"])+> //二重引用符'"', バックスラッシュ'\', 改行文字'\n', '\r'以外の1回以上の繰り返し
+		| <"\\" ~[]> //エスケープコード
+}
+<IN_STRING> TOKEN: { <STRING: "\""> : DEFAULT }
+
+
+//パーサの記述
+
