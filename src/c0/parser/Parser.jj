@@ -57,3 +57,163 @@ MORE: { <"\""> : IN_STRING }
 
 //パーサの記述
 
+//翻訳単位の処理
+//翻訳単位 := {外部宣言}*
+file(): {}
+{
+	(externalDefinition())* <EOF>
+}
+
+//外部宣言 :=
+//	関数宣言
+//	|外部変数宣言
+externalDefinition(): {}
+{
+	  defineFunction()
+	| declareGlobalVariable()
+}
+
+//関数宣言 :=
+//	データ型 単純宣言子 '(' [引数 {',' 引数}* ] ')' 複合文
+//宣言子については、仕様を再検討する
+defineFunction(): {}
+{
+	type() name() "(" [parameter() (',' parameter())* ] ")" blockStatement()
+}
+
+//引数 :=
+//	データ型 識別子
+parameter(): {}
+{
+	type() name()
+}
+
+
+//外部変数宣言 :=
+//{変数宣言}+
+declareGlobalVariable(): {}
+{
+	(declareVariable())+
+}
+
+//変数宣言 :=
+//データ型 単純宣言子 ['=' 式] ';'
+//|データ型 配列宣言子 ';'
+declareVariable(): {}
+{
+	type() name() ['=' expression()] ';'
+	type() declareArray() ';'
+}
+
+//配列宣言子 :=
+//	単純宣言子 '[' 式 ']'
+declareArray(): {}
+{
+	name() '[' expression() ']'
+}
+
+//型の構文
+//データ型 :=
+//	'int'
+type(): {}
+{
+	<INT>
+}
+
+//文 :=
+//	式文
+//	|複合文
+//	|条件文
+//	|繰り返し文
+//	|return文
+//	|空文
+statement(): {}
+{
+	  expressionStatement()
+	| blockStatement()
+	| conditionalStatement()
+	| iterationStatement()
+	| returnStatement()
+	| emptyStatement()
+}
+
+//複合文 :=
+//	'{' [局所変数宣言 {局所変数宣言}* ] {文}* '}'
+blockStatement(): {}
+{
+	'{' [declareLocalVariable() (declareLocalVariable())* ] (statement())* '}'
+}
+
+//局所変数宣言 :=
+//	{変数宣言}+
+declareLocalVariable(): {}
+{
+	(declareVariable())+
+}
+
+//条件文 :=
+//	if文
+conditionalStatement(): {}
+{
+	ifStatement()
+}
+
+//if文 :=
+//	'if' '(' 式 ')' 文 ['else' 文]
+ifStatement(): {}
+{
+	'if' '(' expression() ')' statement() ['else' statement()]
+}
+
+//繰り返し文 :=
+//	while文
+//	|for文
+iterationStatement(): {}
+{
+	  whileStatement()
+	| forStatement()
+}
+
+//while文 :=
+//	'while' '(' 式 ')' 文
+whileStatement(): {}
+{
+	'while' '(' expression() ')' statement()
+}
+
+//for文 :=
+//	'for' '(' [式] ';' [式] ';' [式] ')' 文
+forStatement(): {}
+{
+	'for' '(' [expression()] ';' [expression()] ';' [expression()] ')' statement()
+}
+
+//return文 :=
+//	'return' [式] ';'
+returnStatement(): {}
+{
+	'return' [expression()] ';'
+}
+
+//空文 :=
+//	';'
+emptyStatement(): {}
+{
+	';'
+}
+
+//式文 :=
+//	式 ';'
+expressionStatement(): {}
+{
+	expression() ';'
+}
+
+//項の構文
+term(): {}
+{
+	
+}
+
+
+
