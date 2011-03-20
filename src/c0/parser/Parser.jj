@@ -78,14 +78,14 @@ externalDefinition(): {}
 //宣言子については、仕様を再検討する
 defineFunction(): {}
 {
-	type() name() "(" [parameter() (',' parameter())* ] ")" blockStatement()
+	type() <IDENTIFIER> "(" [parameter() ("," parameter())* ] ")" blockStatement()
 }
 
 //引数 :=
 //	データ型 識別子
 parameter(): {}
 {
-	type() name()
+	type() <IDENTIFIER>
 }
 
 
@@ -101,7 +101,7 @@ declareGlobalVariable(): {}
 //|データ型 配列宣言子 ';'
 declareVariable(): {}
 {
-	type() name() ['=' expression()] ';'
+	type() <IDENTIFIER> ["=" expression()] ";"
 	type() declareArray() ';'
 }
 
@@ -109,7 +109,7 @@ declareVariable(): {}
 //	単純宣言子 '[' 式 ']'
 declareArray(): {}
 {
-	name() '[' expression() ']'
+	<IDENTIFIER> "[" expression() "]"
 }
 
 //型の構文
@@ -141,7 +141,7 @@ statement(): {}
 //	'{' [局所変数宣言 {局所変数宣言}* ] {文}* '}'
 blockStatement(): {}
 {
-	'{' [declareLocalVariable() (declareLocalVariable())* ] (statement())* '}'
+	"{" [declareLocalVariable() (declareLocalVariable())* ] (statement())* "}"
 }
 
 //局所変数宣言 :=
@@ -162,7 +162,7 @@ conditionalStatement(): {}
 //	'if' '(' 式 ')' 文 ['else' 文]
 ifStatement(): {}
 {
-	'if' '(' expression() ')' statement() ['else' statement()]
+	<IF> "(" expression() ")" statement() [<ELSE> statement()]
 }
 
 //繰り返し文 :=
@@ -178,42 +178,118 @@ iterationStatement(): {}
 //	'while' '(' 式 ')' 文
 whileStatement(): {}
 {
-	'while' '(' expression() ')' statement()
+	<WHILE> "(" expression() ")" statement()
 }
 
 //for文 :=
 //	'for' '(' [式] ';' [式] ';' [式] ')' 文
 forStatement(): {}
 {
-	'for' '(' [expression()] ';' [expression()] ';' [expression()] ')' statement()
+	<FOR> "(" [expression()] ";" [expression()] ";" [expression()] ")" statement()
 }
 
 //return文 :=
 //	'return' [式] ';'
 returnStatement(): {}
 {
-	'return' [expression()] ';'
+	"return" [expression()] ";"
 }
 
 //空文 :=
 //	';'
 emptyStatement(): {}
 {
-	';'
+	";"
 }
 
 //式文 :=
 //	式 ';'
 expressionStatement(): {}
 {
-	expression() ';'
+	expression() ";"
+}
+
+//式の構文
+//演算子の優先順位が低い順に書く
+
+//代入式
+expression(): {}
+{
+	  term() "=" expression()
+	| expression5()
+}
+
+//論理OR
+expression5(): {}
+{
+	expression4() ("||" expression4())*
+}
+
+//論理AND
+expression4(): {}
+{
+	expression3() ("&&" expression3())*
+}
+
+//同等式
+//関係式
+expression3(): {}
+{
+	expression2() ( "==" expression2()
+				  | "!=" expression2()
+				  | "<"  expression2()
+				  | ">"  expression2()
+				  | "<=" expression2()
+				  | ">=" expression2() )*
+}
+
+//加算式
+//減算式
+expression2(): {}
+{
+	expression1() ( "+" expression1()
+				  | "-" expression1() )*
+}
+
+//乗算式
+//除算式
+expression1(): {}
+{
+	term() ( "*" term()
+		   | "/" term() )*
 }
 
 //項の構文
 term(): {}
 {
-	
+	unaryExpression()
 }
 
+//単項式
+unaryExpression(): {}
+{
+	  "++" unaryExpression() //前置増分式
+	| "--" unaryExpression() //前置減分式
+	| "-" term() //単項マイナス式
+	| "!" term() //論理否定
+	| PostfixExpression() //後置式
+}
 
+//後置式
+PostfixExpression(): {}
+{
+	primaryExpression() ( "++" //後置増分式
+						  "--" //後置減分式
+						  "[" expression() "]" //添字式
+						  <IDENTIFIER> "(" [expression() ("," expression())* ] ")" )* //関数呼び出し
+}
+
+//一次式
+primaryExpression(): {}
+{
+	  <INTEGER> //定数
+	| <STRING> //文字列定数
+	| <IDENTIFIER> //識別子
+	| "(" expression() ")" //括弧式
+}
 
