@@ -39,8 +39,9 @@ Node
 		ExpressionStatementNode //式文
 		EmptyStatementNode      //空文
 		
-Identifierクラスにグローバル変数の場合は値を、関数の場合は関数本体などの情報を持たせる
-Identifierオブジェクトを名前で検索出来るメソッドが必要
+IdentifierNodeクラスのオブジェクトにグローバル変数の場合は値を、関数の場合は関数本体などの情報を持たせる
+IdentifierNodeオブジェクトのリストがシンボルテーブル
+シンボルテーブルから識別子の情報を名前（文字列）で検索出来るメソッドが必要
 IdentifierNodeから値を取り出す、保存するメソッドが必要
 変数と配列の値の出し入れは区別する必要がある？
 内部で処理を分岐させるか
