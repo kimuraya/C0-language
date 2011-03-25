@@ -4,11 +4,9 @@ ASTを構成するクラス一覧
 Node
 	ASTNode                     //グローバル変数の確保など、プログラム全体の初期処理と後処理を行う
 	ExpressionNode              //式を表す
-		NumNode                 //定数
+		LiteralNode             //定数
 		IdentifierNode          //識別子
 		AssignNode              //"="
-		GetArrayNode            //配列への参照
-		SetArrayNode            //配列への代入
 		EquivalenceNode         //"=="
 		NotEquivalenceNode      //"!="
 		LessThanNode            //"<"
@@ -58,5 +56,21 @@ class IdentifierNode {
 演算子、代入文を親クラスにして、一まとめにできないか。
 代入文をまとめて処理するメソッドを作り、その中で変数への代入、配列への代入などを区別し、処理を分ける。
 
+代入の命令は一つだけで間に合う？
+左辺値をterm()にし、term()の中に変数や配列参照を入れる。
+opcodeは不必要？
+
+class Node {
+	opcode op;
+}
+
+class StatementNode {
+	public execute(); //文の実行を行うメソッド。継承させる。
+}
+
+class AssignNode {
+	IdentifierNode identifier;
+	ExpressionStatementNode expression;
+}
 
 
