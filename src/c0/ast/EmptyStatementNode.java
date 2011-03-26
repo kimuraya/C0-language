@@ -9,10 +9,5 @@ public class EmptyStatementNode extends StatementNode {
 
 	}
 
-	@Override
-	public void execute() {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
 
 }

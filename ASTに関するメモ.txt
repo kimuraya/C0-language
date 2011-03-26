@@ -2,7 +2,7 @@ ASTを構成するクラス一覧
 左が親クラス、右が子クラス
 
 Node
-	ASTNode                     //グローバル変数の確保など、プログラム全体の初期処理と後処理を行う
+	AstNode                     //グローバル変数の確保など、プログラム全体の初期処理と後処理を行う
 	ExpressionNode              //式を表す
 		LiteralNode             //定数
 		IdentifierNode          //識別子
