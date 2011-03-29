@@ -58,19 +58,8 @@ class IdentifierNode {
 
 代入の命令は一つだけで間に合う？
 左辺値をterm()にし、term()の中に変数や配列参照を入れる。
-opcodeは不必要？
 
-class Node {
-	opcode op;
-}
 
-class StatementNode {
-	public execute(); //文の実行を行うメソッド。継承させる。
-}
 
-class AssignNode {
-	IdentifierNode identifier;
-	ExpressionStatementNode expression;
-}
 
 

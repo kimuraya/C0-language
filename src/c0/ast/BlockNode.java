@@ -1,6 +1,7 @@
 package c0.ast;
 
 import java.util.List;
+import c0.util.NodeType;
 
 //複合文
 public class BlockNode extends StatementNode {

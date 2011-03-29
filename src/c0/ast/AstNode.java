@@ -1,6 +1,7 @@
 package c0.ast;
 
 import java.util.List;
+import c0.util.NodeType;
 
 //抽象構文木のルート
 //グローバル変数の確保とmain関数の呼び出しを実行する
