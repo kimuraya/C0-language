@@ -1,5 +1,6 @@
 package c0.util;
 
+//値を管理するクラス
 public class Value {
 	private DataType dataType; //変数のデータ型
 	private int i; //整数
