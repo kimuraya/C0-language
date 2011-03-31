@@ -1,10 +1,11 @@
 package c0.ast;
 
+import c0.util.Value;
+
 //定数
 public class LiteralNode extends ExpressionNode {
 	
-	private int integralLiteral; //整数定数
-	private String stringLiteral; //文字列定数
+	private Value literal;
 	
 	@Override
 	public void dump() {
