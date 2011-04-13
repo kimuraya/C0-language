@@ -1,0 +1,295 @@
+//JavaCCオプション
+options {
+	STATIC = false; //マルチスレッド環境で使えるようにするため、falseに
+	DEBUG_PARSER = true; //デバッグ情報の出力
+	UNICODE_INPUT = true; //日本語を処理する
+	JDK_VERSION = "1.6";
+}
+
+//パーサクラス
+PARSER_BEGIN(Parser)
+PARSER_END(Parser)
+
+//スキャナの記述
+
+//文のキーワード
+TOKEN: {
+	  <INT      : "int">
+	| <IF       : "if">
+	| <ELSE     : "else">
+	| <WHILE    : "while">
+	| <FOR      : "for">
+	| <RETURN   : "return">
+	| <BREAK    : "break">
+}
+
+//識別子
+TOKEN: {
+	<IDENTIFIER: ["A"-"Z", "a"-"z", "_"] (["A"-"Z", "a"-"z", "_", "0"-"9"])*>
+}
+
+//整数
+TOKEN: {
+	<INTEGER: ["1"-"9"] (["0"-"9"])*
+			| "0"
+	>
+}
+
+//空白類
+SPECIAL_TOKEN: {
+	<WHITESPACE: ([" ", "\f", "\n", "\r", "\t"])+>
+}
+
+//一行コメント
+//"//"、改行以外の文字（0回以上の繰り返し）、改行文字（省略可能）
+SPECIAL_TOKEN: {
+	<LINE_COMMENT: "//" (~["\n", "\r"])* ("\n" | "\r\n" | "\r")?>
+}
+
+//文字列リテラル
+MORE: { <"\""> : IN_STRING }
+	<IN_STRING> MORE: {
+		  <(~["\"", "\\", "\n", "\r"])+> //二重引用符'"', バックスラッシュ'\', 改行文字'\n', '\r'以外の1回以上の繰り返し
+		| <"\\" ~[]> //エスケープコード
+}
+<IN_STRING> TOKEN: { <STRING: "\""> : DEFAULT }
+
+
+//パーサの記述
+
+//翻訳単位の処理
+//翻訳単位 := {外部宣言}*
+file(): {}
+{
+	(externalDefinition())* <EOF>
+}
+
+//外部宣言 :=
+//	関数宣言
+//	|外部変数宣言
+externalDefinition(): {}
+{
+	  defineFunction()
+	| declareGlobalVariable()
+}
+
+//関数宣言 :=
+//	データ型 単純宣言子 '(' [引数 {',' 引数}* ] ')' 複合文
+//宣言子については、仕様を再検討する
+defineFunction(): {}
+{
+	type() <IDENTIFIER> "(" [parameter() ("," parameter())* ] ")" blockStatement()
+}
+
+//引数 :=
+//	データ型 識別子
+parameter(): {}
+{
+	type() <IDENTIFIER>
+}
+
+
+//外部変数宣言 :=
+//{変数宣言}+
+declareGlobalVariable(): {}
+{
+	(declareVariable())+
+}
+
+//変数宣言 :=
+//データ型 単純宣言子 ['=' 式] ';'
+//|データ型 配列宣言子 ';'
+declareVariable(): {}
+{
+	type() <IDENTIFIER> ["=" expression()] ";"
+	type() declareArray() ';'
+}
+
+//配列宣言子 :=
+//	単純宣言子 '[' 式 ']'
+declareArray(): {}
+{
+	<IDENTIFIER> "[" expression() "]"
+}
+
+//型の構文
+//データ型 :=
+//	'int'
+type(): {}
+{
+	<INT>
+}
+
+//文 :=
+//	式文
+//	|複合文
+//	|条件文
+//	|繰り返し文
+//	|return文
+//	|空文
+statement(): {}
+{
+	  expressionStatement()
+	| blockStatement()
+	| conditionalStatement()
+	| iterationStatement()
+	| returnStatement()
+	| emptyStatement()
+}
+
+//複合文 :=
+//	'{' [局所変数宣言 {局所変数宣言}* ] {文}* '}'
+blockStatement(): {}
+{
+	"{" [declareLocalVariable() (declareLocalVariable())* ] (statement())* "}"
+}
+
+//局所変数宣言 :=
+//	{変数宣言}+
+declareLocalVariable(): {}
+{
+	(declareVariable())+
+}
+
+//条件文 :=
+//	if文
+conditionalStatement(): {}
+{
+	ifStatement()
+}
+
+//if文 :=
+//	'if' '(' 式 ')' 文 ['else' 文]
+ifStatement(): {}
+{
+	<IF> "(" expression() ")" statement() [<ELSE> statement()]
+}
+
+//繰り返し文 :=
+//	while文
+//	|for文
+iterationStatement(): {}
+{
+	  whileStatement()
+	| forStatement()
+}
+
+//while文 :=
+//	'while' '(' 式 ')' 文
+whileStatement(): {}
+{
+	<WHILE> "(" expression() ")" statement()
+}
+
+//for文 :=
+//	'for' '(' [式] ';' [式] ';' [式] ')' 文
+forStatement(): {}
+{
+	<FOR> "(" [expression()] ";" [expression()] ";" [expression()] ")" statement()
+}
+
+//return文 :=
+//	'return' [式] ';'
+returnStatement(): {}
+{
+	"return" [expression()] ";"
+}
+
+//空文 :=
+//	';'
+emptyStatement(): {}
+{
+	";"
+}
+
+//式文 :=
+//	式 ';'
+expressionStatement(): {}
+{
+	expression() ";"
+}
+
+//式の構文
+//演算子の優先順位が低い順に書く
+
+//代入式
+expression(): {}
+{
+	  term() "=" expression()
+	| expression5()
+}
+
+//論理OR
+expression5(): {}
+{
+	expression4() ("||" expression4())*
+}
+
+//論理AND
+expression4(): {}
+{
+	expression3() ("&&" expression3())*
+}
+
+//同等式
+//関係式
+expression3(): {}
+{
+	expression2() ( "==" expression2()
+				  | "!=" expression2()
+				  | "<"  expression2()
+				  | ">"  expression2()
+				  | "<=" expression2()
+				  | ">=" expression2() )*
+}
+
+//加算式
+//減算式
+expression2(): {}
+{
+	expression1() ( "+" expression1()
+				  | "-" expression1() )*
+}
+
+//乗算式
+//除算式
+expression1(): {}
+{
+	term() ( "*" term()
+		   | "/" term() )*
+}
+
+//項の構文
+term(): {}
+{
+	unaryExpression()
+}
+
+//単項式
+unaryExpression(): {}
+{
+	  "++" unaryExpression() //前置増分式
+	| "--" unaryExpression() //前置減分式
+	| "-" term() //単項マイナス式
+	| "!" term() //論理否定
+	| PostfixExpression() //後置式
+}
+
+//後置式
+PostfixExpression(): {}
+{
+	primaryExpression() ( "++" //後置増分式
+						  "--" //後置減分式
+						  "[" expression() "]" //添字式
+						  <IDENTIFIER> "(" [expression() ("," expression())* ] ")" )* //関数呼び出し
+}
+
+//一次式
+primaryExpression(): {}
+{
+	  <INTEGER> //定数
+	| <STRING> //文字列定数
+	| <IDENTIFIER> //識別子
+	| "(" expression() ")" //括弧式
+}
+
