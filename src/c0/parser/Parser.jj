@@ -285,11 +285,14 @@ PostfixExpression(): {}
 }
 
 //一次式
-primaryExpression(): {}
+primaryExpression():
 {
-	  <INTEGER> //定数
-	| <STRING> //文字列定数
-	| <IDENTIFIER> //識別子
+	Token token;
+}
+{
+	token=<INTEGER> //定数
+	| token=<STRING> //文字列定数
+	| token=<IDENTIFIER> //識別子
 	| "(" expression() ")" //括弧式
 }
 
