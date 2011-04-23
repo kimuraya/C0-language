@@ -192,7 +192,7 @@ forStatement(): {}
 //	'return' [式] ';'
 returnStatement(): {}
 {
-	"return" [expression()] ";"
+	<RETURN> [expression()] ";"
 }
 
 //空文 :=
@@ -285,11 +285,23 @@ PostfixExpression(): {}
 }
 
 //一次式
-primaryExpression(): {}
+primaryExpression():
 {
-	  <INTEGER> //定数
-	| <STRING> //文字列定数
-	| <IDENTIFIER> //識別子
+	Token token;
+}
+{
+	token=<INTEGER> //定数
+			{
+				new LiteralNode();　//整数をTokenから取り出すメソッドが必要
+			}
+	| token=<STRING> //文字列定数
+			{
+				new LiteralNode(location(token), token.image); //文字列をTokenから取り出すメソッドが必要
+			}
+	| token=<IDENTIFIER> //識別子
+			{
+				new IdentifierNode(location(token), token.image);
+			}
 	| "(" expression() ")" //括弧式
 }
 
