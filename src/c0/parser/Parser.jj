@@ -290,13 +290,13 @@ primaryExpression():
 	Token token;
 }
 {
-	token=<INTEGER> //定数
+	token=<INTEGER> //10進定数
 			{
-				new LiteralNode();　//整数をTokenから取り出すメソッドが必要
+				new LiteralNode(location(token), DataType.INT, token.image);
 			}
 	| token=<STRING> //文字列定数
 			{
-				new LiteralNode(location(token), token.image); //文字列をTokenから取り出すメソッドが必要
+				new LiteralNode(location(token), DataType.STRING, token.image); //後日、クラスLiteralNodeのコンストラクタを作り直す
 			}
 	| token=<IDENTIFIER> //識別子
 			{
