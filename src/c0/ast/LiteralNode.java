@@ -13,6 +13,16 @@ public class LiteralNode extends ExpressionNode {
 		literal = new Value();
 		literal.setDataType(dataType);
 		literal.setInteger(Integer.parseInt(image, 10));
+		
+		switch (dataType) {
+			case INT:
+				literal.setDataType(dataType);
+				literal.setInteger(Integer.parseInt(image, 10));
+			case INT_ARRAY:
+			case STRING:
+				literal.setDataType(dataType);
+				literal.setStringLiteral(image);
+		}
 	}
 
 	@Override

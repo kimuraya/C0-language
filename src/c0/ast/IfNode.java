@@ -7,6 +7,14 @@ public class IfNode extends StatementNode {
 	private StatementNode thenStatement; //then
 	private StatementNode elseStatement; //else
 	
+	public IfNode(Location loc, ExpressionNode expression,
+			StatementNode thenStatement, StatementNode elseStatement) {
+		super(loc);
+		this.expression = expression;
+		this.thenStatement = thenStatement;
+		this.elseStatement = elseStatement;
+	}
+
 	@Override
 	public void dump() {
 		// TODO 自動生成されたメソッド・スタブ

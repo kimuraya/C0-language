@@ -296,7 +296,7 @@ primaryExpression():
 			}
 	| token=<STRING> //文字列定数
 			{
-				new LiteralNode(location(token), DataType.STRING, token.image); //後日、クラスLiteralNodeのコンストラクタを作り直す
+				new LiteralNode(location(token), DataType.STRING, token.image);
 			}
 	| token=<IDENTIFIER> //識別子
 			{

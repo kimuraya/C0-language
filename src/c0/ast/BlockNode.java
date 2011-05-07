@@ -9,6 +9,13 @@ public class BlockNode extends StatementNode {
 	private List<IdentifierNode> localVariables; //ローカル変数
 	private List<StatementNode> statements; //ブロック文本体
 	
+	public BlockNode(Location loc, List<IdentifierNode> localVariables,
+			List<StatementNode> statements) {
+		super(loc);
+		this.localVariables = localVariables;
+		this.statements = statements;
+	}
+
 	@Override
 	public void dump() {
 		// TODO 自動生成されたメソッド・スタブ

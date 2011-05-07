@@ -7,6 +7,12 @@ public class DivNode extends ExpressionNode {
 	
 	private ExpressionNode right;
 	private ExpressionNode left;
+	
+	public DivNode(Location location, ExpressionNode right, ExpressionNode left) {
+		super(location);
+		this.right = right;
+		this.left = left;
+	}
 
 	@Override
 	public void dump() {
