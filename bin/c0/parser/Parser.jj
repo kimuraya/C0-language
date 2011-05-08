@@ -276,18 +276,25 @@ unaryExpression(): {}
 }
 
 //後置式
-PostfixExpression(): {}
+PostfixExpression():
 {
-	primaryExpression() ( "++" //後置増分式
-						  "--" //後置減分式
-						  "[" expression() "]" //添字式
-						  <IDENTIFIER> "(" [expression() ("," expression())* ] ")" )* //関数呼び出し
+	Token token;
+	ExpressionNode expressionNode;
+	ExpressionNode index;
+	IdentifierNode leftValue;
+}
+{
+	primaryExpression() ( "++" { expressionNode = new PostIncrementNode(location(token), leftValue); } //後置増分式
+						| "--" { expressionNode = new PostDecrementNode(location(token), leftValue); } //後置減分式
+						| "[" index=expression() "]" {} //添字式
+						| <IDENTIFIER> "(" [expression() ("," expression())* ] ")" )* //関数呼び出し
 }
 
 //一次式
 primaryExpression():
 {
 	Token token;
+	ExpressionNode expressionNode;
 }
 {
 	token=<INTEGER> //10進定数
@@ -302,6 +309,7 @@ primaryExpression():
 			{
 				new IdentifierNode(location(token), token.image);
 			}
-	| "(" expression() ")" //括弧式
+	| "(" expressionNode=expression() ")" //括弧式			{
+				return expressionNode;			}
 }
 
