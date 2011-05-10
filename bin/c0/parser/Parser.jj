@@ -276,6 +276,7 @@ unaryExpression(): {}
 }
 
 //後置式
+//関数呼び出しは後日書きなおす
 PostfixExpression():
 {
 	Token token;
@@ -284,10 +285,12 @@ PostfixExpression():
 	IdentifierNode leftValue;
 }
 {
-	primaryExpression() ( "++" { expressionNode = new PostIncrementNode(location(token), leftValue); } //後置増分式
-						| "--" { expressionNode = new PostDecrementNode(location(token), leftValue); } //後置減分式
-						| "[" index=expression() "]" {} //添字式
-						| <IDENTIFIER> "(" [expression() ("," expression())* ] ")" )* //関数呼び出し
+	expressionNode=primaryExpression()
+	( "++" { expressionNode = new PostIncrementNode(location(token), leftValue); } //後置増分式
+	| "--" { expressionNode = new PostDecrementNode(location(token), leftValue); } //後置減分式
+	| "[" index=expression() "]" { expressionNode = new ArraySubscriptExpression(location(token), leftValue, index) } //添字式
+	| <IDENTIFIER> "(" [expression() ("," expression())* ] ")" { expressionNode = new CallNode(location(token),) } //関数呼び出し
+	)*
 }
 
 //一次式
