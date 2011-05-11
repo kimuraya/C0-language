@@ -3,9 +3,9 @@ package c0.ast;
 //"++" 後置増分
 public class PostIncrementNode extends ExpressionNode {
 	
-	private IdentifierNode leftValue; //左辺値
+	private ExpressionNode leftValue; //左辺値
 	
-	public PostIncrementNode(Location location, IdentifierNode leftValue) {
+	public PostIncrementNode(Location location, ExpressionNode leftValue) {
 		super(location);
 		this.leftValue = leftValue;
 	}

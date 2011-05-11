@@ -5,11 +5,11 @@ import java.util.List;
 //関数呼び出し（ネイティブ関数を含む）
 public class CallNode extends ExpressionNode {
 	
-	private IdentifierNode function;
-	private List<IdentifierNode> parameters; //引数
+	private ExpressionNode function;
+	private List<ExpressionNode> parameters; //引数
 	
-	public CallNode(Location location, IdentifierNode function,
-			List<IdentifierNode> parameters) {
+	public CallNode(Location location, ExpressionNode function,
+			List<ExpressionNode> parameters) {
 		super(location);
 		this.function = function;
 		this.parameters = parameters;

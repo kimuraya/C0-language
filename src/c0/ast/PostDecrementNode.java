@@ -3,9 +3,9 @@ package c0.ast;
 //"--" 後置減分
 public class PostDecrementNode extends ExpressionNode {
 	
-	private IdentifierNode leftValue; //左辺値
+	private ExpressionNode leftValue; //左辺値
 	
-	public PostDecrementNode(Location location, IdentifierNode leftValue) {
+	public PostDecrementNode(Location location, ExpressionNode leftValue) {
 		super(location);
 		this.leftValue = leftValue;
 	}
