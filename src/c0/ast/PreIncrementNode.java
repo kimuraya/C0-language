@@ -3,9 +3,9 @@ package c0.ast;
 //"++" 前置増分
 public class PreIncrementNode extends ExpressionNode {
 	
-	private IdentifierNode leftValue; //左辺値
+	private ExpressionNode leftValue; //左辺値
 	
-	public PreIncrementNode(Location location, IdentifierNode leftValue) {
+	public PreIncrementNode(Location location, ExpressionNode leftValue) {
 		super(location);
 		this.leftValue = leftValue;
 	}

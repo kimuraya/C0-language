@@ -5,11 +5,11 @@ import c0.util.NodeType;
 //"!"
 public class ExclamationNode extends ExpressionNode {
 	
-	private ExpressionNode expression;
+	private ExpressionNode leftValue;
 
-	public ExclamationNode(Location location, ExpressionNode expression) {
+	public ExclamationNode(Location location, ExpressionNode leftValue) {
 		super(location);
-		this.expression = expression;
+		this.leftValue = leftValue;
 	}
 
 	@Override

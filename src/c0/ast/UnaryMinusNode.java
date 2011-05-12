@@ -3,11 +3,11 @@ package c0.ast;
 //"-" 単項マイナス式
 public class UnaryMinusNode extends ExpressionNode {
 	
-	private ExpressionNode expression;
+	private ExpressionNode leftValue;
 	
-	public UnaryMinusNode(Location location, ExpressionNode expression) {
+	public UnaryMinusNode(Location location, ExpressionNode leftValue) {
 		super(location);
-		this.expression = expression;
+		this.leftValue = leftValue;
 	}
 
 	@Override

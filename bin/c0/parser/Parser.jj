@@ -266,17 +266,20 @@ term(): {}
 }
 
 //単項式
-unaryExpression(): {}
+ExpressionNode unaryExpression():
 {
-	  "++" unaryExpression() //前置増分式
-	| "--" unaryExpression() //前置減分式
-	| "-" term() //単項マイナス式
-	| "!" term() //論理否定
-	| PostfixExpression() //後置式
+	Token token;
+	ExpressionNode expressionNode;
+}
+{
+	  "++" expressionNode=unaryExpression() { return new PreIncrementNode(location(token), expressionNode); } //前置増分式
+	| "--" expressionNode=unaryExpression() { return new PreDecrementNode(location(token), expressionNode); } //前置減分式
+	| "-" expressionNode=unaryExpression() { return new UnaryMinusNode(location(token), expressionNode); } //単項マイナス式
+	| "!" expressionNode=unaryExpression() { return new ExclamationNode(location(token), expressionNode); } //論理否定
+	| expressionNode=PostfixExpression() { return expressionNode; } //後置式
 }
 
 //後置式
-//関数呼び出しは後日書きなおす
 ExpressionNode PostfixExpression():
 {
 	Token token;
