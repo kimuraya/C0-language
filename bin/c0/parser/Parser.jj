@@ -253,16 +253,24 @@ expression2(): {}
 
 //乗算式
 //除算式
-expression1(): {}
+expression1():
 {
-	term() ( "*" term()
-		   | "/" term() )*
+	ExpressionNode right;
+	ExpressionNode left;
+}
+{
+	term() ( "*" term() { = new MulNode(location(token), right, left) }
+		   | "/" term() { = new DivNode(location(token), right, left) }
+		   )*
 }
 
 //項の構文
-term(): {}
+term():
 {
-	unaryExpression()
+	ExpressionNode expressionNode;
+}
+{
+	expressionNode=unaryExpression() { return expressionNode; }
 }
 
 //単項式
@@ -294,6 +302,8 @@ ExpressionNode PostfixExpression():
 	| "[" index=expression() "]" { expressionNode = new ArraySubscriptExpressionNode(location(token), expressionNode, index) } //添字式
 	| "(" parameters=parameters() ")" { expressionNode = new CallNode(location(token), expressionNode, parameters) } //関数呼び出し
 	)*
+		{
+			return expressionNode;		}
 }
 
 //引数
