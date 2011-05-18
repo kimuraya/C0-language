@@ -245,27 +245,34 @@ expression3(): {}
 
 //加算式
 //減算式
-expression2(): {}
-{
-	expression1() ( "+" expression1()
-				  | "-" expression1() )*
-}
-
-//乗算式
-//除算式
-expression1():
+ExpressionNode expression2():
 {
 	ExpressionNode right;
 	ExpressionNode left;
 }
 {
-	term() ( "*" term() { = new MulNode(location(token), right, left) }
-		   | "/" term() { = new DivNode(location(token), right, left) }
-		   )*
+	left=expression1()  ( "+" right=expression1() {}
+						| "-" right=expression1() {}
+						)*
+}
+
+//乗算式
+//除算式
+ExpressionNode expression1():
+{
+	ExpressionNode right;
+	ExpressionNode left;
+}
+{
+	left=term() ( "*" right=term() { left = new MulNode(location(token), right, left) }
+		   		| "/" right=term() { left = new DivNode(location(token), right, left) }
+		   		)*
+		   			{						return left;
+		   			}
 }
 
 //項の構文
-term():
+ExpressionNode term():
 {
 	ExpressionNode expressionNode;
 }
