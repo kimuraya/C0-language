@@ -213,34 +213,61 @@ expressionStatement(): {}
 //演算子の優先順位が低い順に書く
 
 //代入式
-expression(): {}
+ExpressionNode expression():
 {
-	  term() "=" expression()
-	| expression5()
+	ExpressionNode right;
+	ExpressionNode left;
+	ExpressionNode expressionNode;
+}
+{
+	  left=term() "=" right=expression() { return AssignNode(location(token), right, left); }
+	| expression5() { return expressionNode; }
 }
 
 //論理OR
-expression5(): {}
+ExpressionNode expression5():
 {
-	expression4() ("||" expression4())*
+	ExpressionNode right;
+	ExpressionNode left;
+}
+{
+	right=expression4() ("||" left=expression4() { left = new LogicalOrNode(location(token), right, left); })*
+							{
+								return left;
+							}
 }
 
 //論理AND
-expression4(): {}
+ExpressionNode expression4():
 {
-	expression3() ("&&" expression3())*
+	ExpressionNode right;
+	ExpressionNode left;
+}
+{
+	left=expression3() ("&&" right=expression3() { left = new LogicalAndNode(location(token), right, left); })*
+						   {
+						   		return left;
+						   }
 }
 
 //同等式
 //関係式
-expression3(): {}
+ExpressionNode expression3():
 {
-	expression2() ( "==" expression2()
-				  | "!=" expression2()
-				  | "<"  expression2()
-				  | ">"  expression2()
-				  | "<=" expression2()
-				  | ">=" expression2() )*
+	ExpressionNode right;
+	ExpressionNode left;
+}
+{
+	left=expression2() ( "==" right=expression2() { left = new EquivalenceNode(location(token), right, left); }
+					   | "!=" right=expression2() { left = new NotEquivalenceNode(location(token), right, left); }
+					   | "<"  right=expression2() { left = new LessThanNode(location(token), right, left); }
+					   | ">"  right=expression2() { left = new GreaterThanNode(location(token), right, left); }
+					   | "<=" right=expression2() { left = new LessThanOrEqualNode(location(token), right, left); }
+					   | ">=" right=expression2() { left = new GreaterThanOrEqualNode(location(token), right, left); }
+					   )*
+							{
+								return left;
+							}
 }
 
 //加算式
@@ -251,9 +278,12 @@ ExpressionNode expression2():
 	ExpressionNode left;
 }
 {
-	left=expression1()  ( "+" right=expression1() {}
-						| "-" right=expression1() {}
+	left=expression1()  ( "+" right=expression1() { left = new PlusNode(location(token), right, left); }
+						| "-" right=expression1() { left = new MinusNode(location(token), right, left); }
 						)*
+							{
+								return left;
+			   				}
 }
 
 //乗算式
@@ -264,8 +294,8 @@ ExpressionNode expression1():
 	ExpressionNode left;
 }
 {
-	left=term() ( "*" right=term() { left = new MulNode(location(token), right, left) }
-		   		| "/" right=term() { left = new DivNode(location(token), right, left) }
+	left=term() ( "*" right=term() { left = new MulNode(location(token), right, left); }
+		   		| "/" right=term() { left = new DivNode(location(token), right, left); }
 		   		)*
 		   			{						return left;
 		   			}
