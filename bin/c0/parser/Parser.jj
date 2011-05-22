@@ -99,25 +99,47 @@ declareGlobalVariable(): {}
 //変数宣言 :=
 //データ型 単純宣言子 ['=' 式] ';'
 //|データ型 配列宣言子 ';'
-declareVariable(): {}
+declareVariable():
 {
-	type() <IDENTIFIER> ["=" expression()] ";"
-	type() declareArray() ';'
+	Token token;
+	DeclareVariableNode declareVariable;
+	DataType dataType;
+	IdentifierNode identifier;
+	ExpressionNode expression;
+}
+{
+	dataType=type() identifier=primaryExpression() ["=" expression=expression()] ";"
+		{
+			return new DeclareVariableNode(location(token), identifier, expression);		}
+	dataType=type() declareArray() ';'
 }
 
 //配列宣言子 :=
 //	単純宣言子 '[' 式 ']'
-declareArray(): {}
+declareArray():
 {
-	<IDENTIFIER> "[" expression() "]"
+	IdentifierNode identifier;
+	ExpressionNode expression;
+}
+{
+	identifier=primaryExpression() "[" expression=expression() "]"
+		{
+			return		}
 }
 
 //型の構文
 //データ型 :=
 //	'int'
-type(): {}
+int type():
 {
-	<INT>
+	Token token;
+	DataType dataType;
+}
+{
+	token=<INT>
+		{
+			return dataType.INT;
+		}
 }
 
 //文 :=
@@ -127,86 +149,142 @@ type(): {}
 //	|繰り返し文
 //	|return文
 //	|空文
-statement(): {}
+StatementNode statement():
 {
-	  expressionStatement()
-	| blockStatement()
-	| conditionalStatement()
-	| iterationStatement()
-	| returnStatement()
-	| emptyStatement()
+	StatementNode statementNode;
+}
+{
+	( statementNode=expressionStatement()
+	| statementNode=blockStatement()
+	| statementNode=conditionalStatement()
+	| statementNode=iterationStatement()
+	| statementNode=returnStatement()
+	| statementNode=emptyStatement()
+	)*
+		{
+			return statementNode;		}
 }
 
 //複合文 :=
 //	'{' [局所変数宣言 {局所変数宣言}* ] {文}* '}'
-blockStatement(): {}
+blockStatement():
 {
-	"{" [declareLocalVariable() (declareLocalVariable())* ] (statement())* "}"
+	Token token;
+	List<IdentifierNode> localVariables = new LinkedList<IdentifierNode>(); //ローカル変数
+	List<StatementNode> statements = new LinkedList<StatementNode>(); //ブロック文本体
+	StatementNode statement;
+}
+{
+	token="{" [declareLocalVariable() (declareLocalVariable())* ] (statement=statement())* { if(statement != null) statements.add(statement); } "}"
+	{
+		return new BlockNode(location(token), localVariables, statements);	}
 }
 
 //局所変数宣言 :=
 //	{変数宣言}+
-declareLocalVariable(): {}
+declareLocalVariable():
 {
-	(declareVariable())+
+}
+{
+	(declareVariable())+ {}
 }
 
 //条件文 :=
 //	if文
-conditionalStatement(): {}
+//この箇所は削除するか検討する
+StatementNode conditionalStatement():
 {
-	ifStatement()
+	StatementNode conditionalStatementNode;
+}
+{
+	conditionalStatementNode=ifStatement() { return conditionalStatementNode; }
 }
 
 //if文 :=
 //	'if' '(' 式 ')' 文 ['else' 文]
-ifStatement(): {}
+StatementNode ifStatement():
 {
-	<IF> "(" expression() ")" statement() [<ELSE> statement()]
+	Token token;
+	ExpressionNode conditional;
+	StatementNode thenBody;
+	StatementNode elseBody;
+}
+{
+	token=<IF> "(" conditional=expression() ")" thenBody=statement() [<ELSE> elseBody=statement()]
+	{ return new IfNode(location(token), conditional, thenBody, elseBody); }
 }
 
 //繰り返し文 :=
 //	while文
 //	|for文
-iterationStatement(): {}
+StatementNode iterationStatement():
 {
-	  whileStatement()
-	| forStatement()
+	StatementNode iterationStatement;
+}
+{
+	  iterationStatement=whileStatement() { return iterationStatement; }
+	| iterationStatement=forStatement() { return iterationStatement; }
 }
 
 //while文 :=
 //	'while' '(' 式 ')' 文
-whileStatement(): {}
+StatementNode whileStatement():
 {
-	<WHILE> "(" expression() ")" statement()
+	Token token;
+	ExpressionNode conditional;
+	StatementNode body;
+}
+{
+	token=<WHILE> "(" conditional=expression() ")" body=statement() { return new WhileNode(location(token), conditional, body); }
 }
 
 //for文 :=
 //	'for' '(' [式] ';' [式] ';' [式] ')' 文
-forStatement(): {}
+//初期化部や更新部で複数の式文を実行出来るようするべきか
+StatementNode forStatement():
 {
-	<FOR> "(" [expression()] ";" [expression()] ";" [expression()] ")" statement()
+	Token token;
+	ExpressionNode initialize;
+	ExpressionNode conditional;
+	ExpressionNode update;
+	StatementNode body;
+}
+{
+	token=<FOR> "(" [initialize=expression()] ";" [conditional=expression()] ";" [update=expression()] ")" body=statement()
+	{ return new ForNode(location(token), initialize, conditional, update, body); }
 }
 
 //return文 :=
 //	'return' [式] ';'
-returnStatement(): {}
+StatementNode returnStatement():
 {
-	<RETURN> [expression()] ";"
+	Token token;
+	ExpressionNode expressionNode;
+}
+{
+	token=<RETURN> [expressionNode=expression()] ";" { return new ReturnNode(location(token), expressionNode); }
 }
 
 //空文 :=
 //	';'
-emptyStatement(): {}
+//あとで見直す
+StatementNode emptyStatement():
 {
-	";"
+	Token token;
+}
+{
+	token=";" { return new EmptyStatementNode(location(token)); }
 }
 
 //式文 :=
 //	式 ';'
-expressionStatement(): {}
+ExpressionNode expressionStatement():
 {
-	expression() ";"
+	Token token;
+	ExpressionNode expressionNode;
+}
+{
+	expressionNode=expression() ";" { return new ExpressionStatementNode(location(token), expressionNode); }
 }
 
 //式の構文
@@ -220,7 +298,7 @@ ExpressionNode expression():
 	ExpressionNode expressionNode;
 }
 {
-	  left=term() "=" right=expression() { return AssignNode(location(token), right, left); }
+	  left=term() "=" right=expression() { return new AssignNode(location(token), right, left); }
 	| expression5() { return expressionNode; }
 }
 

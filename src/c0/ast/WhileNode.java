@@ -3,14 +3,14 @@ package c0.ast;
 //while文
 public class WhileNode extends StatementNode {
 	
-	private ExpressionNode expression; //条件式
-	private StatementNode statement; //文
+	private ExpressionNode conditionalExpression; //条件式
+	private StatementNode bodyStatement; //文
 	
-	public WhileNode(Location loc, ExpressionNode expression,
-			StatementNode statement) {
+	public WhileNode(Location loc, ExpressionNode conditionalExpression,
+			StatementNode bodyStatement) {
 		super(loc);
-		this.expression = expression;
-		this.statement = statement;
+		this.conditionalExpression = conditionalExpression;
+		this.bodyStatement = bodyStatement;
 	}
 
 	@Override

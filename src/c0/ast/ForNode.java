@@ -6,16 +6,16 @@ public class ForNode extends StatementNode {
 	private ExpressionNode initializeExpression; //初期化
 	private ExpressionNode conditionalExpression; //条件
 	private ExpressionNode updateExpression; //更新
-	private StatementNode statement; //文
+	private StatementNode bodyStatement; //文
 	
 	public ForNode(Location loc, ExpressionNode initializeExpression,
 			ExpressionNode conditionalExpression,
-			ExpressionNode updateExpression, StatementNode statement) {
+			ExpressionNode updateExpression, StatementNode bodyStatement) {
 		super(loc);
 		this.initializeExpression = initializeExpression;
 		this.conditionalExpression = conditionalExpression;
 		this.updateExpression = updateExpression;
-		this.statement = statement;
+		this.bodyStatement = bodyStatement;
 	}
 
 	@Override
