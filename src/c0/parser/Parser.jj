@@ -99,34 +99,29 @@ declareGlobalVariable(): {}
 //変数宣言 :=
 //データ型 単純宣言子 ['=' 式] ';'
 //|データ型 配列宣言子 ';'
-declareVariable():
+DeclareVariableNode　declareVariable():
 {
 	Token token;
-	DeclareVariableNode declareVariable;
 	DataType dataType;
 	IdentifierNode identifier;
 	ExpressionNode expression;
-	DeclareVariableNode declareArray;
 }
 {
 	dataType=type() identifier=primaryExpression() ["=" expression=expression()] ";"
 		{
-			return new DeclareVariableNode(location(token), identifier, expression);		}
-	dataType=type() declareArray=declareArray() ';'
+			return new DeclareVariableNode(location(token),　dataType, identifier, expression); //データ型 単純宣言子 ['=' 式] ';'		}
+	dataType=type() identifier=primaryExpression()　"[" expression=expression() "]" ';'
+		{
+			return new DeclareVariableNode(location(token),　dataType, identifier, expression); //データ型 単純宣言子　'[' 式 ']'  ';'
+		}
 }
 
+//削除するかどうか検討
 //配列宣言子 :=
 //	単純宣言子 '[' 式 ']'
-declareArray():
+declareArray():　{}
 {
-	IdentifierNode identifier;
-	ExpressionNode expression;
-	DeclareVariableNode declareArray;
-}
-{
-	identifier=primaryExpression() "[" expression=expression() "]"
-		{
-			return		}
+	primaryExpression() "[" literal=primaryExpression() "]"
 }
 
 //型の構文
@@ -172,7 +167,7 @@ StatementNode statement():
 blockStatement():
 {
 	Token token;
-	List<IdentifierNode> localVariables = new LinkedList<IdentifierNode>(); //ローカル変数
+	List<DeclareVariableNode> localVariables = new LinkedList<DeclareVariableNode>(); //ローカル変数
 	List<StatementNode> statements = new LinkedList<StatementNode>(); //ブロック文本体
 	StatementNode statement;
 }
@@ -186,6 +181,7 @@ blockStatement():
 //	{変数宣言}+
 declareLocalVariable():
 {
+	//変数宣言のListを返すようにするか？
 }
 {
 	(declareVariable())+ {}
