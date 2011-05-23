@@ -106,12 +106,13 @@ declareVariable():
 	DataType dataType;
 	IdentifierNode identifier;
 	ExpressionNode expression;
+	DeclareVariableNode declareArray;
 }
 {
 	dataType=type() identifier=primaryExpression() ["=" expression=expression()] ";"
 		{
 			return new DeclareVariableNode(location(token), identifier, expression);		}
-	dataType=type() declareArray() ';'
+	dataType=type() declareArray=declareArray() ';'
 }
 
 //配列宣言子 :=
@@ -120,6 +121,7 @@ declareArray():
 {
 	IdentifierNode identifier;
 	ExpressionNode expression;
+	DeclareVariableNode declareArray;
 }
 {
 	identifier=primaryExpression() "[" expression=expression() "]"
