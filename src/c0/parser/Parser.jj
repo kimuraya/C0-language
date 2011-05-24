@@ -164,27 +164,31 @@ StatementNode statement():
 
 //複合文 :=
 //	'{' [局所変数宣言 {局所変数宣言}* ] {文}* '}'
-blockStatement():
+StatementNode blockStatement():
 {
 	Token token;
-	List<DeclareVariableNode> localVariables = new LinkedList<DeclareVariableNode>(); //ローカル変数
+	List<DeclareVariableNode> localVariables; //ローカル変数
 	List<StatementNode> statements = new LinkedList<StatementNode>(); //ブロック文本体
 	StatementNode statement;
 }
 {
-	token="{" [declareLocalVariable() (declareLocalVariable())* ] (statement=statement())* { if(statement != null) statements.add(statement); } "}"
+	token="{" [localVariables=declareLocalVariables() ] (statement=statement())* { if(statement != null) statements.add(statement); } "}"
 	{
 		return new BlockNode(location(token), localVariables, statements);	}
 }
 
 //局所変数宣言 :=
 //	{変数宣言}+
-declareLocalVariable():
+List<DeclareVariableNode> declareLocalVariables():
 {
 	//変数宣言のListを返すようにするか？
+	List<DeclareVariableNode> declareVariables = new LinkedList<DeclareVariableNode>();
+	DeclareVariableNode declareVar;
 }
 {
-	(declareVariable())+ {}
+	(declareVar=declareVariable())+ { if(declareVar != null) declareVariables.add(declareVar); }
+	{
+		return declareVariables;	}
 }
 
 //条件文 :=
