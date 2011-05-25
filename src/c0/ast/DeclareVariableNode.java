@@ -7,13 +7,13 @@ import c0.util.DataType;
 //|データ型 配列宣言子 ';'
 public class DeclareVariableNode extends StatementNode {
 	
-	private DataType dataType; //Nodeにするかどうか検討する
-	private IdentifierNode identifier;
-	private ExpressionNode expression; //初期化式。識別子の種類が配列だった場合、要素数を表す	
+	private DataTypeNode dataType; //データ型
+	private IdentifierNode identifier; //識別子
+	private ExpressionNode expression; //初期化式
 	
 	//データ型 単純宣言子 ['=' 式] ';'
 	//|データ型 配列宣言子 ';'
-	public DeclareVariableNode(Location loc, DataType dataType, IdentifierNode identifier,
+	public DeclareVariableNode(Location loc, DataTypeNode dataType, IdentifierNode identifier,
 			ExpressionNode expression) {
 		super(loc);
 		this.dataType = dataType;

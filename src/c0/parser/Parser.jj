@@ -102,26 +102,18 @@ declareGlobalVariable(): {}
 DeclareVariableNode　declareVariable():
 {
 	Token token;
-	DataType dataType;
+	DataTypeNode dataType;
 	IdentifierNode identifier;
 	ExpressionNode expression;
 }
 {
 	dataType=type() identifier=primaryExpression() ["=" expression=expression()] ";"
 		{
-			return new DeclareVariableNode(location(token),　dataType, identifier, expression); //データ型 単純宣言子 ['=' 式] ';'		}
-	dataType=type() identifier=primaryExpression()　"[" expression=expression() "]" ';'
+			return new DeclareVariableNode(location(token),　dataType, identifier, expression); //変数		}
+	dataType=type()  identifier=primaryExpression() ';'
 		{
-			return new DeclareVariableNode(location(token),　dataType, identifier, expression); //データ型 単純宣言子　'[' 式 ']'  ';'
+			return new DeclareVariableNode(location(token),　dataType, identifier, expression); //配列
 		}
-}
-
-//削除するかどうか検討
-//配列宣言子 :=
-//	単純宣言子 '[' 式 ']'
-declareArray():　{}
-{
-	primaryExpression() "[" literal=primaryExpression() "]"
 }
 
 //型の構文
@@ -130,13 +122,17 @@ declareArray():　{}
 int type():
 {
 	Token token;
-	DataType dataType;
+	DataTypeNode dataType; //データ型
+	ExpressionNode elementNumber; //要素数
 }
 {
 	token=<INT>
 		{
-			return dataType.INT;
+			return new DataTypeNode(location(token), DataType.INT, elementNumber); //整数の変数
 		}
+	token=<INT> "[" elementNumber=expression() "]"
+		{
+			return new DataTypeNode(location(token), DataType.INT_ARRAY, elementNumber); //整数の配列		}
 }
 
 //文 :=
@@ -181,8 +177,7 @@ StatementNode blockStatement():
 //	{変数宣言}+
 List<DeclareVariableNode> declareLocalVariables():
 {
-	//変数宣言のListを返すようにするか？
-	List<DeclareVariableNode> declareVariables = new LinkedList<DeclareVariableNode>();
+	List<DeclareVariableNode> declareVariables = new LinkedList<DeclareVariableNode>();　//すべての局所変数宣言
 	DeclareVariableNode declareVar;
 }
 {

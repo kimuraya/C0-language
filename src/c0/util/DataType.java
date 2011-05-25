@@ -4,5 +4,5 @@ package c0.util;
 public enum DataType {
 	INT,
 	INT_ARRAY,
-	STRING
+	STRING;
 }
