@@ -8,4 +8,11 @@ import c0.util.NodeType;
 public class AstNode extends Node {
 	private List<IdentifierNode> globalVariables; //グローバル変数のリスト
 	private IdentifierNode mainFunction; //main関数の参照
+	
+	public AstNode(List<IdentifierNode> globalVariables,
+			IdentifierNode mainFunction) {
+		super();
+		this.globalVariables = globalVariables;
+		this.mainFunction = mainFunction;
+	}	
 }

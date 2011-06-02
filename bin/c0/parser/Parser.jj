@@ -76,7 +76,9 @@ externalDefinition(): {}
 //関数宣言 :=
 //	データ型 単純宣言子 '(' [引数 {',' 引数}* ] ')' 複合文
 //宣言子については、仕様を再検討する
-defineFunction(): {}
+defineFunction():
+{
+}
 {
 	type() <IDENTIFIER> "(" [parameter() ("," parameter())* ] ")" blockStatement()
 }
@@ -91,9 +93,15 @@ parameter(): {}
 
 //外部変数宣言 :=
 //{変数宣言}+
-declareGlobalVariable(): {}
+List<DeclareVariableNode> declareGlobalVariable():
 {
-	(declareVariable())+
+	List<DeclareVariableNode> declareVariables = new LinkedList<DeclareVariableNode>();　//すべての外部変数宣言
+	DeclareVariableNode declareVar;
+}
+{
+	(declareVariable())+ { if(declareVar != null) declareVariables.add(declareVar); }
+	{
+		return declareVariables;	}
 }
 
 //変数宣言 :=
