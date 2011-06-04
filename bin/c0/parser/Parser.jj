@@ -67,7 +67,10 @@ file(): {}
 //外部宣言 :=
 //	関数宣言
 //	|外部変数宣言
-externalDefinition(): {}
+externalDefinition():
+{
+	List<IdentifierNode> identifiers;
+}
 {
 	  defineFunction()
 	| declareGlobalVariable()
@@ -76,18 +79,34 @@ externalDefinition(): {}
 //関数宣言 :=
 //	データ型 単純宣言子 '(' [引数 {',' 引数}* ] ')' 複合文
 //宣言子については、仕様を再検討する
-defineFunction():
+ExpressionNode defineFunction():
 {
+	DataTypeNode dataType;
+	ExpressionNode identifier;
+	ParameterNode parameter;
+	List<ParameterNode> parameters = new LinkedList<ParameterNode>();
+	StatementNode block;
 }
 {
-	type() <IDENTIFIER> "(" [parameter() ("," parameter())* ] ")" blockStatement()
+	dataType=type() identifier=primaryExpression() "(" [parameter=parameter() { if(parameter != null) parameters.add(parameter); } ("," parameter=parameter())* { if(parameter != null) parameters.add(parameter); } ] ")" block=blockStatement()
+		{
+			identifier.setParameters(parameters);
+			identifier.setBlock(block);
+			return identifier;		}
 }
 
 //引数 :=
 //	データ型 識別子
-parameter(): {}
+ParameterNode parameter():
 {
-	type() <IDENTIFIER>
+	Token token;
+	DataTypeNode dataType;
+	ExpressionNode identifier;
+}
+{
+	dataType=type() identifier=primaryExpression()
+		{
+			return new ParameterNode(location(token),　dataType, identifier);		}
 }
 
 
@@ -127,7 +146,7 @@ DeclareVariableNode　declareVariable():
 //型の構文
 //データ型 :=
 //	'int'
-int type():
+DataTypeNode type():
 {
 	Token token;
 	DataTypeNode dataType; //データ型
