@@ -6,9 +6,15 @@ options {
 	JDK_VERSION = "1.6";
 }
 
-//パーサクラス
-PARSER_BEGIN(Parser)
-PARSER_END(Parser)
+PARSER_BEGIN(C0Language)
+package c0.parser;
+
+import c0.ast.*;
+import java.util.List;
+import java.util.LinkedList;
+
+public class C0Language {}
+PARSER_END(C0Language)
 
 //スキャナの記述
 
@@ -57,42 +63,40 @@ MORE: { <"\""> : IN_STRING }
 
 //パーサの記述
 
-//翻訳単位の処理
-//翻訳単位 := {外部宣言}*
-file(): {}
-{
-	(externalDefinition())* <EOF>
-}
-
 //外部宣言 :=
-//	関数宣言
+//   {関数宣言}+
 //	|外部変数宣言
-externalDefinition():
+ASTNode file():
 {
-	List<IdentifierNode> identifiers;
+	List<IdentifierNode> functions = new LinkedList<IdentifierNode>();
+	IdentifierNode function;
+	List<DeclareVariableNode> globalVariables;
 }
 {
-	  defineFunction()
-	| declareGlobalVariable()
+	( (function=defineFunction() { if(function != null) functions.add(function); })+
+	| globalVariables=declareGlobalVariable()
+	)*
+	<EOF>
+		{
+			return new AstNode(globalVariables, functions);		}
 }
 
 //関数宣言 :=
 //	データ型 単純宣言子 '(' [引数 {',' 引数}* ] ')' 複合文
-//宣言子については、仕様を再検討する
 ExpressionNode defineFunction():
 {
 	DataTypeNode dataType;
-	ExpressionNode identifier;
+	ExpressionNode function;
 	ParameterNode parameter;
 	List<ParameterNode> parameters = new LinkedList<ParameterNode>();
 	StatementNode block;
 }
 {
-	dataType=type() identifier=primaryExpression() "(" [parameter=parameter() { if(parameter != null) parameters.add(parameter); } ("," parameter=parameter())* { if(parameter != null) parameters.add(parameter); } ] ")" block=blockStatement()
+	dataType=type() function=primaryExpression() "(" [parameter=parameter() { if(parameter != null) parameters.add(parameter); } ("," parameter=parameter())* { if(parameter != null) parameters.add(parameter); } ] ")" block=blockStatement()
 		{
-			identifier.setParameters(parameters);
-			identifier.setBlock(block);
-			return identifier;		}
+			function.setParameters(parameters);
+			function.setBlock(block);
+			return function;		}
 }
 
 //引数 :=
@@ -106,7 +110,7 @@ ParameterNode parameter():
 {
 	dataType=type() identifier=primaryExpression()
 		{
-			return new ParameterNode(location(token),　dataType, identifier);		}
+			return new ParameterNode(location(token), dataType, identifier);		}
 }
 
 
@@ -114,11 +118,11 @@ ParameterNode parameter():
 //{変数宣言}+
 List<DeclareVariableNode> declareGlobalVariable():
 {
-	List<DeclareVariableNode> declareVariables = new LinkedList<DeclareVariableNode>();　//すべての外部変数宣言
+	List<DeclareVariableNode> declareVariables = new LinkedList<DeclareVariableNode>(); //すべての外部変数宣言
 	DeclareVariableNode declareVar;
 }
 {
-	(declareVariable())+ { if(declareVar != null) declareVariables.add(declareVar); }
+	(declareVar=declareVariable())+ { if(declareVar != null) declareVariables.add(declareVar); }
 	{
 		return declareVariables;	}
 }
@@ -126,7 +130,7 @@ List<DeclareVariableNode> declareGlobalVariable():
 //変数宣言 :=
 //データ型 単純宣言子 ['=' 式] ';'
 //|データ型 配列宣言子 ';'
-DeclareVariableNode　declareVariable():
+DeclareVariableNode declareVariable():
 {
 	Token token;
 	DataTypeNode dataType;
@@ -136,10 +140,10 @@ DeclareVariableNode　declareVariable():
 {
 	dataType=type() identifier=primaryExpression() ["=" expression=expression()] ";"
 		{
-			return new DeclareVariableNode(location(token),　dataType, identifier, expression); //変数		}
-	dataType=type()  identifier=primaryExpression() ';'
+			return new DeclareVariableNode(location(token), dataType, identifier, expression); //変数		}
+	dataType=type() identifier=primaryExpression() ";"
 		{
-			return new DeclareVariableNode(location(token),　dataType, identifier, expression); //配列
+			return new DeclareVariableNode(location(token), dataType, identifier, expression); //配列
 		}
 }
 
@@ -180,35 +184,47 @@ StatementNode statement():
 	| statementNode=iterationStatement()
 	| statementNode=returnStatement()
 	| statementNode=emptyStatement()
-	)*
+	)
 		{
 			return statementNode;		}
 }
 
 //複合文 :=
-//	'{' [局所変数宣言 {局所変数宣言}* ] {文}* '}'
+//	'{' 局所変数宣言 {文}* '}'
 StatementNode blockStatement():
 {
 	Token token;
-	List<DeclareVariableNode> localVariables; //ローカル変数
-	List<StatementNode> statements = new LinkedList<StatementNode>(); //ブロック文本体
+	List<DeclareVariableNode> localVariables; //ローカル変数の宣言
+	List<StatementNode> statements; //ブロック文本体
+}
+{
+	token="{" localVariables=declareLocalVariables() statements=statements() "}"
+	{
+		return new BlockNode(location(token), localVariables, statements);	}
+}
+
+//ブロック文本体
+List<StatementNode> statements():
+{
+	List<StatementNode> statements = new LinkedList<StatementNode>(); //文のリスト
 	StatementNode statement;
 }
 {
-	token="{" [localVariables=declareLocalVariables() ] (statement=statement())* { if(statement != null) statements.add(statement); } "}"
+	(statement=statement())+ { if(statement != null) statements.add(statement); }
 	{
-		return new BlockNode(location(token), localVariables, statements);	}
+		return statements;
+	}
 }
 
 //局所変数宣言 :=
 //	{変数宣言}+
 List<DeclareVariableNode> declareLocalVariables():
 {
-	List<DeclareVariableNode> declareVariables = new LinkedList<DeclareVariableNode>();　//すべての局所変数宣言
+	List<DeclareVariableNode> declareVariables = new LinkedList<DeclareVariableNode>(); //すべての局所変数宣言
 	DeclareVariableNode declareVar;
 }
 {
-	(declareVar=declareVariable())+ { if(declareVar != null) declareVariables.add(declareVar); }
+	(declareVar=declareVariable())* { if(declareVar != null) declareVariables.add(declareVar); }
 	{
 		return declareVariables;	}
 }
@@ -438,8 +454,8 @@ ExpressionNode PostfixExpression():
 	expressionNode=primaryExpression()
 	( "++" { expressionNode = new PostIncrementNode(location(token), expressionNode); } //後置増分式
 	| "--" { expressionNode = new PostDecrementNode(location(token), expressionNode); } //後置減分式
-	| "[" index=expression() "]" { expressionNode = new ArraySubscriptExpressionNode(location(token), expressionNode, index) } //添字式
-	| "(" parameters=parameters() ")" { expressionNode = new CallNode(location(token), expressionNode, parameters) } //関数呼び出し
+	| "[" index=expression() "]" { expressionNode = new ArraySubscriptExpressionNode(location(token), expressionNode, index); } //添字式
+	| "(" parameters=parameters() ")" { expressionNode = new CallNode(location(token), expressionNode, parameters); } //関数呼び出し
 	)*
 		{
 			return expressionNode;		}
@@ -465,17 +481,17 @@ ExpressionNode primaryExpression():
 {
 	token=<INTEGER> //10進定数
 			{
-				new LiteralNode(location(token), DataType.INT, token.image);
+				return new LiteralNode(location(token), DataType.INT, token.image);
 			}
 	| token=<STRING> //文字列定数
 			{
-				new LiteralNode(location(token), DataType.STRING, token.image);
+				return new LiteralNode(location(token), DataType.STRING, token.image);
 			}
 	| token=<IDENTIFIER> //識別子
 			{
-				new IdentifierNode(location(token), token.image);
+				return new IdentifierNode(location(token), token.image);
 			}
-	| "(" expressionNode=expression() ")" //括弧式			{
-				return expressionNode;			}
+	| "(" expressionNode=expression() ")" //括弧式
+			{
+				return expressionNode;			}
 }
-
