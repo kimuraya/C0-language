@@ -73,8 +73,8 @@ ASTNode file():
 	List<DeclareVariableNode> globalVariables;
 }
 {
-	( (function=defineFunction() { if(function != null) functions.add(function); })+
-	| globalVariables=declareGlobalVariable()
+	( LOOKAHEAD(3) (function=defineFunction() { if(function != null) functions.add(function); })+
+	| LOOKAHEAD(3) globalVariables=declareGlobalVariable()
 	)*
 	<EOF>
 		{
@@ -94,7 +94,7 @@ ExpressionNode defineFunction():
 {
 	dataType=type() function=primaryExpression() "(" [parameter=parameter() { if(parameter != null) parameters.add(parameter); } ("," parameter=parameter())* { if(parameter != null) parameters.add(parameter); } ] ")" block=blockStatement()
 		{
-			function.setParameters(parameters);
+			function.setParameters(parameters); //ExpressionNodeでは呼び出せないメソッド。要修正
 			function.setBlock(block);
 			return function;		}
 }
@@ -122,7 +122,7 @@ List<DeclareVariableNode> declareGlobalVariable():
 	DeclareVariableNode declareVar;
 }
 {
-	(declareVar=declareVariable())+ { if(declareVar != null) declareVariables.add(declareVar); }
+	(LOOKAHEAD(2) declareVar=declareVariable())+ { if(declareVar != null) declareVariables.add(declareVar); }
 	{
 		return declareVariables;	}
 }
@@ -250,7 +250,7 @@ StatementNode ifStatement():
 	StatementNode elseBody;
 }
 {
-	token=<IF> "(" conditional=expression() ")" thenBody=statement() [<ELSE> elseBody=statement()]
+	token=<IF> "(" conditional=expression() ")" thenBody=statement() [LOOKAHEAD(1) <ELSE> elseBody=statement()]
 	{ return new IfNode(location(token), conditional, thenBody, elseBody); }
 }
 
@@ -338,7 +338,7 @@ ExpressionNode expression():
 	ExpressionNode expressionNode;
 }
 {
-	  left=term() "=" right=expression() { return new AssignNode(location(token), right, left); }
+	  LOOKAHEAD(1) left=term() "=" right=expression() { return new AssignNode(location(token), right, left); }
 	| expression5() { return expressionNode; }
 }
 
@@ -349,7 +349,7 @@ ExpressionNode expression5():
 	ExpressionNode left;
 }
 {
-	right=expression4() ("||" left=expression4() { left = new LogicalOrNode(location(token), right, left); })*
+	left=expression4() ("||" right=expression4() { left = new LogicalOrNode(location(token), right, left); })*
 							{
 								return left;
 							}
