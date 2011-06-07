@@ -6,6 +6,7 @@ import c0.util.NodeType;
 //抽象構文木のルート
 //グローバル変数の確保とmain関数の呼び出しを実行する
 public class AstNode extends Node {
+	
 	private List<DeclareVariableNode> globalVariables; //グローバル変数のリスト
 	private List<IdentifierNode> functions; //関数のリスト
 	

@@ -13,7 +13,8 @@ import c0.ast.*;
 import java.util.List;
 import java.util.LinkedList;
 
-public class C0Language {}
+public class C0Language {
+	}
 PARSER_END(C0Language)
 
 //スキャナの記述
@@ -66,10 +67,10 @@ MORE: { <"\""> : IN_STRING }
 //外部宣言 :=
 //   {関数宣言}+
 //	|外部変数宣言
-ASTNode file():
+AstNode file():
 {
-	List<IdentifierNode> functions = new LinkedList<IdentifierNode>();
-	IdentifierNode function;
+	List<ExpressionNode> functions = new LinkedList<ExpressionNode>();
+	ExpressionNode function;
 	List<DeclareVariableNode> globalVariables;
 }
 {
@@ -110,7 +111,7 @@ ParameterNode parameter():
 {
 	dataType=type() identifier=primaryExpression()
 		{
-			return new ParameterNode(location(token), dataType, identifier);		}
+			return new ParameterNode(new Location(token), dataType, identifier);		}
 }
 
 
@@ -119,7 +120,7 @@ ParameterNode parameter():
 List<DeclareVariableNode> declareGlobalVariable():
 {
 	List<DeclareVariableNode> declareVariables = new LinkedList<DeclareVariableNode>(); //すべての外部変数宣言
-	DeclareVariableNode declareVar;
+	DeclareVariableNode declareVar = null;
 }
 {
 	(LOOKAHEAD(2) declareVar=declareVariable())+ { if(declareVar != null) declareVariables.add(declareVar); }
@@ -134,16 +135,16 @@ DeclareVariableNode declareVariable():
 {
 	Token token;
 	DataTypeNode dataType;
-	IdentifierNode identifier;
+	ExpressionNode identifier;
 	ExpressionNode expression;
 }
 {
 	dataType=type() identifier=primaryExpression() ["=" expression=expression()] ";"
 		{
-			return new DeclareVariableNode(location(token), dataType, identifier, expression); //変数		}
+			return new DeclareVariableNode(new Location(token), dataType, identifier, expression); //変数		}
 	dataType=type() identifier=primaryExpression() ";"
 		{
-			return new DeclareVariableNode(location(token), dataType, identifier, expression); //配列
+			return new DeclareVariableNode(new Location(token), dataType, identifier, expression); //配列
 		}
 }
 
@@ -159,11 +160,11 @@ DataTypeNode type():
 {
 	token=<INT>
 		{
-			return new DataTypeNode(location(token), DataType.INT, elementNumber); //整数の変数
+			return new DataTypeNode(new Location(token), DataType.INT, elementNumber); //整数の変数
 		}
 	token=<INT> "[" elementNumber=expression() "]"
 		{
-			return new DataTypeNode(location(token), DataType.INT_ARRAY, elementNumber); //整数の配列		}
+			return new DataTypeNode(new Location(token), DataType.INT_ARRAY, elementNumber); //整数の配列		}
 }
 
 //文 :=
@@ -200,7 +201,7 @@ StatementNode blockStatement():
 {
 	token="{" localVariables=declareLocalVariables() statements=statements() "}"
 	{
-		return new BlockNode(location(token), localVariables, statements);	}
+		return new BlockNode(new Location(token), localVariables, statements);	}
 }
 
 //ブロック文本体
@@ -245,13 +246,13 @@ StatementNode conditionalStatement():
 StatementNode ifStatement():
 {
 	Token token;
-	ExpressionNode conditional;
-	StatementNode thenBody;
-	StatementNode elseBody;
+	ExpressionNode conditional = null;
+	StatementNode thenBody = null;
+	StatementNode elseBody = null;
 }
 {
 	token=<IF> "(" conditional=expression() ")" thenBody=statement() [LOOKAHEAD(1) <ELSE> elseBody=statement()]
-	{ return new IfNode(location(token), conditional, thenBody, elseBody); }
+	{ return new IfNode(new Location(token), conditional, thenBody, elseBody); }
 }
 
 //繰り返し文 :=
@@ -275,7 +276,7 @@ StatementNode whileStatement():
 	StatementNode body;
 }
 {
-	token=<WHILE> "(" conditional=expression() ")" body=statement() { return new WhileNode(location(token), conditional, body); }
+	token=<WHILE> "(" conditional=expression() ")" body=statement() { return new WhileNode(new Location(token), conditional, body); }
 }
 
 //for文 :=
@@ -284,14 +285,14 @@ StatementNode whileStatement():
 StatementNode forStatement():
 {
 	Token token;
-	ExpressionNode initialize;
-	ExpressionNode conditional;
-	ExpressionNode update;
-	StatementNode body;
+	ExpressionNode initialize = null;
+	ExpressionNode conditional = null;
+	ExpressionNode update = null;
+	StatementNode body = null;
 }
 {
 	token=<FOR> "(" [initialize=expression()] ";" [conditional=expression()] ";" [update=expression()] ")" body=statement()
-	{ return new ForNode(location(token), initialize, conditional, update, body); }
+	{ return new ForNode(new Location(token), initialize, conditional, update, body); }
 }
 
 //return文 :=
@@ -299,10 +300,10 @@ StatementNode forStatement():
 StatementNode returnStatement():
 {
 	Token token;
-	ExpressionNode expressionNode;
+	ExpressionNode expressionNode = null;
 }
 {
-	token=<RETURN> [expressionNode=expression()] ";" { return new ReturnNode(location(token), expressionNode); }
+	token=<RETURN> [expressionNode=expression()] ";" { return new ReturnNode(new Location(token), expressionNode); }
 }
 
 //空文 :=
@@ -313,18 +314,18 @@ StatementNode emptyStatement():
 	Token token;
 }
 {
-	token=";" { return new EmptyStatementNode(location(token)); }
+	token=";" { return new EmptyStatementNode(new Location(token)); }
 }
 
 //式文 :=
 //	式 ';'
-ExpressionNode expressionStatement():
+ExpressionStatementNode expressionStatement():
 {
 	Token token;
 	ExpressionNode expressionNode;
 }
 {
-	expressionNode=expression() ";" { return new ExpressionStatementNode(location(token), expressionNode); }
+	expressionNode=expression() token=";" { return new ExpressionStatementNode(new Location(token), expressionNode); }
 }
 
 //式の構文
@@ -338,7 +339,7 @@ ExpressionNode expression():
 	ExpressionNode expressionNode;
 }
 {
-	  LOOKAHEAD(1) left=term() "=" right=expression() { return new AssignNode(location(token), right, left); }
+	  LOOKAHEAD(1) left=term() "=" right=expression() { return new AssignNode(new Location(token), right, left); }
 	| expression5() { return expressionNode; }
 }
 
@@ -349,7 +350,7 @@ ExpressionNode expression5():
 	ExpressionNode left;
 }
 {
-	left=expression4() ("||" right=expression4() { left = new LogicalOrNode(location(token), right, left); })*
+	left=expression4() ("||" right=expression4() { left = new LogicalOrNode(new Location(token), right, left); })*
 							{
 								return left;
 							}
@@ -362,7 +363,7 @@ ExpressionNode expression4():
 	ExpressionNode left;
 }
 {
-	left=expression3() ("&&" right=expression3() { left = new LogicalAndNode(location(token), right, left); })*
+	left=expression3() ("&&" right=expression3() { left = new LogicalAndNode(new Location(token), right, left); })*
 						   {
 						   		return left;
 						   }
@@ -376,12 +377,12 @@ ExpressionNode expression3():
 	ExpressionNode left;
 }
 {
-	left=expression2() ( "==" right=expression2() { left = new EquivalenceNode(location(token), right, left); }
-					   | "!=" right=expression2() { left = new NotEquivalenceNode(location(token), right, left); }
-					   | "<"  right=expression2() { left = new LessThanNode(location(token), right, left); }
-					   | ">"  right=expression2() { left = new GreaterThanNode(location(token), right, left); }
-					   | "<=" right=expression2() { left = new LessThanOrEqualNode(location(token), right, left); }
-					   | ">=" right=expression2() { left = new GreaterThanOrEqualNode(location(token), right, left); }
+	left=expression2() ( "==" right=expression2() { left = new EquivalenceNode(new Location(token), right, left); }
+					   | "!=" right=expression2() { left = new NotEquivalenceNode(new Location(token), right, left); }
+					   | "<"  right=expression2() { left = new LessThanNode(new Location(token), right, left); }
+					   | ">"  right=expression2() { left = new GreaterThanNode(new Location(token), right, left); }
+					   | "<=" right=expression2() { left = new LessThanOrEqualNode(new Location(token), right, left); }
+					   | ">=" right=expression2() { left = new GreaterThanOrEqualNode(new Location(token), right, left); }
 					   )*
 							{
 								return left;
@@ -396,8 +397,8 @@ ExpressionNode expression2():
 	ExpressionNode left;
 }
 {
-	left=expression1()  ( "+" right=expression1() { left = new PlusNode(location(token), right, left); }
-						| "-" right=expression1() { left = new MinusNode(location(token), right, left); }
+	left=expression1()  ( "+" right=expression1() { left = new PlusNode(new Location(token), right, left); }
+						| "-" right=expression1() { left = new MinusNode(new Location(token), right, left); }
 						)*
 							{
 								return left;
@@ -412,8 +413,8 @@ ExpressionNode expression1():
 	ExpressionNode left;
 }
 {
-	left=term() ( "*" right=term() { left = new MulNode(location(token), right, left); }
-		   		| "/" right=term() { left = new DivNode(location(token), right, left); }
+	left=term() ( "*" right=term() { left = new MulNode(new Location(token), right, left); }
+		   		| "/" right=term() { left = new DivNode(new Location(token), right, left); }
 		   		)*
 		   			{						return left;
 		   			}
@@ -435,10 +436,10 @@ ExpressionNode unaryExpression():
 	ExpressionNode expressionNode;
 }
 {
-	  "++" expressionNode=unaryExpression() { return new PreIncrementNode(location(token), expressionNode); } //前置増分式
-	| "--" expressionNode=unaryExpression() { return new PreDecrementNode(location(token), expressionNode); } //前置減分式
-	| "-" expressionNode=unaryExpression() { return new UnaryMinusNode(location(token), expressionNode); } //単項マイナス式
-	| "!" expressionNode=unaryExpression() { return new ExclamationNode(location(token), expressionNode); } //論理否定
+	  "++" expressionNode=unaryExpression() { return new PreIncrementNode(new Location(token), expressionNode); } //前置増分式
+	| "--" expressionNode=unaryExpression() { return new PreDecrementNode(new Location(token), expressionNode); } //前置減分式
+	| "-" expressionNode=unaryExpression() { return new UnaryMinusNode(new Location(token), expressionNode); } //単項マイナス式
+	| "!" expressionNode=unaryExpression() { return new ExclamationNode(new Location(token), expressionNode); } //論理否定
 	| expressionNode=PostfixExpression() { return expressionNode; } //後置式
 }
 
@@ -452,10 +453,10 @@ ExpressionNode PostfixExpression():
 }
 {
 	expressionNode=primaryExpression()
-	( "++" { expressionNode = new PostIncrementNode(location(token), expressionNode); } //後置増分式
-	| "--" { expressionNode = new PostDecrementNode(location(token), expressionNode); } //後置減分式
-	| "[" index=expression() "]" { expressionNode = new ArraySubscriptExpressionNode(location(token), expressionNode, index); } //添字式
-	| "(" parameters=parameters() ")" { expressionNode = new CallNode(location(token), expressionNode, parameters); } //関数呼び出し
+	( "++" { expressionNode = new PostIncrementNode(new Location(token), expressionNode); } //後置増分式
+	| "--" { expressionNode = new PostDecrementNode(new Location(token), expressionNode); } //後置減分式
+	| "[" index=expression() "]" { expressionNode = new ArraySubscriptExpressionNode(new Location(token), expressionNode, index); } //添字式
+	| "(" parameters=parameters() ")" { expressionNode = new CallNode(new Location(token), expressionNode, parameters); } //関数呼び出し
 	)*
 		{
 			return expressionNode;		}
@@ -481,15 +482,15 @@ ExpressionNode primaryExpression():
 {
 	token=<INTEGER> //10進定数
 			{
-				return new LiteralNode(location(token), DataType.INT, token.image);
+				return new LiteralNode(new Location(token), DataType.INT, token.image);
 			}
 	| token=<STRING> //文字列定数
 			{
-				return new LiteralNode(location(token), DataType.STRING, token.image);
+				return new LiteralNode(new Location(token), DataType.STRING, token.image);
 			}
 	| token=<IDENTIFIER> //識別子
 			{
-				return new IdentifierNode(location(token), token.image);
+				return new IdentifierNode(new Location(token), token.image);
 			}
 	| "(" expressionNode=expression() ")" //括弧式
 			{
