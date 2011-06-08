@@ -6,10 +6,10 @@ import c0.util.NodeType;
 //複合文
 public class BlockNode extends StatementNode {
 	
-	private List<IdentifierNode> localVariables; //ローカル変数
+	private List<DeclareVariableNode> localVariables; //ローカル変数
 	private List<StatementNode> statements; //ブロック文本体
 	
-	public BlockNode(Location loc, List<IdentifierNode> localVariables,
+	public BlockNode(Location loc, List<DeclareVariableNode> localVariables,
 			List<StatementNode> statements) {
 		super(loc);
 		this.localVariables = localVariables;
