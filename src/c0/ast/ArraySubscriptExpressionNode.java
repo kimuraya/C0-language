@@ -4,15 +4,21 @@ package c0.ast;
 public class ArraySubscriptExpressionNode extends ExpressionNode {
 	
 	private ExpressionNode array;
-	private ExpressionNode index;
-	
-	public ArraySubscriptExpressionNode(Location location, ExpressionNode array,
+	private ExpressionNode index;	
+
+	public ArraySubscriptExpressionNode(ExpressionNode array,
 			ExpressionNode index) {
-		super(location);
+		super();
 		this.array = array;
 		this.index = index;
 	}
-
+	
+	@Override
+	public Location location() {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
+	}
+	
 	@Override
 	public void dump() {
 		// TODO 自動生成されたメソッド・スタブ

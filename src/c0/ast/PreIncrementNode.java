@@ -4,10 +4,16 @@ package c0.ast;
 public class PreIncrementNode extends ExpressionNode {
 	
 	private ExpressionNode leftValue; //左辺値
-	
-	public PreIncrementNode(Location location, ExpressionNode leftValue) {
-		super(location);
+
+	public PreIncrementNode(ExpressionNode leftValue) {
+		super();
 		this.leftValue = leftValue;
+	}
+
+	@Override
+	public Location location() {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
 	}
 
 	@Override
@@ -15,5 +21,4 @@ public class PreIncrementNode extends ExpressionNode {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
-
 }

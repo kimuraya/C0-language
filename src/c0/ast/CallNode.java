@@ -8,11 +8,16 @@ public class CallNode extends ExpressionNode {
 	private ExpressionNode function;
 	private List<ExpressionNode> parameters; //引数
 	
-	public CallNode(Location location, ExpressionNode function,
-			List<ExpressionNode> parameters) {
-		super(location);
+	public CallNode(ExpressionNode function, List<ExpressionNode> parameters) {
+		super();
 		this.function = function;
 		this.parameters = parameters;
+	}
+
+	@Override
+	public Location location() {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
 	}
 
 	@Override
@@ -20,5 +25,4 @@ public class CallNode extends ExpressionNode {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
-
 }

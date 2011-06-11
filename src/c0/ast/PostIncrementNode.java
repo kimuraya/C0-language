@@ -5,9 +5,15 @@ public class PostIncrementNode extends ExpressionNode {
 	
 	private ExpressionNode leftValue; //左辺値
 	
-	public PostIncrementNode(Location location, ExpressionNode leftValue) {
-		super(location);
+	public PostIncrementNode(ExpressionNode leftValue) {
+		super();
 		this.leftValue = leftValue;
+	}
+
+	@Override
+	public Location location() {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
 	}
 
 	@Override

@@ -5,12 +5,17 @@ public class GreaterThanNode extends ExpressionNode {
 	
 	private ExpressionNode right;
 	private ExpressionNode left;
-	
-	public GreaterThanNode(Location location, ExpressionNode right,
-			ExpressionNode left) {
-		super(location);
+
+	public GreaterThanNode(ExpressionNode right, ExpressionNode left) {
+		super();
 		this.right = right;
 		this.left = left;
+	}
+
+	@Override
+	public Location location() {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
 	}
 
 	@Override
@@ -18,5 +23,4 @@ public class GreaterThanNode extends ExpressionNode {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
-
 }

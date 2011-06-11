@@ -7,9 +7,15 @@ public class ExclamationNode extends ExpressionNode {
 	
 	private ExpressionNode leftValue;
 
-	public ExclamationNode(Location location, ExpressionNode leftValue) {
-		super(location);
+	public ExclamationNode(ExpressionNode leftValue) {
+		super();
 		this.leftValue = leftValue;
+	}
+
+	@Override
+	public Location location() {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
 	}
 
 	@Override

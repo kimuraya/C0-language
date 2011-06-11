@@ -5,9 +5,15 @@ public class UnaryMinusNode extends ExpressionNode {
 	
 	private ExpressionNode leftValue;
 	
-	public UnaryMinusNode(Location location, ExpressionNode leftValue) {
-		super(location);
+	public UnaryMinusNode(ExpressionNode leftValue) {
+		super();
 		this.leftValue = leftValue;
+	}
+
+	@Override
+	public Location location() {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
 	}
 
 	@Override
@@ -15,5 +21,4 @@ public class UnaryMinusNode extends ExpressionNode {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
-
 }

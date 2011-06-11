@@ -7,11 +7,17 @@ public class DivNode extends ExpressionNode {
 	
 	private ExpressionNode right;
 	private ExpressionNode left;
-	
-	public DivNode(Location location, ExpressionNode right, ExpressionNode left) {
-		super(location);
+
+	public DivNode(ExpressionNode right, ExpressionNode left) {
+		super();
 		this.right = right;
 		this.left = left;
+	}
+
+	@Override
+	public Location location() {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
 	}
 
 	@Override

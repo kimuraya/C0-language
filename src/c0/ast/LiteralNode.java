@@ -7,9 +7,10 @@ import c0.util.Value;
 public class LiteralNode extends ExpressionNode {
 	
 	private Value literal;
+	private Location location;
 	
 	public LiteralNode(Location location, DataType dataType, String image) {
-		super(location);
+		this.location = location;
 		literal = new Value();
 		literal.setDataType(dataType);
 		literal.setInteger(Integer.parseInt(image, 10));
@@ -23,6 +24,12 @@ public class LiteralNode extends ExpressionNode {
 				literal.setDataType(dataType);
 				literal.setStringLiteral(image);
 		}
+	}
+
+	@Override
+	public Location location() {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
 	}
 
 	@Override
