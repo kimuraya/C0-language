@@ -1,6 +1,12 @@
 package c0.interpreter;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.List;
+
+import c0.ast.AstNode;
+import c0.parser.C0Language;
+import c0.parser.ParseException;
 import c0.util.Identifier;
 
 //ASTのノードを入力として受け取り、関数を実行する。
@@ -8,4 +14,33 @@ import c0.util.Identifier;
 public class Interpreter {
 	private List<Identifier> symbolTable; //シンボルテーブル
 	private List<Environment> interpreterEnvironment; //環境
+	
+	public static void main(String args[]) {
+		//インタプリタのエントリーポイント
+		String fileName = args[0];
+		FileReader fileReader = null;
+		AstNode program = null;
+		
+		//mainメソッドの引数をチェック。ファイル名が無ければ、警告を出して終了
+		try {
+			fileReader = new FileReader(fileName);
+		} catch (FileNotFoundException e) {
+			System.out.println("引数にファイル名が指定されていません");
+			System.out.println(e.getMessage());
+		}
+		
+		//ファイルを渡して、パーサを実行
+		C0Language parser = new C0Language(fileReader);
+		
+		parser.enable_tracing(); //パーサのトレース機能を開始
+		
+		try {
+			parser.file();
+		} catch (ParseException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+		
+		//インタプリタが構文木を入力として受け取り、プログラムを実行する
+	}
 }
