@@ -1,7 +1,10 @@
 package c0.interpreter;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 
 import c0.ast.AstNode;
@@ -46,6 +49,7 @@ public class Interpreter {
 			parser.file();
 		} catch (ParseException e) {
 			// TODO 自動生成された catch ブロック
+			System.out.println("mainの例外処理");
 			e.printStackTrace();
 		}
 		
