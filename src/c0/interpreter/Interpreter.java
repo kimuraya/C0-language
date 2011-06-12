@@ -17,16 +17,24 @@ public class Interpreter {
 	
 	public static void main(String args[]) {
 		//インタプリタのエントリーポイント
-		String fileName = args[0];
+		String fileName = null;
 		FileReader fileReader = null;
 		AstNode program = null;
 		
 		//mainメソッドの引数をチェック。ファイル名が無ければ、警告を出して終了
 		try {
+			fileName = args[0];
 			fileReader = new FileReader(fileName);
-		} catch (FileNotFoundException e) {
+		} catch (java.lang.ArrayIndexOutOfBoundsException e) {
 			System.out.println("引数にファイル名が指定されていません");
 			System.out.println(e.getMessage());
+			e.printStackTrace();
+			return;
+		} catch (FileNotFoundException e) {
+			System.out.println("ファイルが開けません");
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			return;
 		}
 		
 		//ファイルを渡して、パーサを実行
