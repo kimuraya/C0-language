@@ -20,6 +20,11 @@ PARSER_END(C0Language)
 
 //スキャナの記述
 
+//空白類
+SPECIAL_TOKEN: {
+	<WHITESPACE: ([" ", "\f", "\n", "\r", "\t"])+>
+}
+
 //文のキーワード
 TOKEN: {
 	  <INT      : "int">
@@ -41,11 +46,6 @@ TOKEN: {
 	<INTEGER: ["1"-"9"] (["0"-"9"])*
 			| "0"
 	>
-}
-
-//空白類
-SPECIAL_TOKEN: {
-	<WHITESPACE: ([" ", "\f", "\n", "\r", "\t"])+>
 }
 
 //一行コメント
@@ -80,17 +80,18 @@ AstNode file():
 		//構文エラーが発生した際はエラーを出力し、次の構文の処理を行う
 		(
 		  try {
-			  LOOKAHEAD(3) (function=defineFunction() { if(function != null) functions.add(function); })+
+			  LOOKAHEAD(3) (function=defineFunction() { if(function != null) functions.add(function); })+ //この部分にバグがある？
 			| LOOKAHEAD(3) globalVariables=declareGlobalVariable()
 		  } catch(ParseException e) {
 			//System.out.println(e.getMessage());
 			e.printStackTrace();
 
 				//文、ファイルの終わりが見つかるまでスキップする
+				//この処理にバグがないかチェックする
 				do {
 					token = getNextToken();
 				} while(token.image.equals(";") && token.image.equals("}") && token.kind != EOF);
-			}
+		  }
 		)*
 		<EOF>
 			{
