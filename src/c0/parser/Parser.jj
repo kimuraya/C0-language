@@ -111,7 +111,7 @@ IdentifierNode defineFunction():
 	StatementNode block;
 }
 {
-	dataType=type() function=primaryExpression() "(" [parameter=parameter() { if(parameter != null) parameters.add(parameter); } ("," parameter=parameter())* { if(parameter != null) parameters.add(parameter); } ] ")" block=blockStatement()
+	LOOKAHEAD(3) dataType=type() function=primaryExpression() "(" [parameter=parameter() { if(parameter != null) parameters.add(parameter); } ("," parameter=parameter())* { if(parameter != null) parameters.add(parameter); } ] ")" block=blockStatement()
 		{
 			function_i = (IdentifierNode)function;
 			function_i.setParameters(parameters);
@@ -129,7 +129,7 @@ ParameterNode parameter():
 	IdentifierNode parameterName_i;
 }
 {
-	dataType=type() parameterName=primaryExpression()
+	LOOKAHEAD(1) dataType=type() parameterName=primaryExpression()
 		{
 			parameterName_i = (IdentifierNode)parameterName;
 			return new ParameterNode(new Location(token), dataType, parameterName_i);		}
@@ -181,13 +181,14 @@ DataTypeNode type():
 	ExpressionNode elementNumber = null; //要素数
 }
 {
+	<INT> "[" elementNumber=expression() "]"
+		{
+			return new DataTypeNode(DataType.INT_ARRAY, elementNumber); //整数の配列
+		}
 	<INT>
 		{
 			return new DataTypeNode(DataType.INT, elementNumber); //整数の変数
 		}
-	<INT> "[" elementNumber=expression() "]"
-		{
-			return new DataTypeNode(DataType.INT_ARRAY, elementNumber); //整数の配列		}
 }
 
 //文 :=
