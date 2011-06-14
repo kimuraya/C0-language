@@ -80,8 +80,9 @@ AstNode file():
 		//構文エラーが発生した際はエラーを出力し、次の構文の処理を行う
 		(
 		  try {
-			  LOOKAHEAD(3) (function=defineFunction() { if(function != null) functions.add(function); })+ //この部分にバグがある？
-			| LOOKAHEAD(3) globalVariables=declareGlobalVariable()
+			  LOOKAHEAD(type() primaryExpression() "(")
+			  function=defineFunction() { if(function != null) functions.add(function); } //ここの括弧に問題があった。あとで確認する
+			| globalVariables=declareGlobalVariable()
 		  } catch(ParseException e) {
 			//System.out.println(e.getMessage());
 			e.printStackTrace();
@@ -106,18 +107,29 @@ IdentifierNode defineFunction():
 	DataTypeNode dataType;
 	ExpressionNode function;
 	IdentifierNode function_i;
-	ParameterNode parameter;
-	List<ParameterNode> parameters = new LinkedList<ParameterNode>();
+	List<ParameterNode> parameters = null;
 	StatementNode block;
 }
 {
-	LOOKAHEAD(3) dataType=type() function=primaryExpression() "(" [parameter=parameter() { if(parameter != null) parameters.add(parameter); } ("," parameter=parameter())* { if(parameter != null) parameters.add(parameter); } ] ")" block=blockStatement()
+	dataType=type() function=primaryExpression() "(" [parameters=parameters()] ")" block=blockStatement() //角括弧も取り除く必要がある？
 		{
 			function_i = (IdentifierNode)function;
 			function_i.setParameters(parameters);
 			function_i.setBlock(block);
 			return function_i;		}
 }
+
+//引数のリスト
+List<ParameterNode> parameters():
+{
+	List<ParameterNode> parameters = new LinkedList<ParameterNode>();
+	ParameterNode parameter1;
+	ParameterNode parameter2;}
+{
+	parameter1=parameter() { if(parameter1 != null) parameters.add(parameter1); }
+	(LOOKAHEAD(2) "," parameter2=parameter() { if(parameter2 != null) parameters.add(parameter2); } )*
+	{
+		return parameters;	}}
 
 //引数 :=
 //	データ型 識別子
@@ -129,7 +141,7 @@ ParameterNode parameter():
 	IdentifierNode parameterName_i;
 }
 {
-	LOOKAHEAD(1) dataType=type() parameterName=primaryExpression()
+	dataType=type() parameterName=primaryExpression()
 		{
 			parameterName_i = (IdentifierNode)parameterName;
 			return new ParameterNode(new Location(token), dataType, parameterName_i);		}
@@ -144,7 +156,7 @@ List<DeclareVariableNode> declareGlobalVariable():
 	DeclareVariableNode declareVar = null;
 }
 {
-	(LOOKAHEAD(2) declareVar=declareVariable())+ { if(declareVar != null) declareVariables.add(declareVar); }
+	(declareVar=declareVariable())+ { if(declareVar != null) declareVariables.add(declareVar); }
 	{
 		return declareVariables;	}
 }
@@ -482,29 +494,29 @@ ExpressionNode PostfixExpression():
 	Token token;
 	ExpressionNode expressionNode;
 	ExpressionNode index;
-	List<ExpressionNode> parameters;
+	List<ExpressionNode> arguments;
 }
 {
 	expressionNode=primaryExpression()
 	( token="++" { expressionNode = new PostIncrementNode(expressionNode); } //後置増分式
 	| token="--" { expressionNode = new PostDecrementNode(expressionNode); } //後置減分式
 	| token="[" index=expression() "]" { expressionNode = new ArraySubscriptExpressionNode(expressionNode, index); } //添字式
-	| token="(" parameters=parameters() ")" { expressionNode = new CallNode(expressionNode, parameters); } //関数呼び出し
+	| token="(" arguments=arguments() ")" { expressionNode = new CallNode(expressionNode, arguments); } //関数呼び出し
 	)*
 		{
 			return expressionNode;		}
 }
 
 //引数
-List<ExpressionNode> parameters():
+List<ExpressionNode> arguments():
 {
-	List<ExpressionNode> parameters = new LinkedList<ExpressionNode>();
-	ExpressionNode parameter;}
+	List<ExpressionNode> arguments = new LinkedList<ExpressionNode>();
+	ExpressionNode argument;}
 {
-	[parameter=expression() { parameters.add(parameter); }
-	("," parameter=expression() { parameters.add(parameter); })* ]
+	[argument=expression() { arguments.add(argument); }
+	("," argument=expression() { arguments.add(argument); })* ]
 		{
-			return parameters;		}}
+			return arguments;		}}
 
 //一次式
 ExpressionNode primaryExpression():
