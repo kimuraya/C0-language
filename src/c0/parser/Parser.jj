@@ -173,15 +173,11 @@ DeclareVariableNode declareVariable():
 	ExpressionNode expression = null;
 }
 {
+	//一つにするべき？
 	dataType=type() variable=primaryExpression() ["=" expression=expression()] ";"
 		{
 			variable_i = (IdentifierNode)variable;
-			return new DeclareVariableNode(new Location(token), dataType, variable_i, expression); //変数		}
-	dataType=type() variable=primaryExpression() ";"
-		{
-			variable_i = (IdentifierNode)variable;
-			return new DeclareVariableNode(new Location(token), dataType, variable_i, expression); //配列
-		}
+			return new DeclareVariableNode(new Location(token), dataType, variable_i, expression);		}
 }
 
 //型の構文
@@ -193,11 +189,11 @@ DataTypeNode type():
 	ExpressionNode elementNumber = null; //要素数
 }
 {
-	<INT> "[" elementNumber=expression() "]"
-		{
-			return new DataTypeNode(DataType.INT_ARRAY, elementNumber); //整数の配列
-		}
+	//要注意。配列を先にする？
+	//一つで処理できるか。後置式と同じ形式を試してみる
 	<INT>
+	(	  "[" elementNumber=expression() "]"　{　return new DataTypeNode(DataType.INT_ARRAY, elementNumber); //整数の配列　}
+	)*
 		{
 			return new DataTypeNode(DataType.INT, elementNumber); //整数の変数
 		}
@@ -441,7 +437,7 @@ ExpressionNode expression2():
 	ExpressionNode right;
 	ExpressionNode left;
 }
-{
+{	
 	left=expression1()  ( "+" right=expression1() { left = new PlusNode(right, left); }
 						| "-" right=expression1() { left = new MinusNode(right, left); }
 						)*
