@@ -185,18 +185,19 @@ DeclareVariableNode declareVariable():
 //	'int'
 DataTypeNode type():
 {
-	DataTypeNode dataType = null; //データ型
+	DataType dataType; //基本データ型
 	ExpressionNode elementNumber = null; //要素数
 }
 {
-	//要注意。配列を先にする？
-	//一つで処理できるか。後置式と同じ形式を試してみる
+	LOOKAHEAD(<INT> "[")
+	<INT> "[" elementNumber=expression() "]"
+	{
+		return new DataTypeNode(DataType.INT_ARRAY, elementNumber); //整数の配列
+	}
 	<INT>
-	(	  "[" elementNumber=expression() "]"　{　return new DataTypeNode(DataType.INT_ARRAY, elementNumber); //整数の配列　}
-	)*
-		{
-			return new DataTypeNode(DataType.INT, elementNumber); //整数の変数
-		}
+	{
+		return new DataTypeNode(DataType.INT, elementNumber); //整数の変数
+	}
 }
 
 //文 :=
