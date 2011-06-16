@@ -189,11 +189,6 @@ DataTypeNode type():
 	ExpressionNode elementNumber = null; //要素数
 }
 {
-	LOOKAHEAD(<INT> "[")
-	<INT> "[" elementNumber=expression() "]"
-	{
-		return new DataTypeNode(DataType.INT_ARRAY, elementNumber); //整数の配列
-	}
 	<INT>
 	{
 		return new DataTypeNode(DataType.INT, elementNumber); //整数の変数
