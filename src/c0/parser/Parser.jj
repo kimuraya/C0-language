@@ -80,7 +80,9 @@ AstNode file():
 		//構文エラーが発生した際はエラーを出力し、次の構文の処理を行う
 		(
 		  try {
-			  function=defineFunction() { if(function != null) functions.add(function); } //ここの括弧に問題があった。あとで確認する
+		      LOOKAHEAD(3) //LOOKAHEADを付けないと到達不能コードが発生する。原因は不明
+		      globalVariables=declareGlobalVariable() //関数も外部変数宣言として処理しようとしてしまう
+			| function=defineFunction() { if(function != null) functions.add(function); } //ここの括弧に問題があった。あとで確認する
 		  } catch(ParseException e) {
 			//System.out.println(e.getMessage());
 			e.printStackTrace();
@@ -154,7 +156,7 @@ List<DeclareVariableNode> declareGlobalVariable():
 	DeclareVariableNode declareVar = null;
 }
 {
-	(declareVar=declareVariable())* { if(declareVar != null) declareVariables.add(declareVar); }
+	(declareVar=declareVariable())+ { if(declareVar != null) declareVariables.add(declareVar); }
 	{
 		return declareVariables;	}
 }
