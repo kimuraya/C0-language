@@ -13,7 +13,6 @@ public class LiteralNode extends ExpressionNode {
 		this.location = location;
 		literal = new Value();
 		literal.setDataType(dataType);
-		literal.setInteger(Integer.parseInt(image, 10));
 		
 		switch (dataType) {
 			case INT:

@@ -80,9 +80,7 @@ AstNode file():
 		//構文エラーが発生した際はエラーを出力し、次の構文の処理を行う
 		(
 		  try {
-			  LOOKAHEAD(type() primaryExpression() "(")
 			  function=defineFunction() { if(function != null) functions.add(function); } //ここの括弧に問題があった。あとで確認する
-			| globalVariables=declareGlobalVariable()
 		  } catch(ParseException e) {
 			//System.out.println(e.getMessage());
 			e.printStackTrace();
@@ -156,7 +154,7 @@ List<DeclareVariableNode> declareGlobalVariable():
 	DeclareVariableNode declareVar = null;
 }
 {
-	(declareVar=declareVariable())+ { if(declareVar != null) declareVariables.add(declareVar); }
+	(declareVar=declareVariable())* { if(declareVar != null) declareVariables.add(declareVar); }
 	{
 		return declareVariables;	}
 }
@@ -483,17 +481,17 @@ ExpressionNode unaryExpression():
 //後置式
 ExpressionNode PostfixExpression():
 {
-	Token token;
-	ExpressionNode expressionNode;
-	ExpressionNode index;
-	List<ExpressionNode> arguments;
+	Token token = null;
+	ExpressionNode expressionNode = null;
+	ExpressionNode index = null;
+	List<ExpressionNode> arguments = null;
 }
 {
 	expressionNode=primaryExpression()
 	( token="++" { expressionNode = new PostIncrementNode(expressionNode); } //後置増分式
 	| token="--" { expressionNode = new PostDecrementNode(expressionNode); } //後置減分式
 	| token="[" index=expression() "]" { expressionNode = new ArraySubscriptExpressionNode(expressionNode, index); } //添字式
-	| token="(" arguments=arguments() ")" { expressionNode = new CallNode(expressionNode, arguments); } //関数呼び出し
+	| token="(" [arguments=arguments()] ")" { expressionNode = new CallNode(expressionNode, arguments); } //関数呼び出し
 	)*
 		{
 			return expressionNode;		}
@@ -505,8 +503,8 @@ List<ExpressionNode> arguments():
 	List<ExpressionNode> arguments = new LinkedList<ExpressionNode>();
 	ExpressionNode argument;}
 {
-	[argument=expression() { arguments.add(argument); }
-	("," argument=expression() { arguments.add(argument); })* ]
+	argument=expression() { arguments.add(argument); }
+	("," argument=expression() { arguments.add(argument); })*
 		{
 			return arguments;		}}
 
