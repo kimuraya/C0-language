@@ -73,18 +73,18 @@ AstNode file():
 	Token token = null;
 	List<IdentifierNode> functions = new LinkedList<IdentifierNode>();
 	IdentifierNode function = null;
-	List<DeclareVariableNode> globalVariables = null;
+	List<DeclareVariableNode> globalVariables = new LinkedList<DeclareVariableNode>();
+	DeclareVariableNode globalVariable = null;
 }
 {
 		//関数宣言と外部変数宣言の処理
 		//構文エラーが発生した際はエラーを出力し、次の構文の処理を行う
 		(
 		  try {
-		      LOOKAHEAD(3) //LOOKAHEADを付けないと到達不能コードが発生する。原因は不明
-		      globalVariables=declareGlobalVariable() //関数も外部変数宣言として処理しようとしてしまう
-			| function=defineFunction() { if(function != null) functions.add(function); } //ここの括弧に問題があった。あとで確認する
+		      LOOKAHEAD(type() primaryExpression() "(")
+		      function=defineFunction() { if(function != null) functions.add(function); } //ここの括弧に問題があった。あとで確認する
+			| globalVariable=declareVariable() { if(globalVariable != null) globalVariables.add(globalVariable); }
 		  } catch(ParseException e) {
-			//System.out.println(e.getMessage());
 			e.printStackTrace();
 
 				//文、ファイルの終わりが見つかるまでスキップする
@@ -156,7 +156,7 @@ List<DeclareVariableNode> declareGlobalVariable():
 	DeclareVariableNode declareVar = null;
 }
 {
-	(declareVar=declareVariable())+ { if(declareVar != null) declareVariables.add(declareVar); }
+	(declareVar=declareVariable())* { if(declareVar != null) declareVariables.add(declareVar); }
 	{
 		return declareVariables;	}
 }
@@ -173,8 +173,7 @@ DeclareVariableNode declareVariable():
 	ExpressionNode expression = null;
 }
 {
-	//一つにするべき？
-	dataType=type() variable=primaryExpression() ["=" expression=expression()] ";"
+	dataType=type() variable=primaryExpression() ["=" expression=expression()] token=";"
 		{
 			variable_i = (IdentifierNode)variable;
 			return new DeclareVariableNode(new Location(token), dataType, variable_i, expression);		}
@@ -236,10 +235,10 @@ StatementNode blockStatement():
 List<StatementNode> statements():
 {
 	List<StatementNode> statements = new LinkedList<StatementNode>(); //文のリスト
-	StatementNode statement;
+	StatementNode statement = null;
 }
 {
-	(statement=statement())+ { if(statement != null) statements.add(statement); }
+	(statement=statement())* { if(statement != null) statements.add(statement); }
 	{
 		return statements;
 	}
