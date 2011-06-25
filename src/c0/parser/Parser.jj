@@ -82,7 +82,7 @@ AstNode file():
 		(
 		  try {
 		      LOOKAHEAD(type() primaryExpression() "(")
-		      function=defineFunction() { if(function != null) functions.add(function); } //ここの括弧に問題があった。あとで確認する
+		      function=defineFunction() { if(function != null) functions.add(function); }
 			| globalVariable=declareVariable() { if(globalVariable != null) globalVariables.add(globalVariable); }
 		  } catch(ParseException e) {
 			e.printStackTrace();
@@ -145,20 +145,6 @@ ParameterNode parameter():
 		{
 			parameterName_i = (IdentifierNode)parameterName;
 			return new ParameterNode(new Location(token), dataType, parameterName_i);		}
-}
-
-
-//外部変数宣言 :=
-//{変数宣言}+
-List<DeclareVariableNode> declareGlobalVariable():
-{
-	List<DeclareVariableNode> declareVariables = new LinkedList<DeclareVariableNode>(); //すべての外部変数宣言
-	DeclareVariableNode declareVar = null;
-}
-{
-	(declareVar=declareVariable())* { if(declareVar != null) declareVariables.add(declareVar); }
-	{
-		return declareVariables;	}
 }
 
 //変数宣言 :=

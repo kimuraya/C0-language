@@ -12,6 +12,4 @@ abstract public class StatementNode extends Node {
 	public Location location() {
 		return this.location;
 	}
-	
-	abstract public void dump(); //構文木を表示する
 }

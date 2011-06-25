@@ -4,10 +4,9 @@ import java.util.List;
 import c0.util.NodeType;
 
 //抽象構文木のルート
-//グローバル変数の確保とmain関数の呼び出しを実行する
 public class AstNode extends Node {
 	
-	private List<DeclareVariableNode> globalVariables; //グローバル変数のリスト
+	private List<DeclareVariableNode> globalVariables; //外部変数のリスト
 	private List<IdentifierNode> functions; //関数のリスト
 	
 	public AstNode(List<DeclareVariableNode> globalVariables,
@@ -15,5 +14,20 @@ public class AstNode extends Node {
 		super();
 		this.globalVariables = globalVariables;
 		this.functions = functions;
+	}
+
+	//ルートを出力し、外部変数と関数を出力する処理を呼び出す
+	@Override
+	public void dump() {
+		
+		//外部変数の出力
+		for(DeclareVariableNode var : globalVariables) {
+			var.dump();
+		}
+		
+		//関数の出力
+		for(IdentifierNode function : functions) {
+			function.dump();
+		}
 	}	
 }
