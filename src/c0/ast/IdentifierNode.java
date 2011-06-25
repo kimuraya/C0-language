@@ -12,12 +12,12 @@ public class IdentifierNode extends ExpressionNode {
 	private List<ParameterNode> parameters = new LinkedList<ParameterNode>(); //引数のリスト
 	private StatementNode block; //関数本体（複合文）
 	private Location location;
-	private String name;
 	
 	public IdentifierNode(Location location, String name) {
 		super();
 		this.location = location;
-		this.name = name;
+		this.identifier = new Identifier();
+		this.identifier.setName(name);
 	}
 
 	public Identifier getIdentifier() {
@@ -51,8 +51,18 @@ public class IdentifierNode extends ExpressionNode {
 	}
 
 	@Override
-	public void dump() {
-		// TODO 自動生成されたメソッド・スタブ
-
+	public void dump(int depth) {
+		
+		//depth++;
+		
+		//変数か関数かで出力処理を分ける
+		switch(this.identifier.getIdentifierType()) {
+			case VARIABLE:
+				this.printIndent(depth);
+				System.out.println(this.identifier.getName());
+				this.printIndent(depth);
+				System.out.println(this.identifier.getIdentifierType());
+			case FUNCTION:
+		}
 	}
 }

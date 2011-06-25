@@ -21,9 +21,12 @@ public class DataTypeNode extends ExpressionNode {
 	}
 
 	@Override
-	public void dump() {
+	public void dump(int depth) {
 		// TODO 自動生成されたメソッド・スタブ
-
+		System.out.println(dataType);
+		
+		if(elementNumber != null) {
+			elementNumber.dump(depth);
+		}
 	}
-
 }

@@ -32,8 +32,17 @@ public class LiteralNode extends ExpressionNode {
 	}
 
 	@Override
-	public void dump() {
+	public void dump(int depth) {
 		// TODO 自動生成されたメソッド・スタブ
-
+		DataType dataType = this.literal.getDataType();
+		
+		switch (dataType) {
+			case INT:
+				System.out.println(this.literal.getInteger());
+			case INT_ARRAY:
+				System.out.println(this.literal.getArray());
+			case STRING:
+				System.out.println(this.literal.getStringLiteral());
+		}
 	}
 }

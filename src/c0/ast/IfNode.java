@@ -16,7 +16,7 @@ public class IfNode extends StatementNode {
 	}
 
 	@Override
-	public void dump() {
+	public void dump(int depth) {
 		// TODO 自動生成されたメソッド・スタブ
 		
 	}

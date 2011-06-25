@@ -23,9 +23,16 @@ public class DeclareVariableNode extends StatementNode {
 	
 	
 	@Override
-	public void dump() {
-		// TODO 自動生成されたメソッド・スタブ
-
+	public void dump(int depth) {
+		
+		depth++;
+		this.printIndent(depth);
+		dataType.dump(depth);
+		identifier.dump(depth);
+		
+		if(expression != null) {
+			expression.dump(depth);
+		}
 	}
 
 }

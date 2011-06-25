@@ -43,14 +43,16 @@ public class Interpreter {
 		//ファイルを渡して、パーサを実行
 		C0Language parser = new C0Language(fileReader);
 		
-		parser.enable_tracing(); //パーサのトレース機能を開始
+		//parser.enable_tracing(); //パーサのトレース機能を開始
 		
-		try {
-			parser.file();
-		} catch (ParseException e) {
+		//構文木の出力
+		try {			
+			program = parser.file();
+			int depth = 0;
+			program.dump(depth);
+		} catch (ParseException e1) {
 			// TODO 自動生成された catch ブロック
-			System.out.println("mainの例外処理");
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
 		
 		//インタプリタが構文木を入力として受け取り、プログラムを実行する

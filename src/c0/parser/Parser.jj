@@ -10,7 +10,7 @@ PARSER_BEGIN(C0Language)
 package c0.parser;
 
 import c0.ast.*;
-import c0.util.DataType;
+import c0.util.*;
 import java.util.List;
 import java.util.LinkedList;
 
@@ -109,11 +109,19 @@ IdentifierNode defineFunction():
 	IdentifierNode function_i;
 	List<ParameterNode> parameters = null;
 	StatementNode block;
+	Identifier identifier;
 }
 {
 	dataType=type() function=primaryExpression() "(" [parameters=parameters()] ")" block=blockStatement() //角括弧も取り除く必要がある？
 		{
 			function_i = (IdentifierNode)function;
+			
+			identifier = function_i.getIdentifier();
+			identifier.setIdentifierType(IdentifierType.FUNCTION); //識別子の種類は関数
+			identifier.setStandardFunctionFlag(false); //組み込み関数ではない
+			function_i.setIdentifier(identifier);
+
+			//引数と複合文をセットする
 			function_i.setParameters(parameters);
 			function_i.setBlock(block);
 			return function_i;		}
@@ -157,11 +165,15 @@ DeclareVariableNode declareVariable():
 	ExpressionNode variable = null;
 	IdentifierNode variable_i = null;
 	ExpressionNode expression = null;
+	Identifier identifier = null;
 }
 {
 	dataType=type() variable=primaryExpression() ["=" expression=expression()] token=";"
 		{
 			variable_i = (IdentifierNode)variable;
+			identifier = variable_i.getIdentifier();
+			identifier.setIdentifierType(IdentifierType.VARIABLE); //識別子の種類は変数
+			variable_i.setIdentifier(identifier);
 			return new DeclareVariableNode(new Location(token), dataType, variable_i, expression);		}
 }
 
