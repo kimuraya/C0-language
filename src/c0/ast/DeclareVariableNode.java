@@ -23,15 +23,15 @@ public class DeclareVariableNode extends StatementNode {
 	
 	
 	@Override
-	public void dump(int depth) {
+	public void dump(int depth, boolean indentFlag) {
 		
 		depth++;
-		this.printIndent(depth);
-		dataType.dump(depth);
-		identifier.dump(depth);
+		
+		dataType.dump(depth, true);
+		identifier.dump(depth, true);
 		
 		if(expression != null) {
-			expression.dump(depth);
+			expression.dump(depth, false);
 		}
 	}
 

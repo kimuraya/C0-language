@@ -17,7 +17,7 @@ public class PostDecrementNode extends ExpressionNode {
 	}
 
 	@Override
-	public void dump(int depth) {
+	public void dump(int depth, boolean indentFlag) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}

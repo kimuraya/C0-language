@@ -11,10 +11,14 @@ public class EmptyStatementNode extends StatementNode {
 	}
 
 	@Override
-	public void dump(int depth) {
-		// TODO 自動生成されたメソッド・スタブ
-
+	public void dump(int depth, boolean indentFlag) {
+		
+		depth++;
+		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("EmptyStatementNode");
 	}
-
-
 }

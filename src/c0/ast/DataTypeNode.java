@@ -21,12 +21,16 @@ public class DataTypeNode extends ExpressionNode {
 	}
 
 	@Override
-	public void dump(int depth) {
-		// TODO 自動生成されたメソッド・スタブ
-		System.out.println(dataType);
+	public void dump(int depth, boolean indentFlag) {
+		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("DataType : " + dataType);
 		
 		if(elementNumber != null) {
-			elementNumber.dump(depth);
+			elementNumber.dump(depth, false);
 		}
 	}
 }

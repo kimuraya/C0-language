@@ -51,18 +51,48 @@ public class IdentifierNode extends ExpressionNode {
 	}
 
 	@Override
-	public void dump(int depth) {
+	public void dump(int depth, boolean indentFlag) {
 		
-		//depth++;
+		depth++;
 		
 		//変数か関数かで出力処理を分ける
 		switch(this.identifier.getIdentifierType()) {
+		
 			case VARIABLE:
-				this.printIndent(depth);
-				System.out.println(this.identifier.getName());
-				this.printIndent(depth);
-				System.out.println(this.identifier.getIdentifierType());
+				
+				depth--;
+				
+				if (indentFlag) {
+					this.printIndent(depth);
+				}
+				
+				System.out.println("name : " + this.identifier.getName());
+				
+				if (indentFlag) {
+					this.printIndent(depth);
+				}
+				
+				System.out.println("IdentifierType : " + this.identifier.getIdentifierType());
+				
+				break;
+				
 			case FUNCTION:
+				
+				if (indentFlag) {
+					this.printIndent(depth);
+				}
+				
+				System.out.println("name : " + this.identifier.getName());
+				
+				if (indentFlag) {
+					this.printIndent(depth);
+				}
+				
+				System.out.println("IdentifierType : " + this.identifier.getIdentifierType());
+				
+				block.dump(depth, true);
+				
+				break;
 		}
 	}
 }

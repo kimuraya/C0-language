@@ -32,7 +32,7 @@ public class LiteralNode extends ExpressionNode {
 	}
 
 	@Override
-	public void dump(int depth) {
+	public void dump(int depth, boolean indentFlag) {
 		// TODO 自動生成されたメソッド・スタブ
 		DataType dataType = this.literal.getDataType();
 		

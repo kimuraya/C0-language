@@ -18,18 +18,22 @@ public class AstNode extends Node {
 
 	//ルートを出力し、外部変数と関数を出力する処理を呼び出す
 	@Override
-	public void dump(int depth) {
+	public void dump(int depth, boolean indentFlag) {
 		
 		System.out.println("AST");
 		
 		//外部変数の出力
+		System.out.println("globalVariables");
+		
 		for(DeclareVariableNode var : globalVariables) {
-			var.dump(depth);
+			var.dump(depth, true);
 		}
 		
 		//関数の出力
+		System.out.println("functions");
+		
 		for(IdentifierNode function : functions) {
-			function.dump(depth);
+			function.dump(depth, true);
 		}
 	}	
 }

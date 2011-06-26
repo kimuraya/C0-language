@@ -49,7 +49,7 @@ public class Interpreter {
 		try {			
 			program = parser.file();
 			int depth = 0;
-			program.dump(depth);
+			program.dump(depth, true);
 		} catch (ParseException e1) {
 			// TODO 自動生成された catch ブロック
 			e1.printStackTrace();
