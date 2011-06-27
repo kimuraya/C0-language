@@ -25,5 +25,26 @@ public class IfNode extends StatementNode {
 		}
 		
 		System.out.println("IfNode");
+		
+		//thenの出力
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("thenStatement");
+		
+		this.thenStatement.dump(depth, true);
+		
+		//elseの出力
+		if(this.elseStatement != null) {
+			
+			if (indentFlag) {
+				this.printIndent(depth);
+			}
+			
+			System.out.println("elseStatement");
+			this.elseStatement.dump(depth, true);
+		}
+		
 	}
 }

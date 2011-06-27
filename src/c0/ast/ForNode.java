@@ -28,5 +28,41 @@ public class ForNode extends StatementNode {
 		}
 		
 		System.out.println("ForNode");
+		
+		//初期化式の出力
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("initializeExpression");
+		
+		this.initializeExpression.dump(depth, true);
+		
+		//条件式の出力
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("conditionalExpression");
+		
+		this.conditionalExpression.dump(depth, true);
+		
+		//更新式の出力
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("updateExpression");
+		
+		this.updateExpression.dump(depth, true);
+		
+		//文の出力
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("bodyStatement");
+		
+		this.bodyStatement.dump(depth, true);
 	}
 }

@@ -23,5 +23,23 @@ public class WhileNode extends StatementNode {
 		}
 		
 		System.out.println("WhileNode");
+		
+		//条件式の出力
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("conditionalExpression");
+		
+		this.conditionalExpression.dump(depth, true);
+		
+		//文の出力
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("bodyStatement");
+		
+		this.bodyStatement.dump(depth, true);
 	}
 }

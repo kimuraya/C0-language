@@ -1,7 +1,7 @@
 //JavaCCオプション
 options {
 	STATIC = false; //マルチスレッド環境で使えるようにするため、falseに
-	DEBUG_PARSER = true; //デバッグ情報の出力
+	DEBUG_PARSER = false; //デバッグ情報の出力
 	UNICODE_INPUT = true; //日本語を処理する
 	JDK_VERSION = "1.6";
 }
@@ -236,7 +236,7 @@ List<StatementNode> statements():
 	StatementNode statement = null;
 }
 {
-	(statement=statement())* { if(statement != null) statements.add(statement); }
+	(statement=statement() { if(statement != null) statements.add(statement); })*
 	{
 		return statements;
 	}
@@ -250,7 +250,7 @@ List<DeclareVariableNode> declareLocalVariables():
 	DeclareVariableNode declareVar = null;
 }
 {
-	(declareVar=declareVariable())* { if(declareVar != null) declareVariables.add(declareVar); }
+	(declareVar=declareVariable() { if(declareVar != null) declareVariables.add(declareVar); })*
 	{
 		return declareVariables;	}
 }
