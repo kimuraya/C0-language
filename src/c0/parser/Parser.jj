@@ -371,7 +371,7 @@ ExpressionNode expression():
 			leftValue = (IdentifierNode)left;
 			return new AssignNode(leftValue, right);
 		}
-	| expression5()
+	| expressionNode=expression5()
 		{
 			return expressionNode;
 		}
