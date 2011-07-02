@@ -386,7 +386,7 @@ ExpressionNode expression():
 	ExpressionNode expressionNode = null;
 }
 {
-	  LOOKAHEAD(6) left=term() "=" right=expression()
+	  LOOKAHEAD(term() "=") left=term() "=" right=expression()
 		{
 			leftValue = (IdentifierNode)left;
 			return new AssignNode(leftValue, right);
@@ -522,7 +522,7 @@ ExpressionNode PostfixExpression():
 List<ExpressionNode> arguments():
 {
 	List<ExpressionNode> arguments = new LinkedList<ExpressionNode>();
-	ExpressionNode argument;}
+	ExpressionNode argument = null;}
 {
 	argument=expression() { arguments.add(argument); }
 	("," argument=expression() { arguments.add(argument); })*
