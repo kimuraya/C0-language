@@ -44,6 +44,7 @@ public class Interpreter {
 		
 		//ファイルを渡して、パーサを実行
 		C0Language parser = new C0Language(fileReader);
+		parser.setFileName(fileName);
 		
 		//parser.enable_tracing(); //パーサのトレース機能を開始
 		

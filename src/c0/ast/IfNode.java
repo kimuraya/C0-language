@@ -26,6 +26,8 @@ public class IfNode extends StatementNode {
 		
 		System.out.println("IfNode");
 		
+		this.printFileNameAndLine(depth, indentFlag);
+		
 		//thenの出力
 		if (indentFlag) {
 			this.printIndent(depth);

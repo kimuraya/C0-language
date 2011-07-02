@@ -19,6 +19,14 @@ public class PreIncrementNode extends ExpressionNode {
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		// TODO 自動生成されたメソッド・スタブ
-
+		depth++;
+		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("PreIncrementNode");
+		
+		this.leftValue.dump(depth, true);
 	}
 }

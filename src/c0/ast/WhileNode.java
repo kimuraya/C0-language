@@ -24,6 +24,8 @@ public class WhileNode extends StatementNode {
 		
 		System.out.println("WhileNode");
 		
+		this.printFileNameAndLine(depth, indentFlag);
+		
 		//条件式の出力
 		if (indentFlag) {
 			this.printIndent(depth);

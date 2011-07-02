@@ -3,13 +3,13 @@ package c0.ast;
 //"-"
 public class MinusNode extends ExpressionNode {
 	
-	private ExpressionNode right;
 	private ExpressionNode left;
+	private ExpressionNode right;
 	
-	public MinusNode(ExpressionNode right, ExpressionNode left) {
+	public MinusNode(ExpressionNode left, ExpressionNode right) {
 		super();
-		this.right = right;
 		this.left = left;
+		this.right = right;
 	}
 
 	@Override
@@ -21,7 +21,15 @@ public class MinusNode extends ExpressionNode {
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		// TODO 自動生成されたメソッド・スタブ
-
+		depth++;
+		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("MinusNode");
+		
+		this.left.dump(depth, true);
+		this.right.dump(depth, true);
 	}
-
 }

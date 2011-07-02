@@ -3,13 +3,13 @@ package c0.ast;
 //"&&"
 public class LogicalAndNode extends ExpressionNode {
 	
-	private ExpressionNode right;
 	private ExpressionNode left;
+	private ExpressionNode right;
 
-	public LogicalAndNode(ExpressionNode right, ExpressionNode left) {
+	public LogicalAndNode(ExpressionNode left, ExpressionNode right) {
 		super();
-		this.right = right;
 		this.left = left;
+		this.right = right;
 	}
 
 	@Override
@@ -21,7 +21,15 @@ public class LogicalAndNode extends ExpressionNode {
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		// TODO 自動生成されたメソッド・スタブ
-
+		depth++;
+		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("LogicalAndNode");
+		
+		this.left.dump(depth, true);
+		this.right.dump(depth, true);
 	}
-
 }

@@ -5,13 +5,13 @@ import c0.util.NodeType;
 //"/"
 public class DivNode extends ExpressionNode {
 	
-	private ExpressionNode right;
 	private ExpressionNode left;
+	private ExpressionNode right;
 
-	public DivNode(ExpressionNode right, ExpressionNode left) {
+	public DivNode(ExpressionNode left, ExpressionNode right) {
 		super();
-		this.right = right;
 		this.left = left;
+		this.right = right;
 	}
 
 	@Override
@@ -23,7 +23,15 @@ public class DivNode extends ExpressionNode {
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		// TODO 自動生成されたメソッド・スタブ
-
+		depth++;
+		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("DivNode");
+		
+		this.left.dump(depth, true);
+		this.right.dump(depth, true);
 	}
-
 }

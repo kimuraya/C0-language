@@ -29,6 +29,8 @@ public class ForNode extends StatementNode {
 		
 		System.out.println("ForNode");
 		
+		this.printFileNameAndLine(depth, indentFlag);
+		
 		//初期化式の出力
 		if (indentFlag) {
 			this.printIndent(depth);

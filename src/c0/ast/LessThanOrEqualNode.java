@@ -3,13 +3,13 @@ package c0.ast;
 //"<="
 public class LessThanOrEqualNode extends ExpressionNode {
 	
-	private ExpressionNode right;
 	private ExpressionNode left;
+	private ExpressionNode right;
 
-	public LessThanOrEqualNode(ExpressionNode right, ExpressionNode left) {
+	public LessThanOrEqualNode(ExpressionNode left, ExpressionNode right) {
 		super();
-		this.right = right;
 		this.left = left;
+		this.right = right;
 	}
 
 	@Override
@@ -21,6 +21,15 @@ public class LessThanOrEqualNode extends ExpressionNode {
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		// TODO 自動生成されたメソッド・スタブ
-
+		depth++;
+		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("LessThanOrEqualNode");
+		
+		this.left.dump(depth, true);
+		this.right.dump(depth, true);
 	}
 }

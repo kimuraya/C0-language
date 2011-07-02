@@ -20,5 +20,7 @@ public class EmptyStatementNode extends StatementNode {
 		}
 		
 		System.out.println("EmptyStatementNode");
+		
+		this.printFileNameAndLine(depth, indentFlag);
 	}
 }

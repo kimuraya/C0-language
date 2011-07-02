@@ -7,7 +7,6 @@ import c0.util.Value;
 public class LiteralNode extends ExpressionNode {
 	
 	private Value literal;
-	private Location location;
 	
 	public LiteralNode(Location location, DataType dataType, String image) {
 		this.location = location;
@@ -34,15 +33,54 @@ public class LiteralNode extends ExpressionNode {
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		// TODO 自動生成されたメソッド・スタブ
+		depth++;
+		
 		DataType dataType = this.literal.getDataType();
 		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("LiteralNode");
+		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
 		switch (dataType) {
+			
 			case INT:
-				System.out.println(this.literal.getInteger());
+				
+				System.out.println("DataType : " + dataType);
+				
+				if (indentFlag) {
+					this.printIndent(depth);
+				}
+				
+				System.out.println("value : " + this.literal.getInteger());
+				break;
+				
 			case INT_ARRAY:
-				System.out.println(this.literal.getArray());
+				
+				System.out.println("DataType : " + dataType);
+				
+				if (indentFlag) {
+					this.printIndent(depth);
+				}
+				
+				System.out.println("value : " + this.literal.getArray());
+				break;
+				
 			case STRING:
-				System.out.println(this.literal.getStringLiteral());
+				
+				System.out.println("DataType : " + dataType);
+				
+				if (indentFlag) {
+					this.printIndent(depth);
+				}
+				
+				System.out.println("value : " + this.literal.getStringLiteral());
+				break;
 		}
 	}
 }

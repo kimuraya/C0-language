@@ -20,5 +20,9 @@ public class ExpressionStatementNode extends StatementNode {
 		}
 		
 		System.out.println("ExpressionStatementNode");
+		
+		this.printFileNameAndLine(depth, indentFlag);
+		
+		this.expression.dump(depth, true);
 	}
 }

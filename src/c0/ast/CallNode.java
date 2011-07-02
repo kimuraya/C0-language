@@ -23,6 +23,30 @@ public class CallNode extends ExpressionNode {
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		// TODO 自動生成されたメソッド・スタブ
-
+		depth++;
+		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("CallNode");
+		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("function");
+		
+		this.function.dump(depth, true);
+		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("parameters");
+		
+		for(ExpressionNode parameter : parameters) {
+			parameter.dump(depth, true);
+		}
 	}
 }

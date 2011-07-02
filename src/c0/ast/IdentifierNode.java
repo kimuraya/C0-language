@@ -11,7 +11,6 @@ public class IdentifierNode extends ExpressionNode {
 	private Identifier identifier;
 	private List<ParameterNode> parameters = new LinkedList<ParameterNode>(); //引数のリスト
 	private StatementNode block; //関数本体（複合文）
-	private Location location;
 	
 	public IdentifierNode(Location location, String name) {
 		super();
@@ -55,44 +54,76 @@ public class IdentifierNode extends ExpressionNode {
 		
 		depth++;
 		
-		//変数か関数かで出力処理を分ける
-		switch(this.identifier.getIdentifierType()) {
+		if (this.identifier.getIdentifierType() != null) {
 		
-			case VARIABLE:
-				
-				depth--;
-				
-				if (indentFlag) {
-					this.printIndent(depth);
-				}
-				
-				System.out.println("name : " + this.identifier.getName());
-				
-				if (indentFlag) {
-					this.printIndent(depth);
-				}
-				
-				System.out.println("IdentifierType : " + this.identifier.getIdentifierType());
-				
-				break;
-				
-			case FUNCTION:
-				
-				if (indentFlag) {
-					this.printIndent(depth);
-				}
-				
-				System.out.println("name : " + this.identifier.getName());
-				
-				if (indentFlag) {
-					this.printIndent(depth);
-				}
-				
-				System.out.println("IdentifierType : " + this.identifier.getIdentifierType());
-				
-				block.dump(depth, true);
-				
-				break;
+			//変数か関数かで出力処理を分ける
+			switch(this.identifier.getIdentifierType()) {
+			
+				case VARIABLE:
+					
+					depth--;
+					
+					if (indentFlag) {
+						this.printIndent(depth);
+					}
+					
+					System.out.println("IdentifierNode");
+					
+					if (indentFlag) {
+						this.printIndent(depth);
+					}
+					
+					System.out.println("name : " + this.identifier.getName());
+					
+					if (indentFlag) {
+						this.printIndent(depth);
+					}
+					
+					System.out.println("IdentifierType : " + this.identifier.getIdentifierType());
+					
+					this.printFileNameAndLine(depth, indentFlag);
+					
+					break;
+					
+				case FUNCTION:
+					
+					if (indentFlag) {
+						this.printIndent(depth);
+					}
+					
+					System.out.println("IdentifierNode");
+					
+					if (indentFlag) {
+						this.printIndent(depth);
+					}
+					
+					System.out.println("name : " + this.identifier.getName());
+					
+					if (indentFlag) {
+						this.printIndent(depth);
+					}
+					
+					System.out.println("IdentifierType : " + this.identifier.getIdentifierType());
+					
+					this.printFileNameAndLine(depth, indentFlag);
+					
+					block.dump(depth, true);
+					
+					break;
+			}
+		} else {
+			
+			if (indentFlag) {
+				this.printIndent(depth);
+			}
+			
+			System.out.println("IdentifierNode");
+			
+			if (indentFlag) {
+				this.printIndent(depth);
+			}
+			
+			System.out.println("name : " + this.identifier.getName());
 		}
 	}
 }

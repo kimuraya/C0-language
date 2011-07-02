@@ -23,7 +23,16 @@ public class AssignNode extends ExpressionNode {
 
 	@Override
 	public void dump(int depth, boolean indentFlag) {
-		// TODO 自動生成されたメソッド・スタブ
-
+		
+		depth++;
+		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("AssignNode");
+		
+		this.leftValue.dump(depth, true);
+		this.expression.dump(depth, true);
 	}
 }

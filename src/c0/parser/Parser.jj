@@ -15,7 +15,16 @@ import java.util.List;
 import java.util.LinkedList;
 
 public class C0Language {
-	}
+	
+	private String fileName;
+	
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}	}
 PARSER_END(C0Language)
 
 //スキャナの記述
@@ -152,7 +161,7 @@ ParameterNode parameter():
 	dataType=type() parameterName=primaryExpression()
 		{
 			parameterName_i = (IdentifierNode)parameterName;
-			return new ParameterNode(new Location(token), dataType, parameterName_i);		}
+			return new ParameterNode(new Location(this.getFileName(), token), dataType, parameterName_i);		}
 }
 
 //変数宣言 :=
@@ -174,7 +183,7 @@ DeclareVariableNode declareVariable():
 			identifier = variable_i.getIdentifier();
 			identifier.setIdentifierType(IdentifierType.VARIABLE); //識別子の種類は変数
 			variable_i.setIdentifier(identifier);
-			return new DeclareVariableNode(new Location(token), dataType, variable_i, expression);		}
+			return new DeclareVariableNode(new Location(this.getFileName(), token), dataType, variable_i, expression);		}
 }
 
 //型の構文
@@ -208,6 +217,7 @@ StatementNode statement():
 	| statementNode=blockStatement()
 	| statementNode=conditionalStatement()
 	| statementNode=iterationStatement()
+	| statementNode=breakStatement()
 	| statementNode=returnStatement()
 	| statementNode=emptyStatement()
 	)
@@ -226,7 +236,7 @@ StatementNode blockStatement():
 {
 	token="{" localVariables=declareLocalVariables() statements=statements() "}"
 	{
-		return new BlockNode(new Location(token), localVariables, statements);	}
+		return new BlockNode(new Location(this.getFileName(), token), localVariables, statements);	}
 }
 
 //ブロック文本体
@@ -277,7 +287,7 @@ StatementNode ifStatement():
 }
 {
 	token=<IF> "(" conditional=expression() ")" thenBody=statement() [LOOKAHEAD(1) <ELSE> elseBody=statement()]
-	{ return new IfNode(new Location(token), conditional, thenBody, elseBody); }
+	{ return new IfNode(new Location(this.getFileName(), token), conditional, thenBody, elseBody); }
 }
 
 //繰り返し文 :=
@@ -301,7 +311,7 @@ StatementNode whileStatement():
 	StatementNode body;
 }
 {
-	token=<WHILE> "(" conditional=expression() ")" body=statement() { return new WhileNode(new Location(token), conditional, body); }
+	token=<WHILE> "(" conditional=expression() ")" body=statement() { return new WhileNode(new Location(this.getFileName(), token), conditional, body); }
 }
 
 //for文 :=
@@ -317,7 +327,17 @@ StatementNode forStatement():
 }
 {
 	token=<FOR> "(" [initialize=expression()] ";" [conditional=expression()] ";" [update=expression()] ")" body=statement()
-	{ return new ForNode(new Location(token), initialize, conditional, update, body); }
+	{ return new ForNode(new Location(this.getFileName(), token), initialize, conditional, update, body); }
+}
+
+//break文 :=
+//	'break' ';'
+StatementNode breakStatement():
+{
+	Token token;
+}
+{
+	token=<BREAK> ";" { return new BreakNode(new Location(this.getFileName(), token)); }
 }
 
 //return文 :=
@@ -328,7 +348,7 @@ StatementNode returnStatement():
 	ExpressionNode expressionNode = null;
 }
 {
-	token=<RETURN> [expressionNode=expression()] ";" { return new ReturnNode(new Location(token), expressionNode); }
+	token=<RETURN> [expressionNode=expression()] ";" { return new ReturnNode(new Location(this.getFileName(), token), expressionNode); }
 }
 
 //空文 :=
@@ -339,7 +359,7 @@ StatementNode emptyStatement():
 	Token token;
 }
 {
-	token=";" { return new EmptyStatementNode(new Location(token)); }
+	token=";" { return new EmptyStatementNode(new Location(this.getFileName(), token)); }
 }
 
 //式文 :=
@@ -351,7 +371,7 @@ ExpressionStatementNode expressionStatement():
 }
 {
 	//要修正。式のコンストラクタとメソッドを追加してから書き換える
-	expressionNode=expression() token=";" { return new ExpressionStatementNode(new Location(token), expressionNode); }
+	expressionNode=expression() token=";" { return new ExpressionStatementNode(new Location(this.getFileName(), token), expressionNode); }
 }
 
 //式の構文
@@ -384,7 +404,7 @@ ExpressionNode expression5():
 	ExpressionNode left;
 }
 {
-	left=expression4() ("||" right=expression4() { left = new LogicalOrNode(right, left); })*
+	left=expression4() ("||" right=expression4() { left = new LogicalOrNode(left, right); })*
 							{
 								return left;
 							}
@@ -397,7 +417,7 @@ ExpressionNode expression4():
 	ExpressionNode left;
 }
 {
-	left=expression3() ("&&" right=expression3() { left = new LogicalAndNode(right, left); })*
+	left=expression3() ("&&" right=expression3() { left = new LogicalAndNode(left, right); })*
 						   {
 						   		return left;
 						   }
@@ -411,12 +431,12 @@ ExpressionNode expression3():
 	ExpressionNode left;
 }
 {
-	left=expression2() ( "==" right=expression2() { left = new EquivalenceNode(right, left); }
-					   | "!=" right=expression2() { left = new NotEquivalenceNode(right, left); }
-					   | "<"  right=expression2() { left = new LessThanNode(right, left); }
-					   | ">"  right=expression2() { left = new GreaterThanNode(right, left); }
-					   | "<=" right=expression2() { left = new LessThanOrEqualNode(right, left); }
-					   | ">=" right=expression2() { left = new GreaterThanOrEqualNode(right, left); }
+	left=expression2() ( "==" right=expression2() { left = new EquivalenceNode(left, right); }
+					   | "!=" right=expression2() { left = new NotEquivalenceNode(left, right); }
+					   | "<"  right=expression2() { left = new LessThanNode(left, right); }
+					   | ">"  right=expression2() { left = new GreaterThanNode(left, right); }
+					   | "<=" right=expression2() { left = new LessThanOrEqualNode(left, right); }
+					   | ">=" right=expression2() { left = new GreaterThanOrEqualNode(left, right); }
 					   )*
 							{
 								return left;
@@ -431,8 +451,8 @@ ExpressionNode expression2():
 	ExpressionNode left;
 }
 {	
-	left=expression1()  ( "+" right=expression1() { left = new PlusNode(right, left); }
-						| "-" right=expression1() { left = new MinusNode(right, left); }
+	left=expression1()  ( "+" right=expression1() { left = new PlusNode(left, right); }
+						| "-" right=expression1() { left = new MinusNode(left, right); }
 						)*
 							{
 								return left;
@@ -441,14 +461,16 @@ ExpressionNode expression2():
 
 //乗算式
 //除算式
+//剰余式
 ExpressionNode expression1():
 {
 	ExpressionNode right;
 	ExpressionNode left;
 }
 {
-	left=term() ( "*" right=term() { left = new MulNode(right, left); }
-		   		| "/" right=term() { left = new DivNode(right, left); }
+	left=term() ( "*" right=term() { left = new MulNode(left, right); }
+		   		| "/" right=term() { left = new DivNode(left, right); }
+		   		| "%" right=term() { left = new ModNode(left, right); }
 		   		)*
 		   			{						return left;
 		   			}
@@ -516,15 +538,15 @@ ExpressionNode primaryExpression():
 {
 	token=<INTEGER> //10進定数
 			{
-				return new LiteralNode(new Location(token), DataType.INT, token.image);
+				return new LiteralNode(new Location(this.getFileName(), token), DataType.INT, token.image);
 			}
 	| token=<STRING> //文字列定数
 			{
-				return new LiteralNode(new Location(token), DataType.STRING, token.image);
+				return new LiteralNode(new Location(this.getFileName(), token), DataType.STRING, token.image);
 			}
 	| token=<IDENTIFIER> //識別子
 			{
-				return new IdentifierNode(new Location(token), token.image);
+				return new IdentifierNode(new Location(this.getFileName(), token), token.image);
 			}
 	| "(" expressionNode=expression() ")" //括弧式
 			{

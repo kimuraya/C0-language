@@ -27,6 +27,8 @@ public class BlockNode extends StatementNode {
 		
 		System.out.println("BlockNode");
 		
+		this.printFileNameAndLine(depth, indentFlag);
+		
 		//局所変数の出力
 		if (indentFlag) {
 			this.printIndent(depth);
@@ -44,7 +46,6 @@ public class BlockNode extends StatementNode {
 		}
 		
 		System.out.println("statements");
-		//System.out.println(statements);
 		
 		for(StatementNode statement : statements) {
 			statement.dump(depth, true);

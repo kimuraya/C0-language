@@ -31,7 +31,7 @@ public class DeclareVariableNode extends StatementNode {
 		identifier.dump(depth, true);
 		
 		if(expression != null) {
-			expression.dump(depth, false);
+			expression.dump(depth, true);
 		}
 	}
 

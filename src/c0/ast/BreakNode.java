@@ -20,5 +20,7 @@ public class BreakNode extends StatementNode {
 		}
 		
 		System.out.println("BreakNode");
+		
+		this.printFileNameAndLine(depth, indentFlag);
 	}
 }

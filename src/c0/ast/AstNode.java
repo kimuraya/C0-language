@@ -20,7 +20,7 @@ public class AstNode extends Node {
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		
-		System.out.println("AST");
+		System.out.println("AstNode");
 		
 		//外部変数の出力
 		System.out.println("globalVariables");
@@ -35,5 +35,5 @@ public class AstNode extends Node {
 		for(IdentifierNode function : functions) {
 			function.dump(depth, true);
 		}
-	}	
+	}
 }
