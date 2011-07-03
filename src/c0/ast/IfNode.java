@@ -3,14 +3,14 @@ package c0.ast;
 //if-else文
 public class IfNode extends StatementNode {
 	
-	private ExpressionNode expression; //条件式
+	private ExpressionNode conditionalExpression; //条件式
 	private StatementNode thenStatement; //then
 	private StatementNode elseStatement; //else
 	
 	public IfNode(Location loc, ExpressionNode expression,
 			StatementNode thenStatement, StatementNode elseStatement) {
 		super(loc);
-		this.expression = expression;
+		this.conditionalExpression = expression;
 		this.thenStatement = thenStatement;
 		this.elseStatement = elseStatement;
 	}
@@ -27,6 +27,15 @@ public class IfNode extends StatementNode {
 		System.out.println("IfNode");
 		
 		this.printFileNameAndLine(depth, indentFlag);
+		
+		//条件式の出力
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("conditionalExpression");
+		
+		this.conditionalExpression.dump(depth, true);
 		
 		//thenの出力
 		if (indentFlag) {

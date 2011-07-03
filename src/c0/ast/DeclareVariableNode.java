@@ -27,11 +27,11 @@ public class DeclareVariableNode extends StatementNode {
 		
 		depth++;
 		
-		dataType.dump(depth, true);
-		identifier.dump(depth, true);
+		this.dataType.dump(depth, true);
+		this.identifier.dump(depth, true);
 		
-		if(expression != null) {
-			expression.dump(depth, true);
+		if(this.expression != null) {
+			this.expression.dump(depth, true);
 		}
 	}
 

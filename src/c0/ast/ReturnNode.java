@@ -22,5 +22,9 @@ public class ReturnNode extends StatementNode {
 		System.out.println("ReturnNode");
 		
 		this.printFileNameAndLine(depth, indentFlag);
+		
+		if(this.expression != null) {
+			this.expression.dump(depth, true);
+		}
 	}
 }
