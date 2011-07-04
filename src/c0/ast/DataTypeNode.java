@@ -27,10 +27,16 @@ public class DataTypeNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
+		System.out.println("DataTypeNode");
+		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
 		System.out.println("DataType : " + dataType);
 		
 		if(elementNumber != null) {
-			elementNumber.dump(depth, false);
+			this.elementNumber.dump(depth, true);
 		}
 	}
 }

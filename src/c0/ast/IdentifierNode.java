@@ -107,7 +107,15 @@ public class IdentifierNode extends ExpressionNode {
 					
 					this.printFileNameAndLine(depth, indentFlag);
 					
-					block.dump(depth, true);
+					if (parameters != null) {
+						//depth--;
+						
+						for(ParameterNode parameter : parameters) {
+							parameter.dump(depth, true);
+						}
+					}
+					
+					this.block.dump(depth, true);
 					
 					break;
 			}

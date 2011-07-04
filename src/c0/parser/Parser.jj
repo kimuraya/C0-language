@@ -153,14 +153,18 @@ List<ParameterNode> parameters():
 ParameterNode parameter():
 {
 	Token token = null;
-	DataTypeNode dataType;
-	ExpressionNode parameterName;
-	IdentifierNode parameterName_i;
+	DataTypeNode dataType = null;
+	ExpressionNode parameterName = null;
+	IdentifierNode parameterName_i = null;
+	Identifier identifier = null;
 }
 {
 	dataType=type() parameterName=primaryExpression()
 		{
 			parameterName_i = (IdentifierNode)parameterName;
+			identifier = parameterName_i.getIdentifier();
+			identifier.setIdentifierType(IdentifierType.VARIABLE); //識別子の種類は変数
+			parameterName_i.setIdentifier(identifier);
 			return new ParameterNode(new Location(this.getFileName(), token), dataType, parameterName_i);		}
 }
 
@@ -195,7 +199,12 @@ DataTypeNode type():
 	ExpressionNode elementNumber = null; //要素数
 }
 {
-	<INT>
+	LOOKAHEAD(<INT> "[")
+	<INT> "[" elementNumber=expression() "]"
+	{
+		return new DataTypeNode(DataType.INT_ARRAY, elementNumber); //整数の配列
+	}
+	| <INT>
 	{
 		return new DataTypeNode(DataType.INT, elementNumber); //整数の変数
 	}
@@ -380,16 +389,14 @@ ExpressionStatementNode expressionStatement():
 //代入式
 ExpressionNode expression():
 {
-	ExpressionNode right = null;
 	ExpressionNode left = null;
-	IdentifierNode leftValue = null;
+	ExpressionNode right = null;
 	ExpressionNode expressionNode = null;
 }
 {
 	  LOOKAHEAD(term() "=") left=term() "=" right=expression()
 		{
-			leftValue = (IdentifierNode)left;
-			return new AssignNode(leftValue, right);
+			return new AssignNode(left, right);
 		}
 	| expressionNode=expression5()
 		{

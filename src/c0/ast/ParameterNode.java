@@ -17,7 +17,15 @@ public class ParameterNode extends StatementNode {
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		// TODO 自動生成されたメソッド・スタブ
-
+		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("ParameterNode");
+		
+		this.dataType.dump(depth, true);
+		this.identifier.dump(depth, true);
 	}
 
 }
