@@ -27,7 +27,7 @@ public class GreaterThanOrEqualNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("GreaterThanOrEqualNode");
+		System.out.println("\">=\" GreaterThanOrEqualNode");
 		
 		this.left.dump(depth, true);
 		this.right.dump(depth, true);

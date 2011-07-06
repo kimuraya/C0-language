@@ -27,7 +27,7 @@ public class MulNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("MulNode");
+		System.out.println("\"*\" MulNode");
 		
 		this.left.dump(depth, true);
 		this.right.dump(depth, true);

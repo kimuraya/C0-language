@@ -29,7 +29,7 @@ public class EquivalenceNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("EquivalenceNode");
+		System.out.println("\"==\" EquivalenceNode");
 		
 		this.left.dump(depth, true);
 		this.right.dump(depth, true);

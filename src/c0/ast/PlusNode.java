@@ -27,7 +27,7 @@ public class PlusNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("PlusNode");
+		System.out.println("\"+\" PlusNode");
 		
 		this.left.dump(depth, true);
 		this.right.dump(depth, true);

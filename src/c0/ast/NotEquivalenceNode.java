@@ -27,7 +27,7 @@ public class NotEquivalenceNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("NotEquivalenceNode");
+		System.out.println("\"!=\" NotEquivalenceNode");
 		
 		this.left.dump(depth, true);
 		this.right.dump(depth, true);

@@ -27,7 +27,7 @@ public class LogicalAndNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("LogicalAndNode");
+		System.out.println("\"&&\" LogicalAndNode");
 		
 		this.left.dump(depth, true);
 		this.right.dump(depth, true);

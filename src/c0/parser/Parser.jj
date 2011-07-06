@@ -16,7 +16,7 @@ import java.util.LinkedList;
 
 public class C0Language {
 	
-	private String fileName;
+	private String fileName = null;
 	
 	public String getFileName() {
 		return fileName;
@@ -113,12 +113,12 @@ AstNode file():
 //	データ型 単純宣言子 '(' [引数 {',' 引数}* ] ')' 複合文
 IdentifierNode defineFunction():
 {
-	DataTypeNode dataType;
-	ExpressionNode function;
-	IdentifierNode function_i;
+	DataTypeNode dataType = null;
+	ExpressionNode function = null;
+	IdentifierNode function_i = null;
 	List<ParameterNode> parameters = null;
-	StatementNode block;
-	Identifier identifier;
+	StatementNode block = null;
+	Identifier identifier = null;
 }
 {
 	dataType=type() function=primaryExpression() "(" [parameters=parameters()] ")" block=blockStatement() //角括弧も取り除く必要がある？
@@ -140,8 +140,8 @@ IdentifierNode defineFunction():
 List<ParameterNode> parameters():
 {
 	List<ParameterNode> parameters = new LinkedList<ParameterNode>();
-	ParameterNode parameter1;
-	ParameterNode parameter2;}
+	ParameterNode parameter1 = null;
+	ParameterNode parameter2 = null;}
 {
 	parameter1=parameter() { if(parameter1 != null) parameters.add(parameter1); }
 	(LOOKAHEAD(2) "," parameter2=parameter() { if(parameter2 != null) parameters.add(parameter2); } )*
@@ -219,7 +219,7 @@ DataTypeNode type():
 //	|空文
 StatementNode statement():
 {
-	StatementNode statementNode;
+	StatementNode statementNode = null;
 }
 {
 	( statementNode=expressionStatement()
@@ -238,9 +238,9 @@ StatementNode statement():
 //	'{' 局所変数宣言 {文}* '}'
 StatementNode blockStatement():
 {
-	Token token;
-	List<DeclareVariableNode> localVariables; //ローカル変数の宣言
-	List<StatementNode> statements; //ブロック文本体
+	Token token = null;
+	List<DeclareVariableNode> localVariables = null; //ローカル変数の宣言
+	List<StatementNode> statements = null; //ブロック文本体
 }
 {
 	token="{" localVariables=declareLocalVariables() statements=statements() "}"
@@ -279,7 +279,7 @@ List<DeclareVariableNode> declareLocalVariables():
 //この箇所は削除するか検討する
 StatementNode conditionalStatement():
 {
-	StatementNode conditionalStatementNode;
+	StatementNode conditionalStatementNode = null;
 }
 {
 	conditionalStatementNode=ifStatement() { return conditionalStatementNode; }
@@ -289,7 +289,7 @@ StatementNode conditionalStatement():
 //	'if' '(' 式 ')' 文 ['else' 文]
 StatementNode ifStatement():
 {
-	Token token;
+	Token token = null;
 	ExpressionNode conditional = null;
 	StatementNode thenBody = null;
 	StatementNode elseBody = null;
@@ -304,7 +304,7 @@ StatementNode ifStatement():
 //	|for文
 StatementNode iterationStatement():
 {
-	StatementNode iterationStatement;
+	StatementNode iterationStatement = null;
 }
 {
 	  iterationStatement=whileStatement() { return iterationStatement; }
@@ -315,9 +315,9 @@ StatementNode iterationStatement():
 //	'while' '(' 式 ')' 文
 StatementNode whileStatement():
 {
-	Token token;
-	ExpressionNode conditional;
-	StatementNode body;
+	Token token = null;
+	ExpressionNode conditional = null;
+	StatementNode body = null;
 }
 {
 	token=<WHILE> "(" conditional=expression() ")" body=statement() { return new WhileNode(new Location(this.getFileName(), token), conditional, body); }
@@ -328,7 +328,7 @@ StatementNode whileStatement():
 //初期化部や更新部で複数の式文を実行出来るようするべきか
 StatementNode forStatement():
 {
-	Token token;
+	Token token = null;
 	ExpressionNode initialize = null;
 	ExpressionNode conditional = null;
 	ExpressionNode update = null;
@@ -343,7 +343,7 @@ StatementNode forStatement():
 //	'break' ';'
 StatementNode breakStatement():
 {
-	Token token;
+	Token token = null;
 }
 {
 	token=<BREAK> ";" { return new BreakNode(new Location(this.getFileName(), token)); }
@@ -353,7 +353,7 @@ StatementNode breakStatement():
 //	'return' [式] ';'
 StatementNode returnStatement():
 {
-	Token token;
+	Token token = null;
 	ExpressionNode expressionNode = null;
 }
 {
@@ -365,7 +365,7 @@ StatementNode returnStatement():
 //あとで見直す
 StatementNode emptyStatement():
 {
-	Token token;
+	Token token = null;
 }
 {
 	token=";" { return new EmptyStatementNode(new Location(this.getFileName(), token)); }
@@ -375,8 +375,8 @@ StatementNode emptyStatement():
 //	式 ';'
 ExpressionStatementNode expressionStatement():
 {
-	Token token;
-	ExpressionNode expressionNode;
+	Token token = null;
+	ExpressionNode expressionNode = null;
 }
 {
 	//要修正。式のコンストラクタとメソッドを追加してから書き換える
@@ -407,8 +407,8 @@ ExpressionNode expression():
 //論理OR
 ExpressionNode expression5():
 {
-	ExpressionNode right;
-	ExpressionNode left;
+	ExpressionNode left = null;
+	ExpressionNode right = null;
 }
 {
 	left=expression4() ("||" right=expression4() { left = new LogicalOrNode(left, right); })*
@@ -420,8 +420,8 @@ ExpressionNode expression5():
 //論理AND
 ExpressionNode expression4():
 {
-	ExpressionNode right;
-	ExpressionNode left;
+	ExpressionNode left = null;
+	ExpressionNode right = null;
 }
 {
 	left=expression3() ("&&" right=expression3() { left = new LogicalAndNode(left, right); })*
@@ -434,8 +434,8 @@ ExpressionNode expression4():
 //関係式
 ExpressionNode expression3():
 {
-	ExpressionNode right;
-	ExpressionNode left;
+	ExpressionNode left = null;
+	ExpressionNode right = null;
 }
 {
 	left=expression2() ( "==" right=expression2() { left = new EquivalenceNode(left, right); }
@@ -454,8 +454,8 @@ ExpressionNode expression3():
 //減算式
 ExpressionNode expression2():
 {
-	ExpressionNode right;
-	ExpressionNode left;
+	ExpressionNode left = null;
+	ExpressionNode right = null;
 }
 {	
 	left=expression1()  ( "+" right=expression1() { left = new PlusNode(left, right); }
@@ -471,8 +471,8 @@ ExpressionNode expression2():
 //剰余式
 ExpressionNode expression1():
 {
-	ExpressionNode right;
-	ExpressionNode left;
+	ExpressionNode left = null;
+	ExpressionNode right = null;
 }
 {
 	left=term() ( "*" right=term() { left = new MulNode(left, right); }
@@ -486,7 +486,7 @@ ExpressionNode expression1():
 //項の構文
 ExpressionNode term():
 {
-	ExpressionNode expressionNode;
+	ExpressionNode expressionNode = null;
 }
 {
 	expressionNode=unaryExpression() { return expressionNode; }
@@ -495,8 +495,8 @@ ExpressionNode term():
 //単項式
 ExpressionNode unaryExpression():
 {
-	Token token;
-	ExpressionNode expressionNode;
+	Token token = null;
+	ExpressionNode expressionNode = null;
 }
 {
 	  token="++" expressionNode=unaryExpression() { return new PreIncrementNode(expressionNode); } //前置増分式
@@ -539,8 +539,8 @@ List<ExpressionNode> arguments():
 //一次式
 ExpressionNode primaryExpression():
 {
-	Token token;
-	ExpressionNode expressionNode;
+	Token token = null;
+	ExpressionNode expressionNode = null;
 }
 {
 	token=<INTEGER> //10進定数

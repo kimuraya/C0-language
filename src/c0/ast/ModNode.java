@@ -27,7 +27,7 @@ public class ModNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("ModNode");
+		System.out.println("\"%\" ModNode");
 		
 		this.left.dump(depth, true);
 		this.right.dump(depth, true);

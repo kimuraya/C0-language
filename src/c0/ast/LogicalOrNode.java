@@ -27,7 +27,7 @@ public class LogicalOrNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("LogicalOrNode");
+		System.out.println("\"||\" LogicalOrNode");
 		
 		this.left.dump(depth, true);
 		this.right.dump(depth, true);

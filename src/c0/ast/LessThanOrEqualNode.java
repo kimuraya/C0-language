@@ -27,7 +27,7 @@ public class LessThanOrEqualNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("LessThanOrEqualNode");
+		System.out.println("\"<=\" LessThanOrEqualNode");
 		
 		this.left.dump(depth, true);
 		this.right.dump(depth, true);

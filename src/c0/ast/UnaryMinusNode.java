@@ -25,7 +25,7 @@ public class UnaryMinusNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("UnaryMinusNode");
+		System.out.println("\"-\" UnaryMinusNode");
 		
 		this.leftValue.dump(depth, true);
 	}

@@ -29,7 +29,7 @@ public class DivNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("DivNode");
+		System.out.println("\"/\" DivNode");
 		
 		this.left.dump(depth, true);
 		this.right.dump(depth, true);

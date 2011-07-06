@@ -25,7 +25,7 @@ public class PostIncrementNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("PostIncrementNode");
+		System.out.println("\"++\" PostIncrementNode");
 		
 		this.leftValue.dump(depth, true);
 	}

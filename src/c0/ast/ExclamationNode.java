@@ -27,7 +27,7 @@ public class ExclamationNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("ExclamationNode");
+		System.out.println("\"!\" ExclamationNode");
 		
 		this.leftValue.dump(depth, true);
 	}

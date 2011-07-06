@@ -25,7 +25,7 @@ public class PreIncrementNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("PreIncrementNode");
+		System.out.println("\"++\" PreIncrementNode");
 		
 		this.leftValue.dump(depth, true);
 	}

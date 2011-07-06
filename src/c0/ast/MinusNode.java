@@ -27,7 +27,7 @@ public class MinusNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("MinusNode");
+		System.out.println("\"-\" MinusNode");
 		
 		this.left.dump(depth, true);
 		this.right.dump(depth, true);
