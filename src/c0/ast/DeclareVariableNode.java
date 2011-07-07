@@ -27,6 +27,12 @@ public class DeclareVariableNode extends StatementNode {
 		
 		depth++;
 		
+		if (indentFlag) {
+			this.printIndent(depth);
+		}
+		
+		System.out.println("DeclareVariableNode");
+		
 		this.dataType.dump(depth, true);
 		this.identifier.dump(depth, true);
 		
