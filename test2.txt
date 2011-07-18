@@ -1,0 +1,14 @@
+int a;
+
+int main() {
+	int i = 1;
+	int j = 2;
+	
+	a = add(i, j);
+}
+
+int add(int i, int j) {
+	int b;
+	b = i + j;
+	return b;
+}
