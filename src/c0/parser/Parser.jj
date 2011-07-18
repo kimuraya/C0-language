@@ -37,6 +37,7 @@ SPECIAL_TOKEN: {
 //文のキーワード
 TOKEN: {
 	  <INT      : "int">
+    | <VOID     : "void">
 	| <IF       : "if">
 	| <ELSE     : "else">
 	| <WHILE    : "while">
@@ -130,9 +131,9 @@ IdentifierNode defineFunction():
 			identifier.setStandardFunctionFlag(false); //組み込み関数ではない
 			function_i.setIdentifier(identifier);
 
-			//引数と複合文をセットする
-			function_i.setParameters(parameters);
-			function_i.setBlock(block);
+			function_i.setParameters(parameters); //引数
+			function_i.setBlock(block); //複合文
+			function_i.setReturnDataType(dataType); //戻り値のデータ型
 			return function_i;		}
 }
 
@@ -207,6 +208,10 @@ DataTypeNode type():
 	| <INT>
 	{
 		return new DataTypeNode(DataType.INT, elementNumber); //整数の変数
+	}
+	| <VOID>
+	{
+		return new DataTypeNode(DataType.VOID, elementNumber); //void
 	}
 }
 
@@ -511,6 +516,7 @@ ExpressionNode PostfixExpression():
 {
 	Token token = null;
 	ExpressionNode expressionNode = null;
+	IdentifierNode arrayName = null;
 	ExpressionNode index = null;
 	List<ExpressionNode> arguments = null;
 }
@@ -518,7 +524,11 @@ ExpressionNode PostfixExpression():
 	expressionNode=primaryExpression()
 	( token="++" { expressionNode = new PostIncrementNode(expressionNode); } //後置増分式
 	| token="--" { expressionNode = new PostDecrementNode(expressionNode); } //後置減分式
-	| token="[" index=expression() "]" { expressionNode = new ArraySubscriptExpressionNode(expressionNode, index); } //添字式
+	| token="[" index=expression() "]"
+		{
+			arrayName = (IdentifierNode)expressionNode;
+			expressionNode = new ArraySubscriptExpressionNode(arrayName, index); //添字式
+		}
 	| token="(" [arguments=arguments()] ")" { expressionNode = new CallNode(expressionNode, arguments); } //関数呼び出し
 	)*
 		{

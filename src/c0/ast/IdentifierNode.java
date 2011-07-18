@@ -9,6 +9,7 @@ import c0.util.Identifier;
 public class IdentifierNode extends ExpressionNode {
 	
 	private Identifier identifier;
+	private DataTypeNode returnDataType; //関数の戻り値のデータ型
 	private List<ParameterNode> parameters = new LinkedList<ParameterNode>(); //引数のリスト
 	private StatementNode block; //関数本体（複合文）
 	
@@ -27,6 +28,14 @@ public class IdentifierNode extends ExpressionNode {
 		this.identifier = identifier;
 	}
 	
+	public DataTypeNode getReturnDataType() {
+		return returnDataType;
+	}
+
+	public void setReturnDataType(DataTypeNode returnDataType) {
+		this.returnDataType = returnDataType;
+	}
+
 	public List<ParameterNode> getParameters() {
 		return parameters;
 	}
@@ -106,6 +115,8 @@ public class IdentifierNode extends ExpressionNode {
 					System.out.println("IdentifierType : " + this.identifier.getIdentifierType());
 					
 					this.printFileNameAndLine(depth, indentFlag);
+					
+					this.returnDataType.dump(depth, true);
 					
 					if (parameters != null) {
 						//depth--;

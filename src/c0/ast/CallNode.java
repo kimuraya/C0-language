@@ -43,10 +43,12 @@ public class CallNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		System.out.println("parameters");
-		
-		for(ExpressionNode parameter : parameters) {
-			parameter.dump(depth, true);
+		if (this.parameters != null) {
+			System.out.println("parameters");
+			
+			for(ExpressionNode parameter : this.parameters) {
+				parameter.dump(depth, true);
+			}
 		}
 	}
 }

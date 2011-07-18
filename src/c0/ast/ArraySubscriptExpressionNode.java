@@ -3,10 +3,10 @@ package c0.ast;
 //添字式
 public class ArraySubscriptExpressionNode extends ExpressionNode {
 	
-	private ExpressionNode array;
+	private IdentifierNode array;
 	private ExpressionNode index;	
 
-	public ArraySubscriptExpressionNode(ExpressionNode array,
+	public ArraySubscriptExpressionNode(IdentifierNode array,
 			ExpressionNode index) {
 		super();
 		this.array = array;

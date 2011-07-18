@@ -5,13 +5,13 @@ import c0.util.NodeType;
 //"="
 public class AssignNode extends ExpressionNode {
 
-	private IdentifierNode leftValue; //左辺値
+	private ExpressionNode leftValue; //左辺値
 	private ExpressionNode expression; //式
 
 	public AssignNode(ExpressionNode leftValue,
 			ExpressionNode expression) {
 		super();
-		this.leftValue = (IdentifierNode)leftValue;
+		this.leftValue = leftValue;
 		this.expression = expression;
 	}
 
