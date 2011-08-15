@@ -5,6 +5,8 @@ int main() {
 	int j = 2;
 	
 	a = add(i, j);
+	
+	return;
 }
 
 int add(int i, int j) {
