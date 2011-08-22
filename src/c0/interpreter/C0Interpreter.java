@@ -6,11 +6,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Stack;
 
 import c0.ast.AstNode;
 import c0.parser.C0Language;
 import c0.parser.ParseException;
 import c0.util.Identifier;
+import c0.util.StackElement;
 
 //ASTのノードを入力として受け取り、関数を実行する。
 //シンボルテーブルや環境を管理する
@@ -18,6 +20,7 @@ public class C0Interpreter {
 	
 	private List<Identifier> symbolTable; //シンボルテーブル
 	private List<Environment> interpreterEnvironment; //環境
+	private Stack<StackElement> stack; //局所変数、戻り値、戻り先、ベースポインタを積む
 	
 	public static void main(String args[]) {
 		
@@ -27,6 +30,7 @@ public class C0Interpreter {
 		AstNode program = null;
 		
 		//mainメソッドの引数をチェック。ファイル名が無ければ、警告を出して終了
+		//例外を使わないコードに書き換える
 		try {
 			fileName = args[0];
 			fileReader = new FileReader(fileName);

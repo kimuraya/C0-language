@@ -1,5 +1,7 @@
 package c0.util;
 
+import c0.ast.StatementNode;
+
 //値を管理するクラス
 public class Value {
 	
@@ -7,6 +9,7 @@ public class Value {
 	private int integer; //整数
 	private int[] array; //整数の配列
 	private String stringLiteral; //文字列定数
+	private StatementNode returnAddress; //戻り先
 	
 	//getter, setter
 	public DataType getDataType() {
@@ -32,5 +35,11 @@ public class Value {
 	}
 	public void setStringLiteral(String stringLiteral) {
 		this.stringLiteral = stringLiteral;
+	}
+	public void setReturnAddress(StatementNode returnAddress) {
+		this.returnAddress = returnAddress;
+	}
+	public StatementNode getReturnAddress() {
+		return returnAddress;
 	}
 }
