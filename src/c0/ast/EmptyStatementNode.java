@@ -1,7 +1,5 @@
 package c0.ast;
 
-import c0.util.NodeType;
-
 //空文
 public class EmptyStatementNode extends StatementNode {
 	

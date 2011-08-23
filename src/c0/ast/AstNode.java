@@ -1,7 +1,6 @@
 package c0.ast;
 
 import java.util.List;
-import c0.util.NodeType;
 
 //抽象構文木のルート
 public class AstNode extends Node {

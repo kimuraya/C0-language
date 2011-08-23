@@ -1,10 +1,7 @@
 package c0.ast;
 
-import c0.util.NodeType;
-
 abstract public class Node {
 	
-	protected NodeType nodeType; //構文木の種類を表す列挙体
 	protected Location location; //ソースファイルの名前とTokenオブジェクトを保持する
 	
 	abstract public void dump(int depth, boolean indentFlag); //構文木を表示する
