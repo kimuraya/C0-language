@@ -9,6 +9,7 @@ import java.util.LinkedList;
 public class C0Language implements C0LanguageConstants {
 
         private String fileName = null;
+        private List<Identifier> symbolTable = null;
 
         public String getFileName() {
                 return fileName;
@@ -16,6 +17,14 @@ public class C0Language implements C0LanguageConstants {
 
         public void setFileName(String fileName) {
                 this.fileName = fileName;
+        }
+
+        public List<Identifier> getSymbolTable() {
+                return symbolTable;
+        }
+
+        public void setSymbolTable(List<Identifier> symbolTable) {
+                this.symbolTable = symbolTable;
         }
 
 //パ�?サの記述
@@ -952,43 +961,6 @@ public class C0Language implements C0LanguageConstants {
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_3R_55() {
-    if (jj_scan_token(19)) return true;
-    if (jj_3R_24()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_46() {
-    if (jj_3R_24()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_55()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_42() {
-    if (jj_scan_token(27)) return true;
-    if (jj_3R_41()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_43() {
-    if (jj_3R_46()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_41() {
-    if (jj_3R_44()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_45()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
   private boolean jj_3R_14() {
     if (jj_3R_12()) return true;
     return false;
@@ -1368,6 +1340,43 @@ public class C0Language implements C0LanguageConstants {
     if (jj_3R_22()) return true;
     }
     }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_55() {
+    if (jj_scan_token(19)) return true;
+    if (jj_3R_24()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_46() {
+    if (jj_3R_24()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_55()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_42() {
+    if (jj_scan_token(27)) return true;
+    if (jj_3R_41()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_43() {
+    if (jj_3R_46()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_41() {
+    if (jj_3R_44()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_45()) { jj_scanpos = xsp; break; }
     }
     return false;
   }

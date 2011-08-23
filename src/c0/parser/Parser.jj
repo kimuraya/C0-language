@@ -17,6 +17,7 @@ import java.util.LinkedList;
 public class C0Language {
 	
 	private String fileName = null;
+	private List<Identifier> symbolTable = null;
 	
 	public String getFileName() {
 		return fileName;
@@ -24,7 +25,15 @@ public class C0Language {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
-	}	}
+	}
+
+	public List<Identifier> getSymbolTable() {
+		return symbolTable;
+	}
+
+	public void setSymbolTable(List<Identifier> symbolTable) {
+		this.symbolTable = symbolTable;
+	}}
 PARSER_END(C0Language)
 
 //スキャナの記述
