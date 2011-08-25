@@ -14,12 +14,13 @@ import c0.parser.C0Language;
 import c0.parser.ParseException;
 import c0.util.Identifier;
 import c0.util.StackElement;
+import c0.util.SymbolTable;
 
 //ASTのノードを入力として受け取り、関数を実行する。
 //シンボルテーブルや環境を管理する
 public class C0Interpreter {
 
-	private LinkedList<Identifier> symbolTable = null; //シンボルテーブル
+	private SymbolTable symbolTable = null; //シンボルテーブル
 	private Stack<StackElement> stack = null; //局所変数、戻り値、戻り先、ベースポインタを積む
 	
 	public static void main(String args[]) {
@@ -52,7 +53,7 @@ public class C0Interpreter {
 	
 	//インタプリタの初期処理
 	private void init() {
-		this.symbolTable = new LinkedList<Identifier>(); //シンボルテーブル
+		this.symbolTable = new SymbolTable(); //シンボルテーブル
 		this.stack = new Stack<StackElement>(); //局所変数、戻り値、戻り先、ベースポインタを積む
 	}
 	
@@ -64,7 +65,7 @@ public class C0Interpreter {
 		//ファイルを渡して、パーサを実行
 		C0Language parser = new C0Language(fileReader);
 		parser.setFileName(fileName);
-		parser.setSymbolTable(symbolTable);
+		//parser.setSymbolTable(symbolTable);
 		
 		//parser.enable_tracing(); //パーサのトレース機能を開始
 		
