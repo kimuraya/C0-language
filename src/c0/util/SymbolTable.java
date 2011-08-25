@@ -15,7 +15,7 @@ public class SymbolTable {
 		
 	}
 	
-	//識別子名をシンボルテーブルから手に入れる
+	//名前のシンボルテーブルを検索し、シンボルを取得する
 	public Identifier getSymbol(String name) {
 		
 	}
