@@ -7,15 +7,15 @@ public class SymbolTable {
 	private LinkedList<Identifier> symbolTable = new LinkedList<Identifier>();
 	
 	//識別子がシンボルテーブルに登録済みかをチェックする
-	public boolean searchSymbol() {
+	public boolean searchSymbol(Identifier Symbol) {
 	}
 	
 	//識別子をシンボルテーブルに追加する
-	public void addSymbol() {
+	public void addSymbol(Identifier Symbol) {
 		
 	}
 	
-	//名前のシンボルテーブルを検索し、シンボルを取得する
+	//名前でシンボルテーブルを検索し、シンボルを取得する
 	public Identifier getSymbol(String name) {
 		
 	}
