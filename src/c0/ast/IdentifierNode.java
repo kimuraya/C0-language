@@ -13,11 +13,9 @@ public class IdentifierNode extends ExpressionNode {
 	private List<ParameterNode> parameters = new LinkedList<ParameterNode>(); //引数のリスト
 	private StatementNode block; //関数本体（複合文）
 	
-	public IdentifierNode(Location location, String name) {
+	public IdentifierNode(Location location) {
 		super();
 		this.location = location;
-		this.identifier = new Identifier();
-		this.identifier.setName(name);
 	}
 
 	public Identifier getIdentifier() {

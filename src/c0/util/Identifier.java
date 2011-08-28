@@ -13,6 +13,11 @@ public class Identifier {
 	private LeftValue leftValue;             //グローバル変数の値
 	private List<Identifier> parameters;     //引数のリスト
 	
+	public Identifier(String name) {
+		super();
+		this.name = name;
+	}
+	
 	//getter, setter
 	public String getName() {
 		return name;

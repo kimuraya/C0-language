@@ -560,6 +560,8 @@ ExpressionNode primaryExpression():
 {
 	Token token = null;
 	ExpressionNode expressionNode = null;
+	IdentifierNode identifierNode = null;
+	Identifier identifier = null;
 }
 {
 	token=<INTEGER> //10進定数
@@ -572,7 +574,16 @@ ExpressionNode primaryExpression():
 			}
 	| token=<IDENTIFIER> //識別子
 			{
-				return new IdentifierNode(new Location(this.getFileName(), token), token.image);
+				identifierNode = new IdentifierNode(new Location(this.getFileName(), token));
+				identifier = new Identifier(token.image);
+								
+				//同じ名前の識別子がシンボルテーブルに無ければ、テーブルに追加する
+				if (this.symbolTable.searchSymbol(token.image)) {
+					this.symbolTable.addSymbol(identifierNode.getIdentifier());				} else {
+					//識別子がシンボルテーブルに登録済みなら、IdentifierNodeには登録されたシンボルの参照を入れる
+				}
+
+				return identifierNode;
 			}
 	| "(" expressionNode=expression() ")" //括弧式
 			{
