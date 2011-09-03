@@ -576,11 +576,13 @@ ExpressionNode primaryExpression():
 			{
 				identifierNode = new IdentifierNode(new Location(this.getFileName(), token));
 				identifier = new Identifier(token.image);
-								
+				
 				//同じ名前の識別子がシンボルテーブルに無ければ、テーブルに追加する
-				if (this.symbolTable.searchSymbol(token.image)) {
+				if (!this.symbolTable.searchSymbol(token.image)) {
+					identifierNode.setIdentifier(identifier);
 					this.symbolTable.addSymbol(identifierNode.getIdentifier());				} else {
 					//識別子がシンボルテーブルに登録済みなら、IdentifierNodeには登録されたシンボルの参照を入れる
+					identifierNode.setIdentifier(this.symbolTable.getSymbol(token.image));
 				}
 
 				return identifierNode;

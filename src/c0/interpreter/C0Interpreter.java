@@ -64,8 +64,8 @@ public class C0Interpreter {
 		
 		//ファイルを渡して、パーサを実行
 		C0Language parser = new C0Language(fileReader);
+		parser.setSymbolTable(this.symbolTable);
 		parser.setFileName(fileName);
-		//parser.setSymbolTable(symbolTable);
 		
 		//parser.enable_tracing(); //パーサのトレース機能を開始
 		
@@ -77,6 +77,8 @@ public class C0Interpreter {
 		} catch (ParseException e1) {
 			e1.printStackTrace();
 		}
+		
+		System.out.println(this.symbolTable.getSymbolTable());
 		
 		//インタプリタが構文木を入力として受け取り、プログラムを実行する
 	}

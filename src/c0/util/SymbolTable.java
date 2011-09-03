@@ -76,4 +76,12 @@ public class SymbolTable {
 		//更新をしなかった場合
 		return false;
 	}
+
+	public LinkedList<Identifier> getSymbolTable() {
+		return symbolTable;
+	}
+
+	public void setSymbolTable(LinkedList<Identifier> symbolTable) {
+		this.symbolTable = symbolTable;
+	}
 }

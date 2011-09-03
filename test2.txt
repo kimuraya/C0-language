@@ -5,6 +5,9 @@ int main() {
 	int j = 2;
 	
 	a = add(i, j);
+	{
+		int i;
+	}
 	
 	return a;
 }

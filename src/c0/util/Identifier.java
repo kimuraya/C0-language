@@ -49,4 +49,9 @@ public class Identifier {
 	public void setStandardFunctionFlag(boolean standardFunctionFlag) {
 		this.standardFunctionFlag = standardFunctionFlag;
 	}
+	
+	//デバッグ用
+	public String toString() {
+		return this.name;
+	}
 }

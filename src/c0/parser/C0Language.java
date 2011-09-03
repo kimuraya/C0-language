@@ -9,7 +9,7 @@ import java.util.LinkedList;
 public class C0Language implements C0LanguageConstants {
 
         private String fileName = null;
-        private List<Identifier> symbolTable = null;
+        private SymbolTable symbolTable = null;
 
         public String getFileName() {
                 return fileName;
@@ -19,11 +19,11 @@ public class C0Language implements C0LanguageConstants {
                 this.fileName = fileName;
         }
 
-        public List<Identifier> getSymbolTable() {
+        public SymbolTable getSymbolTable() {
                 return symbolTable;
         }
 
-        public void setSymbolTable(List<Identifier> symbolTable) {
+        public void setSymbolTable(SymbolTable symbolTable) {
                 this.symbolTable = symbolTable;
         }
 
@@ -906,6 +906,8 @@ public class C0Language implements C0LanguageConstants {
   final public ExpressionNode primaryExpression() throws ParseException {
         Token token = null;
         ExpressionNode expressionNode = null;
+        IdentifierNode identifierNode = null;
+        Identifier identifier = null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case INTEGER:
       token = jj_consume_token(INTEGER);
@@ -917,7 +919,18 @@ public class C0Language implements C0LanguageConstants {
       break;
     case IDENTIFIER:
       token = jj_consume_token(IDENTIFIER);
-                                {if (true) return new IdentifierNode(new Location(this.getFileName(), token), token.image);}
+                                identifierNode = new IdentifierNode(new Location(this.getFileName(), token));
+                                identifier = new Identifier(token.image);
+                                identifierNode.setIdentifier(identifier);
+
+                                //同じ名前の識別子がシンボル�??ブルに無ければ、テーブルに追�?���?
+                                if (!this.symbolTable.searchSymbol(token.image)) {
+                                        this.symbolTable.addSymbol(identifierNode.getIdentifier());
+                                } else {
+                                        //識別子がシンボル�??ブルに登録済みなら�?IdentifierNodeには登録されたシンボルの参�?を�?れる
+                                }
+
+                                {if (true) return identifierNode;}
       break;
     case 17:
       jj_consume_token(17);
@@ -1179,6 +1192,13 @@ public class C0Language implements C0LanguageConstants {
     return false;
   }
 
+  private boolean jj_3R_22() {
+    if (jj_scan_token(17)) return true;
+    if (jj_3R_24()) return true;
+    if (jj_scan_token(18)) return true;
+    return false;
+  }
+
   private boolean jj_3R_17() {
     if (jj_scan_token(INT)) return true;
     return false;
@@ -1268,13 +1288,6 @@ public class C0Language implements C0LanguageConstants {
     return false;
   }
 
-  private boolean jj_3R_22() {
-    if (jj_scan_token(17)) return true;
-    if (jj_3R_24()) return true;
-    if (jj_scan_token(18)) return true;
-    return false;
-  }
-
   private boolean jj_3R_21() {
     if (jj_scan_token(IDENTIFIER)) return true;
     return false;
@@ -1282,6 +1295,27 @@ public class C0Language implements C0LanguageConstants {
 
   private boolean jj_3R_20() {
     if (jj_scan_token(STRING)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_19() {
+    if (jj_scan_token(INTEGER)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_13() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_19()) {
+    jj_scanpos = xsp;
+    if (jj_3R_20()) {
+    jj_scanpos = xsp;
+    if (jj_3R_21()) {
+    jj_scanpos = xsp;
+    if (jj_3R_22()) return true;
+    }
+    }
+    }
     return false;
   }
 
@@ -1319,27 +1353,6 @@ public class C0Language implements C0LanguageConstants {
     while (true) {
       xsp = jj_scanpos;
       if (jj_3R_48()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_19() {
-    if (jj_scan_token(INTEGER)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_13() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_19()) {
-    jj_scanpos = xsp;
-    if (jj_3R_20()) {
-    jj_scanpos = xsp;
-    if (jj_3R_21()) {
-    jj_scanpos = xsp;
-    if (jj_3R_22()) return true;
-    }
-    }
     }
     return false;
   }
