@@ -1,5 +1,7 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
+
 //式文
 public class ExpressionStatementNode extends StatementNode {
 	
@@ -7,6 +9,14 @@ public class ExpressionStatementNode extends StatementNode {
 	
 	public ExpressionStatementNode(Location loc, ExpressionNode expression) {
 		super(loc);
+		this.expression = expression;
+	}
+
+	public ExpressionNode getExpression() {
+		return expression;
+	}
+
+	public void setExpression(ExpressionNode expression) {
 		this.expression = expression;
 	}
 
@@ -24,5 +34,10 @@ public class ExpressionStatementNode extends StatementNode {
 		this.printFileNameAndLine(depth, indentFlag);
 		
 		this.expression.dump(depth, true);
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
 	}
 }

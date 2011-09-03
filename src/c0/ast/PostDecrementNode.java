@@ -1,5 +1,7 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
+
 //"--" 後置減分
 public class PostDecrementNode extends ExpressionNode {
 	
@@ -28,5 +30,11 @@ public class PostDecrementNode extends ExpressionNode {
 		System.out.println("\"--\" PostDecrementNode");
 		
 		this.leftValue.dump(depth, true);
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		// TODO 自動生成されたメソッド・スタブ
+		
 	}
 }

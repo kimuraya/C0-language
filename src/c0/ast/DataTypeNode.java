@@ -1,5 +1,6 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
 import c0.util.DataType;
 
 //データ型
@@ -38,5 +39,11 @@ public class DataTypeNode extends ExpressionNode {
 		if(elementNumber != null) {
 			this.elementNumber.dump(depth, true);
 		}
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		// TODO 自動生成されたメソッド・スタブ
+		
 	}
 }

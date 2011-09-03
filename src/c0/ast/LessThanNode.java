@@ -1,5 +1,7 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
+
 //"<"
 public class LessThanNode extends ExpressionNode {
 	
@@ -31,6 +33,12 @@ public class LessThanNode extends ExpressionNode {
 		
 		this.left.dump(depth, true);
 		this.right.dump(depth, true);
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		// TODO 自動生成されたメソッド・スタブ
+		
 	}
 
 }

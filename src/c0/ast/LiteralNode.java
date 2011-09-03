@@ -1,5 +1,6 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
 import c0.util.DataType;
 import c0.util.Value;
 
@@ -82,5 +83,11 @@ public class LiteralNode extends ExpressionNode {
 				System.out.println("value : " + this.literal.getStringLiteral());
 				break;
 		}
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		// TODO 自動生成されたメソッド・スタブ
+		
 	}
 }

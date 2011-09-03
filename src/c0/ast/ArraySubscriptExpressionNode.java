@@ -1,5 +1,7 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
+
 //添字式
 public class ArraySubscriptExpressionNode extends ExpressionNode {
 	
@@ -32,5 +34,11 @@ public class ArraySubscriptExpressionNode extends ExpressionNode {
 		
 		this.array.dump(depth, true);
 		this.index.dump(depth, true);
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		// TODO 自動生成されたメソッド・スタブ
+		
 	}
 }

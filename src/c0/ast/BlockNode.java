@@ -2,6 +2,8 @@ package c0.ast;
 
 import java.util.List;
 
+import c0.interpreter.Visitor;
+
 //複合文
 public class BlockNode extends StatementNode {
 	
@@ -12,6 +14,22 @@ public class BlockNode extends StatementNode {
 			List<StatementNode> statements) {
 		super(loc);
 		this.localVariables = localVariables;
+		this.statements = statements;
+	}
+
+	public List<DeclareVariableNode> getLocalVariables() {
+		return localVariables;
+	}
+
+	public void setLocalVariables(List<DeclareVariableNode> localVariables) {
+		this.localVariables = localVariables;
+	}
+
+	public List<StatementNode> getStatements() {
+		return statements;
+	}
+
+	public void setStatements(List<StatementNode> statements) {
 		this.statements = statements;
 	}
 
@@ -49,5 +67,10 @@ public class BlockNode extends StatementNode {
 		for(StatementNode statement : statements) {
 			statement.dump(depth, true);
 		}
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
 	}
 }

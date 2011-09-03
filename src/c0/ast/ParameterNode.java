@@ -1,5 +1,7 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
+
 //引数 :=
 //データ型 識別子
 public class ParameterNode extends StatementNode {
@@ -11,6 +13,22 @@ public class ParameterNode extends StatementNode {
 			IdentifierNode identifier) {
 		super(loc);
 		this.dataType = dataType;
+		this.identifier = identifier;
+	}
+
+	public DataTypeNode getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(DataTypeNode dataType) {
+		this.dataType = dataType;
+	}
+
+	public IdentifierNode getIdentifier() {
+		return identifier;
+	}
+
+	public void setIdentifier(IdentifierNode identifier) {
 		this.identifier = identifier;
 	}
 
@@ -26,6 +44,11 @@ public class ParameterNode extends StatementNode {
 		
 		this.dataType.dump(depth, true);
 		this.identifier.dump(depth, true);
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
 	}
 
 }

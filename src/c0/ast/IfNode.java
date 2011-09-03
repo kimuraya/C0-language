@@ -1,5 +1,7 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
+
 //if-else文
 public class IfNode extends StatementNode {
 	
@@ -56,6 +58,12 @@ public class IfNode extends StatementNode {
 			System.out.println("elseStatement");
 			this.elseStatement.dump(depth, true);
 		}
+		
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		// TODO 自動生成されたメソッド・スタブ
 		
 	}
 }

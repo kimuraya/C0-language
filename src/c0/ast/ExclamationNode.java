@@ -1,5 +1,7 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
+
 //"!"
 public class ExclamationNode extends ExpressionNode {
 	
@@ -28,6 +30,12 @@ public class ExclamationNode extends ExpressionNode {
 		System.out.println("\"!\" ExclamationNode");
 		
 		this.leftValue.dump(depth, true);
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		// TODO 自動生成されたメソッド・スタブ
+		
 	}
 
 }

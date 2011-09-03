@@ -1,5 +1,7 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
+
 //for文
 public class ForNode extends StatementNode {
 	
@@ -66,5 +68,11 @@ public class ForNode extends StatementNode {
 		System.out.println("bodyStatement");
 		
 		this.bodyStatement.dump(depth, true);
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		// TODO 自動生成されたメソッド・スタブ
+		
 	}
 }

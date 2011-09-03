@@ -1,5 +1,7 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
+
 //"-" 単項マイナス式
 public class UnaryMinusNode extends ExpressionNode {
 	
@@ -28,5 +30,11 @@ public class UnaryMinusNode extends ExpressionNode {
 		System.out.println("\"-\" UnaryMinusNode");
 		
 		this.leftValue.dump(depth, true);
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		// TODO 自動生成されたメソッド・スタブ
+		
 	}
 }

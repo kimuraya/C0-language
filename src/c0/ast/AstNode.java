@@ -2,6 +2,8 @@ package c0.ast;
 
 import java.util.List;
 
+import c0.interpreter.Visitor;
+
 //抽象構文木のルート
 public class AstNode extends Node {
 	
@@ -35,4 +37,24 @@ public class AstNode extends Node {
 			function.dump(depth, true);
 		}
 	}
+
+	public List<DeclareVariableNode> getGlobalVariables() {
+		return globalVariables;
+	}
+
+	public void setGlobalVariables(List<DeclareVariableNode> globalVariables) {
+		this.globalVariables = globalVariables;
+	}
+
+	public List<IdentifierNode> getFunctions() {
+		return functions;
+	}
+
+	public void setFunctions(List<IdentifierNode> functions) {
+		this.functions = functions;
+	}
+	
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+    }
 }

@@ -17,7 +17,6 @@ import java.util.LinkedList;
 public class C0Language {
 	
 	private String fileName = null;
-	private SymbolTable symbolTable = null;
 	
 	public String getFileName() {
 		return fileName;
@@ -25,14 +24,6 @@ public class C0Language {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
-	}
-
-	public SymbolTable getSymbolTable() {
-		return symbolTable;
-	}
-
-	public void setSymbolTable(SymbolTable symbolTable) {
-		this.symbolTable = symbolTable;
 	}}
 PARSER_END(C0Language)
 
@@ -576,15 +567,8 @@ ExpressionNode primaryExpression():
 			{
 				identifierNode = new IdentifierNode(new Location(this.getFileName(), token));
 				identifier = new Identifier(token.image);
+				identifierNode.setIdentifier(identifier);
 				
-				//同じ名前の識別子がシンボルテーブルに無ければ、テーブルに追加する
-				if (!this.symbolTable.searchSymbol(token.image)) {
-					identifierNode.setIdentifier(identifier);
-					this.symbolTable.addSymbol(identifierNode.getIdentifier());				} else {
-					//識別子がシンボルテーブルに登録済みなら、IdentifierNodeには登録されたシンボルの参照を入れる
-					identifierNode.setIdentifier(this.symbolTable.getSymbol(token.image));
-				}
-
 				return identifierNode;
 			}
 	| "(" expressionNode=expression() ")" //括弧式

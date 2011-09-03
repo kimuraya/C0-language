@@ -1,5 +1,7 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
+
 //式
 abstract public class ExpressionNode extends Node {
 	
@@ -8,4 +10,8 @@ abstract public class ExpressionNode extends Node {
 	}
 
 	abstract public Location location();
+	
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
 }

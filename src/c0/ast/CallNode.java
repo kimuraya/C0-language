@@ -2,6 +2,8 @@ package c0.ast;
 
 import java.util.List;
 
+import c0.interpreter.Visitor;
+
 //関数呼び出し（ネイティブ関数を含む）
 public class CallNode extends ExpressionNode {
 	
@@ -50,5 +52,11 @@ public class CallNode extends ExpressionNode {
 				parameter.dump(depth, true);
 			}
 		}
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		// TODO 自動生成されたメソッド・スタブ
+		
 	}
 }

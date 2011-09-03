@@ -1,5 +1,7 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
+
 abstract public class Node {
 	
 	protected Location location; //ソースファイルの名前とTokenオブジェクトを保持する
@@ -32,4 +34,7 @@ abstract public class Node {
 		
 		System.out.println("line : " + location.getToken().beginLine);
 	}
+	
+	//訪問者の受け入れ
+	abstract public void accept(Visitor visitor);
 }

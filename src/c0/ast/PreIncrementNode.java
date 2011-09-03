@@ -1,5 +1,7 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
+
 //"++" 前置増分
 public class PreIncrementNode extends ExpressionNode {
 	
@@ -28,5 +30,11 @@ public class PreIncrementNode extends ExpressionNode {
 		System.out.println("\"++\" PreIncrementNode");
 		
 		this.leftValue.dump(depth, true);
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		// TODO 自動生成されたメソッド・スタブ
+		
 	}
 }

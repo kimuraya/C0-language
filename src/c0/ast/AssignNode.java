@@ -1,5 +1,7 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
+
 //"="
 public class AssignNode extends ExpressionNode {
 
@@ -19,6 +21,22 @@ public class AssignNode extends ExpressionNode {
 		return null;
 	}
 
+	public ExpressionNode getLeftValue() {
+		return leftValue;
+	}
+
+	public void setLeftValue(ExpressionNode leftValue) {
+		this.leftValue = leftValue;
+	}
+
+	public ExpressionNode getExpression() {
+		return expression;
+	}
+
+	public void setExpression(ExpressionNode expression) {
+		this.expression = expression;
+	}
+
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		
@@ -32,5 +50,10 @@ public class AssignNode extends ExpressionNode {
 		
 		this.leftValue.dump(depth, true);
 		this.expression.dump(depth, true);
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
 	}
 }

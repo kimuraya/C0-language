@@ -1,5 +1,7 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
+
 //break文
 public class BreakNode extends StatementNode {
 	
@@ -20,5 +22,11 @@ public class BreakNode extends StatementNode {
 		System.out.println("BreakNode");
 		
 		this.printFileNameAndLine(depth, indentFlag);
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		// TODO 自動生成されたメソッド・スタブ
+		
 	}
 }

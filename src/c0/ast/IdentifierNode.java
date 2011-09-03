@@ -3,6 +3,7 @@ package c0.ast;
 import java.util.LinkedList;
 import java.util.List;
 import c0.ast.Location;
+import c0.interpreter.Visitor;
 import c0.util.Identifier;
 
 //識別子
@@ -54,6 +55,11 @@ public class IdentifierNode extends ExpressionNode {
 	public Location location() {
 		// TODO 自動生成されたメソッド・スタブ
 		return null;
+	}
+	
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
 	}
 
 	@Override

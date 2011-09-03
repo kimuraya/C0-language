@@ -1,5 +1,7 @@
 package c0.ast;
 
+import c0.interpreter.Visitor;
+
 //while文
 public class WhileNode extends StatementNode {
 	
@@ -43,5 +45,11 @@ public class WhileNode extends StatementNode {
 		System.out.println("bodyStatement");
 		
 		this.bodyStatement.dump(depth, true);
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		// TODO 自動生成されたメソッド・スタブ
+		
 	}
 }
