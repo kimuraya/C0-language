@@ -98,44 +98,44 @@ public class AstVisitor implements Visitor {
 
 	@Override
 	public void visit(EquivalenceNode equivalenceNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		equivalenceNode.getLeft().accept(this);
+		equivalenceNode.getRight().accept(this);
 	}
 
 	@Override
 	public void visit(NotEquivalenceNode notEquivalenceNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		notEquivalenceNode.getLeft().accept(this);
+		notEquivalenceNode.getRight().accept(this);
 	}
 
 	@Override
 	public void visit(LessThanNode lessThanNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		lessThanNode.getLeft().accept(this);
+		lessThanNode.getRight().accept(this);
 	}
 
 	@Override
 	public void visit(LessThanOrEqualNode lessThanOrEqualNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		lessThanOrEqualNode.getLeft().accept(this);
+		lessThanOrEqualNode.getRight().accept(this);
 	}
 
 	@Override
 	public void visit(GreaterThanNode greaterThanNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		greaterThanNode.getLeft().accept(this);
+		greaterThanNode.getRight().accept(this);
 	}
 
 	@Override
 	public void visit(GreaterThanOrEqualNode greaterThanOrEqualNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		greaterThanOrEqualNode.getLeft().accept(this);
+		greaterThanOrEqualNode.getRight().accept(this);
 	}
 
 	@Override
 	public void visit(LogicalAndNode logicalAndNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		logicalAndNode.getLeft().accept(this);
+		logicalAndNode.getRight().accept(this);
 	}
 
 	@Override
