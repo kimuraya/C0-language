@@ -140,86 +140,85 @@ public class AstVisitor implements Visitor {
 
 	@Override
 	public void visit(LogicalOrNode logicalOrNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		logicalOrNode.getLeft().accept(this);
+		logicalOrNode.getRight().accept(this);
 	}
 
 	@Override
 	public void visit(PlusNode plusNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		plusNode.getLeft().accept(this);
+		plusNode.getRight().accept(this);
 	}
 
 	@Override
 	public void visit(MinusNode minusNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		minusNode.getLeft().accept(this);
+		minusNode.getRight().accept(this);
 	}
 
 	@Override
 	public void visit(MulNode mulNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		mulNode.getLeft().accept(this);
+		mulNode.getRight().accept(this);
 	}
 
 	@Override
 	public void visit(DivNode divNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		divNode.getLeft().accept(this);
+		divNode.getRight().accept(this);
 	}
 
 	@Override
 	public void visit(ModNode modNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		modNode.getLeft().accept(this);
+		modNode.getRight().accept(this);
 	}
 
 	@Override
 	public void visit(ExclamationNode exclamationNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		exclamationNode.getLeftValue().accept(this);
 	}
 
 	@Override
 	public void visit(UnaryMinusNode unaryMinusNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		unaryMinusNode.getLeftValue().accept(this);
 	}
 
 	@Override
 	public void visit(PreIncrementNode preIncrementNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		preIncrementNode.getLeftValue().accept(this);
 	}
 
 	@Override
 	public void visit(PreDecrementNode preDecrementNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		preDecrementNode.getLeftValue().accept(this);
 	}
 
 	@Override
 	public void visit(PostIncrementNode postIncrementNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		postIncrementNode.getLeftValue().accept(this);
 	}
 
 	@Override
 	public void visit(PostDecrementNode postDecrementNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		postDecrementNode.getLeftValue().accept(this);
 	}
 
 	@Override
 	public void visit(CallNode callNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		callNode.getFunction().accept(this);
+		List<ExpressionNode> Parameters = callNode.getParameters();
 		
+		// TODO　あとで検討する
+		for (ExpressionNode Parameter : Parameters) {
+			
+		}
 	}
 	
 	@Override
 	public void visit(StatementNode statementNode) {
 		// TODO 自動生成されたメソッド・スタブ
-		
+		// TODO　あとで検討する
 	}
 
 	@Override
@@ -247,31 +246,31 @@ public class AstVisitor implements Visitor {
 
 	@Override
 	public void visit(IfNode ifNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		// TODO あとで検討する
 		
 	}
 
 	@Override
 	public void visit(WhileNode whileNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		// TODO あとで検討する
 		
 	}
 
 	@Override
 	public void visit(ForNode forNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		// TODO あとで検討する
 		
 	}
 
 	@Override
 	public void visit(BreakNode breakNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		// TODO あとで検討する
 		
 	}
 
 	@Override
 	public void visit(ReturnNode returnNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		// TODO あとで検討する
 		
 	}
 
@@ -282,7 +281,7 @@ public class AstVisitor implements Visitor {
 
 	@Override
 	public void visit(EmptyStatementNode emptyStatementNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		// TODO あとで検討する
 		
 	}
 

@@ -7,7 +7,6 @@ public class BreakNode extends StatementNode {
 	
 	public BreakNode(Location loc) {
 		super(loc);
-		// TODO 自動生成されたコンストラクター・スタブ
 	}
 
 	@Override
@@ -26,7 +25,6 @@ public class BreakNode extends StatementNode {
 
 	@Override
 	public void accept(Visitor visitor) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		visitor.visit(this);
 	}
 }

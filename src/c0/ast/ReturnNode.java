@@ -12,6 +12,14 @@ public class ReturnNode extends StatementNode {
 		this.expression = expression;
 	}
 
+	public ExpressionNode getExpression() {
+		return expression;
+	}
+
+	public void setExpression(ExpressionNode expression) {
+		this.expression = expression;
+	}
+
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		
@@ -32,7 +40,6 @@ public class ReturnNode extends StatementNode {
 
 	@Override
 	public void accept(Visitor visitor) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		visitor.visit(this);
 	}
 }

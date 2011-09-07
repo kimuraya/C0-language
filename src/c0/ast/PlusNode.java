@@ -19,10 +19,25 @@ public class PlusNode extends ExpressionNode {
 		// TODO 自動生成されたメソッド・スタブ
 		return null;
 	}
+	
+	public ExpressionNode getLeft() {
+		return left;
+	}
+
+	public void setLeft(ExpressionNode left) {
+		this.left = left;
+	}
+
+	public ExpressionNode getRight() {
+		return right;
+	}
+
+	public void setRight(ExpressionNode right) {
+		this.right = right;
+	}
 
 	@Override
 	public void dump(int depth, boolean indentFlag) {
-		// TODO 自動生成されたメソッド・スタブ
 		depth++;
 		
 		if (indentFlag) {
@@ -37,7 +52,6 @@ public class PlusNode extends ExpressionNode {
 
 	@Override
 	public void accept(Visitor visitor) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		visitor.visit(this);
 	}
 }

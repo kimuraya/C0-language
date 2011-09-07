@@ -20,6 +20,38 @@ public class ForNode extends StatementNode {
 		this.bodyStatement = bodyStatement;
 	}
 
+	public ExpressionNode getInitializeExpression() {
+		return initializeExpression;
+	}
+
+	public void setInitializeExpression(ExpressionNode initializeExpression) {
+		this.initializeExpression = initializeExpression;
+	}
+
+	public ExpressionNode getConditionalExpression() {
+		return conditionalExpression;
+	}
+
+	public void setConditionalExpression(ExpressionNode conditionalExpression) {
+		this.conditionalExpression = conditionalExpression;
+	}
+
+	public ExpressionNode getUpdateExpression() {
+		return updateExpression;
+	}
+
+	public void setUpdateExpression(ExpressionNode updateExpression) {
+		this.updateExpression = updateExpression;
+	}
+
+	public StatementNode getBodyStatement() {
+		return bodyStatement;
+	}
+
+	public void setBodyStatement(StatementNode bodyStatement) {
+		this.bodyStatement = bodyStatement;
+	}
+
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		
@@ -72,7 +104,6 @@ public class ForNode extends StatementNode {
 
 	@Override
 	public void accept(Visitor visitor) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		visitor.visit(this);
 	}
 }

@@ -15,6 +15,22 @@ public class WhileNode extends StatementNode {
 		this.bodyStatement = bodyStatement;
 	}
 
+	public ExpressionNode getConditionalExpression() {
+		return conditionalExpression;
+	}
+
+	public void setConditionalExpression(ExpressionNode conditionalExpression) {
+		this.conditionalExpression = conditionalExpression;
+	}
+
+	public StatementNode getBodyStatement() {
+		return bodyStatement;
+	}
+
+	public void setBodyStatement(StatementNode bodyStatement) {
+		this.bodyStatement = bodyStatement;
+	}
+
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		
@@ -49,7 +65,6 @@ public class WhileNode extends StatementNode {
 
 	@Override
 	public void accept(Visitor visitor) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		visitor.visit(this);
 	}
 }

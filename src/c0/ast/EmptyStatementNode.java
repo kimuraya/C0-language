@@ -7,7 +7,6 @@ public class EmptyStatementNode extends StatementNode {
 	
 	public EmptyStatementNode(Location loc) {
 		super(loc);
-		// TODO 自動生成されたコンストラクター・スタブ
 	}
 
 	@Override
@@ -26,7 +25,6 @@ public class EmptyStatementNode extends StatementNode {
 
 	@Override
 	public void accept(Visitor visitor) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		visitor.visit(this);
 	}
 }

@@ -18,9 +18,16 @@ public class PostIncrementNode extends ExpressionNode {
 		return null;
 	}
 
+	public ExpressionNode getLeftValue() {
+		return leftValue;
+	}
+
+	public void setLeftValue(ExpressionNode leftValue) {
+		this.leftValue = leftValue;
+	}
+
 	@Override
 	public void dump(int depth, boolean indentFlag) {
-		// TODO 自動生成されたメソッド・スタブ
 		depth++;
 		
 		if (indentFlag) {
@@ -34,7 +41,6 @@ public class PostIncrementNode extends ExpressionNode {
 
 	@Override
 	public void accept(Visitor visitor) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		visitor.visit(this);
 	}
 }

@@ -17,6 +17,30 @@ public class IfNode extends StatementNode {
 		this.elseStatement = elseStatement;
 	}
 
+	public ExpressionNode getConditionalExpression() {
+		return conditionalExpression;
+	}
+
+	public void setConditionalExpression(ExpressionNode conditionalExpression) {
+		this.conditionalExpression = conditionalExpression;
+	}
+
+	public StatementNode getThenStatement() {
+		return thenStatement;
+	}
+
+	public void setThenStatement(StatementNode thenStatement) {
+		this.thenStatement = thenStatement;
+	}
+
+	public StatementNode getElseStatement() {
+		return elseStatement;
+	}
+
+	public void setElseStatement(StatementNode elseStatement) {
+		this.elseStatement = elseStatement;
+	}
+
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		
@@ -63,7 +87,6 @@ public class IfNode extends StatementNode {
 
 	@Override
 	public void accept(Visitor visitor) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		visitor.visit(this);
 	}
 }

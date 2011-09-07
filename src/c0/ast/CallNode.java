@@ -22,9 +22,24 @@ public class CallNode extends ExpressionNode {
 		return null;
 	}
 
+	public ExpressionNode getFunction() {
+		return function;
+	}
+
+	public void setFunction(ExpressionNode function) {
+		this.function = function;
+	}
+
+	public List<ExpressionNode> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(List<ExpressionNode> parameters) {
+		this.parameters = parameters;
+	}
+
 	@Override
 	public void dump(int depth, boolean indentFlag) {
-		// TODO 自動生成されたメソッド・スタブ
 		depth++;
 		
 		if (indentFlag) {
@@ -56,7 +71,6 @@ public class CallNode extends ExpressionNode {
 
 	@Override
 	public void accept(Visitor visitor) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		visitor.visit(this);
 	}
 }
