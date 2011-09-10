@@ -21,6 +21,22 @@ public class ArraySubscriptExpressionNode extends ExpressionNode {
 		return null;
 	}
 	
+	public IdentifierNode getArray() {
+		return array;
+	}
+
+	public void setArray(IdentifierNode array) {
+		this.array = array;
+	}
+
+	public ExpressionNode getIndex() {
+		return index;
+	}
+
+	public void setIndex(ExpressionNode index) {
+		this.index = index;
+	}
+
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		
@@ -38,7 +54,6 @@ public class ArraySubscriptExpressionNode extends ExpressionNode {
 
 	@Override
 	public void accept(Visitor visitor) {
-		// TODO 自動生成されたメソッド・スタブ
-		
+		visitor.visit(this);
 	}
 }

@@ -2,6 +2,7 @@ package c0.interpreter;
 
 import java.util.List;
 
+import c0.ast.ArraySubscriptExpressionNode;
 import c0.ast.AssignNode;
 import c0.ast.AstNode;
 import c0.ast.BlockNode;
@@ -72,6 +73,7 @@ public class AstVisitor implements Visitor {
 
 	@Override
 	//識別子をシンボルテーブルに登録する
+	//変数と関数で処理を分ける
 	public void visit(IdentifierNode identifierNode) {
 		System.out.println(identifierNode.getIdentifier().getName());
 		
@@ -207,18 +209,22 @@ public class AstVisitor implements Visitor {
 	@Override
 	public void visit(CallNode callNode) {
 		callNode.getFunction().accept(this);
-		List<ExpressionNode> Parameters = callNode.getParameters();
+		List<ExpressionNode> parameters = callNode.getParameters();
 		
-		// TODO　あとで検討する
-		for (ExpressionNode Parameter : Parameters) {
-			
+		for (ExpressionNode parameter : parameters) {
+			parameter.accept(this);
 		}
 	}
 	
 	@Override
+	public void visit(ArraySubscriptExpressionNode arraySubscriptExpressionNode) {
+		arraySubscriptExpressionNode.getArray().accept(this);
+		arraySubscriptExpressionNode.getIndex().accept(this);
+	}	
+	
+	@Override
 	public void visit(StatementNode statementNode) {
-		// TODO 自動生成されたメソッド・スタブ
-		// TODO　あとで検討する
+		statementNode.accept(this);
 	}
 
 	@Override
@@ -246,20 +252,23 @@ public class AstVisitor implements Visitor {
 
 	@Override
 	public void visit(IfNode ifNode) {
-		// TODO あとで検討する
-		
+		ifNode.getConditionalExpression().accept(this);
+		ifNode.getThenStatement().accept(this);
+		ifNode.getElseStatement().accept(this);
 	}
 
 	@Override
 	public void visit(WhileNode whileNode) {
-		// TODO あとで検討する
-		
+		whileNode.getConditionalExpression().accept(this);
+		whileNode.getBodyStatement().accept(this);
 	}
 
 	@Override
 	public void visit(ForNode forNode) {
-		// TODO あとで検討する
-		
+		forNode.getInitializeExpression().accept(this);
+		forNode.getConditionalExpression().accept(this);
+		forNode.getUpdateExpression().accept(this);
+		forNode.getBodyStatement().accept(this);
 	}
 
 	@Override
@@ -270,8 +279,7 @@ public class AstVisitor implements Visitor {
 
 	@Override
 	public void visit(ReturnNode returnNode) {
-		// TODO あとで検討する
-		
+		returnNode.getExpression().accept(this);
 	}
 
 	@Override
@@ -293,5 +301,5 @@ public class AstVisitor implements Visitor {
 	@Override
 	public void visit(ParameterNode parameterNode) {
 		parameterNode.getIdentifier().accept(this);
-	}	
+	}
 }

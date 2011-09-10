@@ -29,6 +29,7 @@ public interface Visitor {
 	void visit(PostIncrementNode postIncrementNode);
 	void visit(PostDecrementNode postDecrementNode);
 	void visit(CallNode callNode);
+	void visit(ArraySubscriptExpressionNode arraySubscriptExpressionNode);
 	void visit(StatementNode statementNode);
 	void visit(BlockNode blockNode);
 	void visit(IfNode ifNode);
