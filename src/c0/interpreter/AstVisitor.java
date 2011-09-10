@@ -61,7 +61,6 @@ public class AstVisitor implements Visitor {
 
 	@Override
 	public void visit(ExpressionNode expressionNode) {
-		// TODO 自動生成されたメソッド・スタブ
 		expressionNode.accept(this);
 	}
 
@@ -296,6 +295,10 @@ public class AstVisitor implements Visitor {
 	@Override
 	public void visit(DeclareVariableNode declareVariableNode) {
 		declareVariableNode.getIdentifier().accept(this);
+		
+		if (declareVariableNode.getExpression() != null) {
+			declareVariableNode.getExpression().accept(this);
+		}
 	}
 
 	@Override
