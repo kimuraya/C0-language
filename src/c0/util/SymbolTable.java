@@ -4,8 +4,11 @@ import java.util.LinkedList;
 
 public class SymbolTable {
 	
-	//シンボルテーブルには同じ名前の識別子
+	//シンボルテーブル
 	private LinkedList<Identifier> symbolTable = new LinkedList<Identifier>();
+	
+	//上位のシンボルテーブルへのリンク
+	private SymbolTable prev = null;
 	
 	//識別子がシンボルテーブルに登録済みかをチェックする
 	public boolean searchSymbol(Identifier Symbol) {
@@ -83,5 +86,13 @@ public class SymbolTable {
 
 	public void setSymbolTable(LinkedList<Identifier> symbolTable) {
 		this.symbolTable = symbolTable;
+	}
+
+	public SymbolTable getPrev() {
+		return prev;
+	}
+
+	public void setPrev(SymbolTable prev) {
+		this.prev = prev;
 	}
 }

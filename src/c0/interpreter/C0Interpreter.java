@@ -20,7 +20,7 @@ import c0.util.SymbolTable;
 //シンボルテーブルや環境を管理する
 public class C0Interpreter {
 
-	private SymbolTable symbolTable = null; //シンボルテーブル
+	//private SymbolTable symbolTable = null; //シンボルテーブル
 	private Stack<StackElement> stack = null; //局所変数、戻り値、戻り先、ベースポインタを積む
 	
 	public static void main(String args[]) {
@@ -53,7 +53,7 @@ public class C0Interpreter {
 	
 	//インタプリタの初期処理
 	private void init() {
-		this.symbolTable = new SymbolTable(); //シンボルテーブル
+		//this.symbolTable = new SymbolTable(); //シンボルテーブル
 		this.stack = new Stack<StackElement>(); //局所変数、戻り値、戻り先、ベースポインタを積む
 	}
 	
@@ -77,7 +77,28 @@ public class C0Interpreter {
 			e1.printStackTrace();
 		}
 		
-		program.accept(new AstVisitor());
+		//Visitorを準備する
+		AstVisitor astVisitor = new AstVisitor();
+		
+		//シンボルテーブル
+		LinkedList<SymbolTable> symbolTableList = new LinkedList<SymbolTable>();
+		symbolTableList.add(new SymbolTable());
+		
+		astVisitor.setSymbolTableList(symbolTableList);
+		
+		program.accept(astVisitor);
+		
+		LinkedList<SymbolTable> resultList = astVisitor.getSymbolTableList();
+		
+		System.out.println("シンボルテーブルの出力");
+		
+		for (SymbolTable symbolTable : resultList) {
+			System.out.print("[");
+			for (Identifier identifier : symbolTable.getSymbolTable()) {
+				System.out.print(identifier.getName() + " ");
+			}
+			System.out.print("]");
+		}
 		
 		//System.out.println(this.symbolTable.getSymbolTable());
 		

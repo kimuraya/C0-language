@@ -1,6 +1,8 @@
 package c0.interpreter;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 import c0.ast.ArraySubscriptExpressionNode;
 import c0.ast.AssignNode;
@@ -40,8 +42,15 @@ import c0.ast.ReturnNode;
 import c0.ast.StatementNode;
 import c0.ast.UnaryMinusNode;
 import c0.ast.WhileNode;
+import c0.util.Identifier;
+import c0.util.IdentifierType;
+import c0.util.StackElement;
+import c0.util.SymbolTable;
 
 public class AstVisitor implements Visitor {
+	
+	//シンボルテーブル
+	private LinkedList<SymbolTable> symbolTableList = null;
 
 	@Override
 	public void visit(AstNode astNode) {
@@ -75,6 +84,36 @@ public class AstVisitor implements Visitor {
 	//変数と関数で処理を分ける
 	public void visit(IdentifierNode identifierNode) {
 		System.out.println(identifierNode.getIdentifier().getName());
+		
+		//関数を登録する場合
+		if (identifierNode.getIdentifier().getIdentifierType() == IdentifierType.FUNCTION) {
+			//関数ごとにシンボルテーブルを新規作成する
+			SymbolTable prev = this.symbolTableList.getLast();
+			this.symbolTableList.add(new SymbolTable());
+			this.symbolTableList.getLast().setPrev(prev);
+			
+			//シンボルテーブルに登録済みか。現在のテーブルから最上位のテーブルまで繰り返しチェックする
+			//最上位のテーブルでもシンボルが見つからなかった場合のみ、現在のテーブルに登録する
+			boolean flag = false;
+			
+			for (int index = this.symbolTableList.size() - 1;  index > 0; index--) {
+				//System.out.println("index == " + index);
+				SymbolTable symbolTable = this.symbolTableList.get(index);
+				
+				flag = symbolTable.searchSymbol(identifierNode.getIdentifier().getName());
+			}
+			
+			//実際の登録処理
+			if (!flag) {
+				//最上位のテーブルでもシンボルが見つからなかった
+				this.symbolTableList.getLast().addSymbol(identifierNode.getIdentifier());
+			}
+		}
+		
+		//変数を登録する場合
+		if (identifierNode.getIdentifier().getIdentifierType() == IdentifierType.VARIABLE) {
+			
+		}
 		
 		//引数がある場合
 		if(identifierNode.getParameters() != null) {
@@ -229,6 +268,11 @@ public class AstVisitor implements Visitor {
 	@Override
 	public void visit(BlockNode blockNode) {
 		
+		//複合文に入る度、シンボルテーブルを追加する
+		SymbolTable prev = this.symbolTableList.getLast();
+		this.symbolTableList.add(new SymbolTable());
+		this.symbolTableList.getLast().setPrev(prev);
+		
 		//局所変数が宣言されていた場合
 		if (blockNode.getLocalVariables() != null) {
 			List<DeclareVariableNode> localVariables = blockNode.getLocalVariables();
@@ -304,5 +348,14 @@ public class AstVisitor implements Visitor {
 	@Override
 	public void visit(ParameterNode parameterNode) {
 		parameterNode.getIdentifier().accept(this);
+	}
+
+	//getter, setter
+	public LinkedList<SymbolTable> getSymbolTableList() {
+		return symbolTableList;
+	}
+
+	public void setSymbolTableList(LinkedList<SymbolTable> symbolTableList) {
+		this.symbolTableList = symbolTableList;
 	}
 }
