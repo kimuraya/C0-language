@@ -87,17 +87,12 @@ public class AstVisitor implements Visitor {
 		
 		//関数を登録する場合
 		if (identifierNode.getIdentifier().getIdentifierType() == IdentifierType.FUNCTION) {
-			//関数ごとにシンボルテーブルを新規作成する
-			SymbolTable prev = this.symbolTableList.getLast();
-			this.symbolTableList.add(new SymbolTable());
-			this.symbolTableList.getLast().setPrev(prev);
-			
-			//シンボルテーブルに登録済みか。現在のテーブルから最上位のテーブルまで繰り返しチェックする
-			//最上位のテーブルでもシンボルが見つからなかった場合のみ、現在のテーブルに登録する
+
+			//シンボルテーブルに登録済みかチェックし、未登録の物を登録する
 			boolean flag = false;
 			
 			for (int index = this.symbolTableList.size() - 1;  index > 0; index--) {
-				//System.out.println("index == " + index);
+				
 				SymbolTable symbolTable = this.symbolTableList.get(index);
 				
 				flag = symbolTable.searchSymbol(identifierNode.getIdentifier().getName());
@@ -105,29 +100,41 @@ public class AstVisitor implements Visitor {
 			
 			//実際の登録処理
 			if (!flag) {
-				//最上位のテーブルでもシンボルが見つからなかった
+				//シンボルが見つからなかった
 				this.symbolTableList.getLast().addSymbol(identifierNode.getIdentifier());
+			}
+			
+			//関数ごとにシンボルテーブルを新規作成する
+			SymbolTable prev = this.symbolTableList.getLast();
+			this.symbolTableList.add(new SymbolTable());
+			this.symbolTableList.getLast().setPrev(prev);
+			
+			//引数と複合文は新しいシンボルテーブルに登録する
+			
+			//引数がある場合
+			if(identifierNode.getParameters() != null) {
+				List<ParameterNode> Parameters = identifierNode.getParameters();
+				for (ParameterNode parameterNode : Parameters) {
+					parameterNode.accept(this);
+				}
+			}
+			
+			//複合文がある場合
+			if(identifierNode.getBlock() != null) {
+				identifierNode.getBlock().accept(this);
 			}
 		}
 		
 		//変数を登録する場合
 		if (identifierNode.getIdentifier().getIdentifierType() == IdentifierType.VARIABLE) {
 			
+			//シンボルテーブルに登録済みかチェックし、未登録の物を登録する
+			//上位のシンボルテーブルへは、変数prevを使用して移動する
+			
+			
+			//実際の登録処理
+			
 		}
-		
-		//引数がある場合
-		if(identifierNode.getParameters() != null) {
-			List<ParameterNode> Parameters = identifierNode.getParameters();
-			for (ParameterNode parameterNode : Parameters) {
-				parameterNode.accept(this);
-			}
-		}
-		
-		//複合文がある場合
-		if(identifierNode.getBlock() != null) {
-			identifierNode.getBlock().accept(this);
-		}
-		
 	}
 
 	@Override
