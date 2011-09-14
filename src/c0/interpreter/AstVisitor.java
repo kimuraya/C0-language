@@ -42,15 +42,18 @@ import c0.ast.ReturnNode;
 import c0.ast.StatementNode;
 import c0.ast.UnaryMinusNode;
 import c0.ast.WhileNode;
+import c0.util.GlobalScope;
 import c0.util.Identifier;
 import c0.util.IdentifierType;
+import c0.util.LocalScope;
 import c0.util.StackElement;
 import c0.util.SymbolTable;
 
 public class AstVisitor implements Visitor {
 	
 	//シンボルテーブル
-	private LinkedList<SymbolTable> symbolTableList = null;
+	GlobalScope globalScope = new GlobalScope();
+	String beingProcessedFunctionName = null;
 
 	@Override
 	public void visit(AstNode astNode) {
@@ -89,27 +92,19 @@ public class AstVisitor implements Visitor {
 		if (identifierNode.getIdentifier().getIdentifierType() == IdentifierType.FUNCTION) {
 
 			//シンボルテーブルに登録済みかチェックし、未登録の物を登録する
-			boolean flag = false;
-			
-			for (int index = this.symbolTableList.size() - 1;  index > 0; index--) {
-				
-				SymbolTable symbolTable = this.symbolTableList.get(index);
-				
-				flag = symbolTable.searchSymbol(identifierNode.getIdentifier().getName());
+			if(!this.globalScope.getGlobalSymbolTable().searchSymbol(identifierNode.getIdentifier().getName())) {
+				//実際の登録処理
+				this.globalScope.getGlobalSymbolTable().addSymbol(identifierNode.getIdentifier());
 			}
 			
-			//実際の登録処理
-			if (!flag) {
-				//シンボルが見つからなかった
-				this.symbolTableList.getLast().addSymbol(identifierNode.getIdentifier());
-			}
+			//関数ごとにシンボルテーブルを新規作成し、処理中の関数名を保存する
+			LocalScope newFunctionScope = new LocalScope();
+			newFunctionScope.setFunctionName(identifierNode.getIdentifier().getName());
+			beingProcessedFunctionName = identifierNode.getIdentifier().getName();
 			
-			//関数ごとにシンボルテーブルを新規作成する
-			SymbolTable prev = this.symbolTableList.getLast();
-			this.symbolTableList.add(new SymbolTable());
-			this.symbolTableList.getLast().setPrev(prev);
+			this.globalScope.getFunctionScopeList().add(newFunctionScope);
 			
-			//引数と複合文は新しいシンボルテーブルに登録する
+			//引数と複合文の局所変数は新しいシンボルテーブルに登録する
 			
 			//引数がある場合
 			if(identifierNode.getParameters() != null) {
@@ -128,8 +123,11 @@ public class AstVisitor implements Visitor {
 		//変数を登録する場合
 		if (identifierNode.getIdentifier().getIdentifierType() == IdentifierType.VARIABLE) {
 			
+			//現在処理中の関数のスコープを手に入れる
+			
+			
 			//シンボルテーブルに登録済みかチェックし、未登録の物を登録する
-			//上位のシンボルテーブルへは、変数prevを使用して移動する
+			//下位から上位のシンボルテーブルをチェックする
 			
 			
 			//実際の登録処理
@@ -357,12 +355,11 @@ public class AstVisitor implements Visitor {
 		parameterNode.getIdentifier().accept(this);
 	}
 
-	//getter, setter
-	public LinkedList<SymbolTable> getSymbolTableList() {
-		return symbolTableList;
+	public GlobalScope getGlobalScope() {
+		return globalScope;
 	}
 
-	public void setSymbolTableList(LinkedList<SymbolTable> symbolTableList) {
-		this.symbolTableList = symbolTableList;
+	public void setGlobalScope(GlobalScope globalScope) {
+		this.globalScope = globalScope;
 	}
 }

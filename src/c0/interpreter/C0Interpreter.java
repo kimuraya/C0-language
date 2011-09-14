@@ -12,6 +12,7 @@ import java.util.Stack;
 import c0.ast.AstNode;
 import c0.parser.C0Language;
 import c0.parser.ParseException;
+import c0.util.GlobalScope;
 import c0.util.Identifier;
 import c0.util.StackElement;
 import c0.util.SymbolTable;
@@ -80,25 +81,19 @@ public class C0Interpreter {
 		//Visitorを準備する
 		AstVisitor astVisitor = new AstVisitor();
 		
-		//シンボルテーブル
-		LinkedList<SymbolTable> symbolTableList = new LinkedList<SymbolTable>();
-		symbolTableList.add(new SymbolTable());
-		
-		astVisitor.setSymbolTableList(symbolTableList);
-		
 		program.accept(astVisitor);
 		
-		LinkedList<SymbolTable> resultList = astVisitor.getSymbolTableList();
-		
-		System.out.println("シンボルテーブルの出力");
-		
-		for (SymbolTable symbolTable : resultList) {
-			System.out.print("[");
-			for (Identifier identifier : symbolTable.getSymbolTable()) {
-				System.out.print(identifier.getName() + " ");
-			}
-			System.out.print("]");
-		}
+//		LinkedList<SymbolTable> resultList = astVisitor.getSymbolTableList();
+//		
+//		System.out.println("シンボルテーブルの出力");
+//		
+//		for (SymbolTable symbolTable : resultList) {
+//			System.out.print("[");
+//			for (Identifier identifier : symbolTable.getSymbolTable()) {
+//				System.out.print(identifier.getName() + " ");
+//			}
+//			System.out.print("]");
+//		}
 		
 		//System.out.println(this.symbolTable.getSymbolTable());
 		
