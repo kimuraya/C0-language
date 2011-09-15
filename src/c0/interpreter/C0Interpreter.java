@@ -14,6 +14,7 @@ import c0.parser.C0Language;
 import c0.parser.ParseException;
 import c0.util.GlobalScope;
 import c0.util.Identifier;
+import c0.util.LocalScope;
 import c0.util.StackElement;
 import c0.util.SymbolTable;
 
@@ -83,15 +84,29 @@ public class C0Interpreter {
 		
 		program.accept(astVisitor);
 		
-//		LinkedList<SymbolTable> resultList = astVisitor.getSymbolTableList();
-//		
-//		System.out.println("シンボルテーブルの出力");
-//		
+		System.out.println("シンボルテーブルの出力");
+		GlobalScope globalScope = astVisitor.getGlobalScope();
+		
+		System.out.println("グローバル変数の出力");
+		SymbolTable globalSymbolTable = globalScope.getGlobalSymbolTable();
+		for (Identifier identifier : globalSymbolTable.getSymbolTable()) {
+			System.out.print(identifier.getName() + " ");
+		}
+		System.out.print("\n");
+		
+		System.out.println("ローカル変数の出力");
+		for (LocalScope localScope : globalScope.getFunctionScopeList()) {
+			for (SymbolTable localSymbolTable : localScope.getLocalSymbolTableList()) {
+				for (Identifier identifier : localSymbolTable.getSymbolTable()) {
+					System.out.print(identifier.getName() + " ");
+				}
+				System.out.print("\n");
+			}
+		}
+		
 //		for (SymbolTable symbolTable : resultList) {
 //			System.out.print("[");
-//			for (Identifier identifier : symbolTable.getSymbolTable()) {
-//				System.out.print(identifier.getName() + " ");
-//			}
+
 //			System.out.print("]");
 //		}
 		
