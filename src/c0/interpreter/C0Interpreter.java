@@ -87,21 +87,22 @@ public class C0Interpreter {
 		System.out.println("シンボルテーブルの出力");
 		GlobalScope globalScope = astVisitor.getGlobalScope();
 		
-		System.out.println("グローバル変数の出力");
+		System.out.println("グローバル領域の出力");
 		SymbolTable globalSymbolTable = globalScope.getGlobalSymbolTable();
 		for (Identifier identifier : globalSymbolTable.getSymbolTable()) {
 			System.out.print(identifier.getName() + " ");
 		}
 		System.out.print("\n");
 		
-		System.out.println("ローカル変数の出力");
+		System.out.println("各スコープとローカル変数の出力");
 		for (LocalScope localScope : globalScope.getFunctionScopeList()) {
+			System.out.println(localScope.getFunctionName());
 			for (SymbolTable localSymbolTable : localScope.getLocalSymbolTableList()) {
 				for (Identifier identifier : localSymbolTable.getSymbolTable()) {
 					System.out.print(identifier.getName() + " ");
 				}
-				System.out.print("\n");
 			}
+			System.out.println("\n");
 		}
 		
 //		for (SymbolTable symbolTable : resultList) {
