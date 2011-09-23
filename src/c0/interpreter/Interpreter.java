@@ -3,7 +3,7 @@ package c0.interpreter;
 public interface Interpreter {
 	
 	//文の処理
-	void executeStatement(); //複合文の中で使用する
+	void executeStatement();
 	void executeBlockStatement(); //複合文
 	void executeIfStatement(); //if文
 	void executeWhileStatement(); //while文

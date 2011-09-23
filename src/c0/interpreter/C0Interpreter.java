@@ -105,14 +105,6 @@ public class C0Interpreter {
 			System.out.println("\n");
 		}
 		
-//		for (SymbolTable symbolTable : resultList) {
-//			System.out.print("[");
-
-//			System.out.print("]");
-//		}
-		
-		//System.out.println(this.symbolTable.getSymbolTable());
-		
 		//インタプリタが構文木を入力として受け取り、プログラムを実行する
 	}
 }
