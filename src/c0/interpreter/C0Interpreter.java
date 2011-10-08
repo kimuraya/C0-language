@@ -50,14 +50,7 @@ public class C0Interpreter extends InterpreterImplementation {
 		
 		//インタプリタのエントリーポイント
 		C0Interpreter interpreter = new C0Interpreter(new Stack<StackElement>());
-		interpreter.init(); //初期処理
 		interpreter.interpretation(fileName, fileReader); //実行
-	}
-	
-	//インタプリタの初期処理
-	private void init() {
-		//this.symbolTable = new SymbolTable(); //シンボルテーブル
-		//this.stack = new Stack<StackElement>(); //局所変数、戻り値、戻り先、ベースポインタを積む
 	}
 	
 	//インタプリタの実行
@@ -80,23 +73,42 @@ public class C0Interpreter extends InterpreterImplementation {
 			e1.printStackTrace();
 		}
 		
-		//Visitorを準備する
-		AstVisitor astVisitor = new AstVisitor();
+		//シンボルテーブル
+		GlobalScope globalScope = new GlobalScope();
 		
+		//標準関数をシンボルテーブルに登録する
+		
+		
+		//Visitorを準備する
+		AstVisitor astVisitor = new AstVisitor(globalScope);
+		
+		//シンボルテーブルの作成
 		program.accept(astVisitor);
 		
+		//シンボルテーブルの出力
+		this.outputSymbolTable(astVisitor);
+		
+		//インタプリタが構文木を入力として受け取り、プログラムを実行する
+	}
+	
+	/**
+	 * シンボルテーブルの出力
+	 * @param astVisitor
+	 */
+	private void outputSymbolTable(AstVisitor astVisitor) {
+		
 		System.out.println("シンボルテーブルの出力");
-		GlobalScope globalScope = astVisitor.getGlobalScope();
+		GlobalScope outputScope = astVisitor.getGlobalScope();
 		
 		System.out.println("グローバル領域の出力");
-		SymbolTable globalSymbolTable = globalScope.getGlobalSymbolTable();
+		SymbolTable globalSymbolTable = outputScope.getGlobalSymbolTable();
 		for (Identifier identifier : globalSymbolTable.getSymbolTable()) {
 			System.out.print(identifier.getName() + " ");
 		}
 		System.out.print("\n");
 		
 		System.out.println("各スコープとローカル変数の出力");
-		for (LocalScope localScope : globalScope.getFunctionScopeList()) {
+		for (LocalScope localScope : outputScope.getFunctionScopeList()) {
 			System.out.println(localScope.getFunctionName());
 			for (SymbolTable localSymbolTable : localScope.getLocalSymbolTableList()) {
 				for (Identifier identifier : localSymbolTable.getSymbolTable()) {
@@ -106,6 +118,6 @@ public class C0Interpreter extends InterpreterImplementation {
 			System.out.println("\n");
 		}
 		
-		//インタプリタが構文木を入力として受け取り、プログラムを実行する
+		return;
 	}
 }

@@ -52,8 +52,13 @@ import c0.util.SymbolTable;
 public class AstVisitor implements Visitor {
 	
 	//シンボルテーブル
-	GlobalScope globalScope = new GlobalScope();
+	GlobalScope globalScope = null;
 	String beingProcessedFunctionName = null; //現在処理中の関数名
+
+	public AstVisitor(GlobalScope globalScope) {
+		super();
+		this.globalScope = globalScope;
+	}
 
 	@Override
 	public void visit(AstNode astNode) {
