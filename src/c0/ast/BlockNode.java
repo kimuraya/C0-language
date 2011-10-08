@@ -3,6 +3,7 @@ package c0.ast;
 import java.util.List;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //複合文
 public class BlockNode extends StatementNode {
@@ -15,6 +16,7 @@ public class BlockNode extends StatementNode {
 		super(loc);
 		this.localVariables = localVariables;
 		this.statements = statements;
+		nodeType = NodeType.BLOCK_STATEMENT;
 	}
 
 	public List<DeclareVariableNode> getLocalVariables() {

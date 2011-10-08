@@ -1,6 +1,7 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //式文
 public class ExpressionStatementNode extends StatementNode {
@@ -10,6 +11,7 @@ public class ExpressionStatementNode extends StatementNode {
 	public ExpressionStatementNode(Location loc, ExpressionNode expression) {
 		super(loc);
 		this.expression = expression;
+		nodeType = NodeType.EXPRESSION_STATEMENT;
 	}
 
 	public ExpressionNode getExpression() {

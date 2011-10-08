@@ -1,6 +1,7 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //while文
 public class WhileNode extends StatementNode {
@@ -13,6 +14,7 @@ public class WhileNode extends StatementNode {
 		super(loc);
 		this.conditionalExpression = conditionalExpression;
 		this.bodyStatement = bodyStatement;
+		nodeType = NodeType.WHILE_STATEMENT;
 	}
 
 	public ExpressionNode getConditionalExpression() {

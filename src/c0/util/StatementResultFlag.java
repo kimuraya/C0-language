@@ -1,0 +1,7 @@
+package c0.util;
+
+public enum StatementResultFlag {
+	NORMAL_STATEMENT_RESULT,
+	BREAK_STATEMENT_RESULT,
+	RETURN_STATEMENT_RESULT
+}

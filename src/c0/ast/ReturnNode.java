@@ -1,6 +1,7 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //return文
 public class ReturnNode extends StatementNode {
@@ -10,6 +11,7 @@ public class ReturnNode extends StatementNode {
 	public ReturnNode(Location loc, ExpressionNode expression) {
 		super(loc);
 		this.expression = expression;
+		nodeType = NodeType.RETURN_STATEMENT;
 	}
 
 	public ExpressionNode getExpression() {

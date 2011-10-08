@@ -1,6 +1,7 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //for文
 public class ForNode extends StatementNode {
@@ -18,6 +19,7 @@ public class ForNode extends StatementNode {
 		this.conditionalExpression = conditionalExpression;
 		this.updateExpression = updateExpression;
 		this.bodyStatement = bodyStatement;
+		nodeType = NodeType.FOR_STATEMENT;
 	}
 
 	public ExpressionNode getInitializeExpression() {

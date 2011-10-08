@@ -20,11 +20,12 @@ import c0.util.SymbolTable;
 
 //ASTのノードを入力として受け取り、関数を実行する。
 //シンボルテーブルや環境を管理する
-public class C0Interpreter {
-
-	//private SymbolTable symbolTable = null; //シンボルテーブル
-	private Stack<StackElement> stack = null; //局所変数、戻り値、戻り先、ベースポインタを積む
+public class C0Interpreter extends InterpreterImplementation {
 	
+	public C0Interpreter(Stack<StackElement> stack) {
+		super(stack);
+	}
+
 	public static void main(String args[]) {
 		
 		//mainメソッドの引数をチェック。ファイル名が無ければ、警告を出して終了
@@ -48,7 +49,7 @@ public class C0Interpreter {
 		}
 		
 		//インタプリタのエントリーポイント
-		C0Interpreter interpreter = new C0Interpreter();
+		C0Interpreter interpreter = new C0Interpreter(new Stack<StackElement>());
 		interpreter.init(); //初期処理
 		interpreter.interpretation(fileName, fileReader); //実行
 	}
@@ -56,7 +57,7 @@ public class C0Interpreter {
 	//インタプリタの初期処理
 	private void init() {
 		//this.symbolTable = new SymbolTable(); //シンボルテーブル
-		this.stack = new Stack<StackElement>(); //局所変数、戻り値、戻り先、ベースポインタを積む
+		//this.stack = new Stack<StackElement>(); //局所変数、戻り値、戻り先、ベースポインタを積む
 	}
 	
 	//インタプリタの実行

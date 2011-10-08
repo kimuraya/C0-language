@@ -1,6 +1,7 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //if-else文
 public class IfNode extends StatementNode {
@@ -15,6 +16,7 @@ public class IfNode extends StatementNode {
 		this.conditionalExpression = expression;
 		this.thenStatement = thenStatement;
 		this.elseStatement = elseStatement;
+		nodeType = NodeType.IF_STATEMENT;
 	}
 
 	public ExpressionNode getConditionalExpression() {

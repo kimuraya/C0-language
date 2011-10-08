@@ -1,11 +1,21 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 abstract public class Node {
 	
 	protected Location location; //ソースファイルの名前とTokenオブジェクトを保持する
+	protected NodeType nodeType;
 	
+	public NodeType getNodeType() {
+		return nodeType;
+	}
+
+	public void setNodeType(NodeType nodeType) {
+		this.nodeType = nodeType;
+	}
+
 	abstract public void dump(int depth, boolean indentFlag); //構文木を表示する
 	
 	//構文木を出力させる際、字下げを調整する
