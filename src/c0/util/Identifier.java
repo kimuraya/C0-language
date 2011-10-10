@@ -12,6 +12,7 @@ public class Identifier {
 	private boolean standardFunctionFlag;   //組み込み関数か否かを判別する為のフラグ変数
 	private LeftValue leftValue;             //グローバル変数の値
 	private List<Identifier> parameters;     //引数のリスト
+	//標準関数用の情報を追記する
 	
 	public Identifier(String name) {
 		super();
