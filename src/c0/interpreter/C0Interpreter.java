@@ -77,7 +77,8 @@ public class C0Interpreter extends InterpreterImplementation {
 		GlobalScope globalScope = new GlobalScope();
 		
 		//標準関数をシンボルテーブルに登録する
-		
+		StandardFunction standardFunction = new StandardFunction();
+		standardFunction.addSymbolTable(globalScope);
 		
 		//Visitorを準備する
 		AstVisitor astVisitor = new AstVisitor(globalScope);
