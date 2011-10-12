@@ -100,11 +100,14 @@ public class C0Language implements C0LanguageConstants {
                         identifier = function_i.getIdentifier();
                         identifier.setIdentifierType(IdentifierType.FUNCTION); //è­˜åˆ¥å­ã?ç¨®é¡ã?é–¢æ•°
                         identifier.setStandardFunctionFlag(false); //çµ?¿è¾¼ã¿é–¢æ•°ã§ã¯ãªã?
-                        function_i.setIdentifier(identifier);
+                        identifier.setFunctionNode(function_i); //ãƒã?ãƒ‰ã?ãƒªãƒ³ã‚¯
 
+                        function_i.setIdentifier(identifier);
                         function_i.setParameters(parameters); //å¼•æ•°
                         function_i.setBlock(block); //è¤?ˆæ–?
                         function_i.setReturnDataType(dataType); //æˆ»ã‚Šå?ã®ãƒ??ã‚¿å?
+
+
                         {if (true) return function_i;}
     throw new Error("Missing return statement in function");
   }
@@ -958,28 +961,6 @@ public class C0Language implements C0LanguageConstants {
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_3R_55() {
-    if (jj_scan_token(19)) return true;
-    if (jj_3R_24()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_46() {
-    if (jj_3R_24()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_55()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_42() {
-    if (jj_scan_token(27)) return true;
-    if (jj_3R_41()) return true;
-    return false;
-  }
-
   private boolean jj_3R_43() {
     if (jj_3R_46()) return true;
     return false;
@@ -1240,13 +1221,6 @@ public class C0Language implements C0LanguageConstants {
     return false;
   }
 
-  private boolean jj_3_1() {
-    if (jj_3R_12()) return true;
-    if (jj_3R_13()) return true;
-    if (jj_scan_token(17)) return true;
-    return false;
-  }
-
   private boolean jj_3R_53() {
     if (jj_scan_token(32)) return true;
     if (jj_3R_44()) return true;
@@ -1269,6 +1243,13 @@ public class C0Language implements C0LanguageConstants {
   private boolean jj_3R_51() {
     if (jj_scan_token(30)) return true;
     if (jj_3R_44()) return true;
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_3R_12()) return true;
+    if (jj_3R_13()) return true;
+    if (jj_scan_token(17)) return true;
     return false;
   }
 
@@ -1375,6 +1356,28 @@ public class C0Language implements C0LanguageConstants {
       xsp = jj_scanpos;
       if (jj_3R_48()) { jj_scanpos = xsp; break; }
     }
+    return false;
+  }
+
+  private boolean jj_3R_55() {
+    if (jj_scan_token(19)) return true;
+    if (jj_3R_24()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_46() {
+    if (jj_3R_24()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_55()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_42() {
+    if (jj_scan_token(27)) return true;
+    if (jj_3R_41()) return true;
     return false;
   }
 

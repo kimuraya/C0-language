@@ -90,6 +90,14 @@ public class C0Interpreter extends InterpreterImplementation {
 		this.outputSymbolTable(astVisitor);
 		
 		//インタプリタが構文木を入力として受け取り、プログラムを実行する
+		
+		//デバッグ
+		Identifier main = globalScope.getGlobalSymbolTable().getSymbol("main");
+		
+		if (main.getFunctionNode() != null) {
+			System.out.println(main.getFunctionNode().getIdentifier().getName());
+			System.out.println(main.getFunctionNode().getIdentifier().getIdentifierType());
+		}
 	}
 	
 	/**

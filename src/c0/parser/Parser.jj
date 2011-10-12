@@ -129,11 +129,14 @@ IdentifierNode defineFunction():
 			identifier = function_i.getIdentifier();
 			identifier.setIdentifierType(IdentifierType.FUNCTION); //識別子の種類は関数
 			identifier.setStandardFunctionFlag(false); //組み込み関数ではない
+			identifier.setFunctionNode(function_i); //ノードのリンク
+			
 			function_i.setIdentifier(identifier);
-
 			function_i.setParameters(parameters); //引数
 			function_i.setBlock(block); //複合文
 			function_i.setReturnDataType(dataType); //戻り値のデータ型
+			
+			
 			return function_i;		}
 }
 

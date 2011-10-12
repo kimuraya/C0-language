@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import c0.ast.ExpressionNode;
+import c0.ast.IdentifierNode;
+import c0.ast.LiteralNode;
 import c0.util.GlobalScope;
 import c0.util.Identifier;
 import c0.util.IdentifierType;
@@ -32,11 +34,26 @@ public class StandardFunction {
 	}
 	
 	/**
-	 * System.out.printlnのラッパー
-	 * 識別子からラップしているクラス名を取り出し、引数から値を取り出して、処理を実行させる
+	 * System.out.printf(String format, Object... args)のラッパー
+	 * 引数から値を取り出して、処理を実行させる
 	 */
 	public void printFunction(ExpressionNode function, List<ExpressionNode> parameters) {
 		
+		//インタプリタの引数から値を取り出す
+		LiteralNode formatValue = (LiteralNode)parameters.get(0);
+		
+		String format = formatValue.getLiteral().getStringLiteral();
+		
+		Object[] args = null;
+		for (int i = 1; i < parameters.size(); i++) {
+			IdentifierNode arg = (IdentifierNode) parameters.get(i);
+			args[i] = arg.getIdentifier().getName();
+		}
+		
+		//ラップしているメソッドの実行
+		System.out.printf(format, args);
+		
+		return;
 	}
 	
 	/**

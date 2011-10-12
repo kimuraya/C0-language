@@ -3,6 +3,7 @@ package c0.util;
 import java.util.List;
 
 import c0.ast.BlockNode;
+import c0.ast.ExpressionNode;
 import c0.ast.IdentifierNode;
 
 public class Identifier {
@@ -13,6 +14,7 @@ public class Identifier {
 	private LeftValue leftValue;             //グローバル変数の値
 	private List<Identifier> parameters;     //引数のリスト
 	private String standardFunctionName;     //標準関数に使用するクラス名を入れる
+	private IdentifierNode functionNode;     //構文木にある自分のノードへのリンク
 	
 	public Identifier(String name) {
 		super();
@@ -57,6 +59,14 @@ public class Identifier {
 
 	public void setStandardFunctionName(String standardFunctionName) {
 		this.standardFunctionName = standardFunctionName;
+	}
+
+	public IdentifierNode getFunctionNode() {
+		return functionNode;
+	}
+
+	public void setFunctionNode(IdentifierNode functionNode) {
+		this.functionNode = functionNode;
 	}
 
 	//デバッグ用

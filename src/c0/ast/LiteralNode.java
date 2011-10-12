@@ -25,6 +25,14 @@ public class LiteralNode extends ExpressionNode {
 		}
 	}
 
+	public Value getLiteral() {
+		return literal;
+	}
+
+	public void setLiteral(Value literal) {
+		this.literal = literal;
+	}
+
 	@Override
 	public Location location() {
 		// TODO 自動生成されたメソッド・スタブ
