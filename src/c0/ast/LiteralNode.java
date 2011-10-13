@@ -10,6 +10,7 @@ public class LiteralNode extends ExpressionNode {
 	private Value literal;
 	
 	public LiteralNode(Location location, DataType dataType, String image) {
+		
 		this.location = location;
 		literal = new Value();
 		literal.setDataType(dataType);
@@ -22,6 +23,15 @@ public class LiteralNode extends ExpressionNode {
 			case STRING:
 				literal.setDataType(dataType);
 				literal.setStringLiteral(image);
+			case BOOLEAN:
+				//trueの場合
+				if (image.equals("true")) {
+					literal.setDataType(dataType);
+					literal.setBooleanLiteral(true);
+				} else if (image.equals("false")) {
+					literal.setDataType(dataType);
+					literal.setBooleanLiteral(false);
+				}
 		}
 	}
 
@@ -77,7 +87,7 @@ public class LiteralNode extends ExpressionNode {
 					this.printIndent(depth);
 				}
 				
-				System.out.println("value : " + this.literal.getArray());
+				System.out.println("value : " + this.literal.getIntegerArray());
 				break;
 				
 			case STRING:
@@ -89,6 +99,28 @@ public class LiteralNode extends ExpressionNode {
 				}
 				
 				System.out.println("value : " + this.literal.getStringLiteral());
+				break;
+			
+			case BOOLEAN:
+				
+				System.out.println("DataType : " + dataType);
+				
+				if (indentFlag) {
+					this.printIndent(depth);
+				}
+				
+				System.out.println("value : " + this.literal.isBooleanLiteral());
+				break;
+				
+			case BOOLEAN_ARRAY:
+				
+				System.out.println("DataType : " + dataType);
+				
+				if (indentFlag) {
+					this.printIndent(depth);
+				}
+				
+				System.out.println("value : " + this.literal.getBooleanArray());
 				break;
 		}
 	}

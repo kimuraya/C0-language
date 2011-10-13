@@ -15,27 +15,33 @@ public interface C0LanguageConstants {
   /** RegularExpression Id. */
   int INT = 2;
   /** RegularExpression Id. */
-  int VOID = 3;
+  int BOOLEAN = 3;
   /** RegularExpression Id. */
-  int IF = 4;
+  int VOID = 4;
   /** RegularExpression Id. */
-  int ELSE = 5;
+  int IF = 5;
   /** RegularExpression Id. */
-  int WHILE = 6;
+  int ELSE = 6;
   /** RegularExpression Id. */
-  int FOR = 7;
+  int WHILE = 7;
   /** RegularExpression Id. */
-  int RETURN = 8;
+  int FOR = 8;
   /** RegularExpression Id. */
-  int BREAK = 9;
+  int RETURN = 9;
   /** RegularExpression Id. */
-  int IDENTIFIER = 10;
+  int BREAK = 10;
   /** RegularExpression Id. */
-  int INTEGER = 11;
+  int TRUE = 11;
   /** RegularExpression Id. */
-  int LINE_COMMENT = 12;
+  int FALSE = 12;
   /** RegularExpression Id. */
-  int STRING = 16;
+  int IDENTIFIER = 13;
+  /** RegularExpression Id. */
+  int INTEGER = 14;
+  /** RegularExpression Id. */
+  int LINE_COMMENT = 15;
+  /** RegularExpression Id. */
+  int STRING = 19;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -47,6 +53,7 @@ public interface C0LanguageConstants {
     "<EOF>",
     "<WHITESPACE>",
     "\"int\"",
+    "\"boolean\"",
     "\"void\"",
     "\"if\"",
     "\"else\"",
@@ -54,12 +61,14 @@ public interface C0LanguageConstants {
     "\"for\"",
     "\"return\"",
     "\"break\"",
+    "\"true\"",
+    "\"false\"",
     "<IDENTIFIER>",
     "<INTEGER>",
     "<LINE_COMMENT>",
     "\"\\\"\"",
-    "<token of kind 14>",
-    "<token of kind 15>",
+    "<token of kind 17>",
+    "<token of kind 18>",
     "\"\\\"\"",
     "\"(\"",
     "\")\"",

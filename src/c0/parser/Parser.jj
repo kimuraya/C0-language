@@ -37,13 +37,20 @@ SPECIAL_TOKEN: {
 //文のキーワード
 TOKEN: {
 	  <INT      : "int">
-    | <VOID     : "void">
+	| <BOOLEAN  : "boolean">
+	| <VOID     : "void">
 	| <IF       : "if">
 	| <ELSE     : "else">
 	| <WHILE    : "while">
 	| <FOR      : "for">
 	| <RETURN   : "return">
 	| <BREAK    : "break">
+}
+
+//真偽値リテラル
+TOKEN: {
+	  <TRUE : "true">
+	| <FALSE : "false">
 }
 
 //識別子
@@ -208,10 +215,18 @@ DataTypeNode type():
 	{
 		return new DataTypeNode(DataType.INT_ARRAY, elementNumber); //整数の配列
 	}
+	| LOOKAHEAD(<BOOLEAN> "[")
+	<BOOLEAN> "[" elementNumber=expression() "]"
+	{
+		return new DataTypeNode(DataType.BOOLEAN_ARRAY, elementNumber); //真偽値の配列
+	}
 	| <INT>
 	{
 		return new DataTypeNode(DataType.INT, elementNumber); //整数の変数
 	}
+	| <BOOLEAN>
+	{
+		return new DataTypeNode(DataType.BOOLEAN, elementNumber); //真偽値の変数	}
 	| <VOID>
 	{
 		return new DataTypeNode(DataType.VOID, elementNumber); //void
@@ -565,6 +580,13 @@ ExpressionNode primaryExpression():
 	| token=<STRING> //文字列定数
 			{
 				return new LiteralNode(new Location(this.getFileName(), token), DataType.STRING, token.image);
+			}
+	| token=<TRUE> //真偽値リテラル : true
+			{
+				return new LiteralNode(new Location(this.getFileName(), token), DataType.BOOLEAN, token.image);			}
+	| token=<FALSE> //真偽値リテラル : false
+			{
+				return new LiteralNode(new Location(this.getFileName(), token), DataType.BOOLEAN, token.image);
 			}
 	| token=<IDENTIFIER> //識別子
 			{

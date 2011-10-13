@@ -5,5 +5,7 @@ public enum DataType {
 	INT,
 	INT_ARRAY,
 	STRING,
+	BOOLEAN,
+	BOOLEAN_ARRAY,
 	VOID;
 }

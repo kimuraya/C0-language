@@ -3,6 +3,8 @@ package c0.interpreter;
 import java.util.Stack;
 
 import c0.ast.ExpressionNode;
+import c0.ast.IdentifierNode;
+import c0.ast.IfNode;
 import c0.ast.StatementNode;
 import c0.util.ExecuteStatementResult;
 import c0.util.NodeType;
@@ -19,6 +21,9 @@ public abstract class InterpreterImplementation implements Interpreter {
 	
 	/**
 	 * 文の処理
+	 * StatementResultFlagがBREAK_STATEMENT_RESULTになっている場合、ループの処理を終了する。
+	 * ループの終了後、StatementResultFlagをNORMAL_STATEMENT_RESULTに戻す。
+	 * StatementResultFlagがRETURN_STATEMENT_RESULTになっている場合、文の処理を行わない。
 	 */
 	@Override
 	public ExecuteStatementResult executeStatement(StatementNode statementNode) {
@@ -61,7 +66,13 @@ public abstract class InterpreterImplementation implements Interpreter {
 	@Override
 	public ExecuteStatementResult executeBlockStatement(
 			StatementNode statementNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		
+		//局所変数をスタックに詰める
+		
+		//文を実行する
+		
+		//局所変数をスタックから破棄する
+		
 		return null;
 	}
 
@@ -70,7 +81,15 @@ public abstract class InterpreterImplementation implements Interpreter {
 	 */
 	@Override
 	public ExecuteStatementResult executeIfStatement(StatementNode statementNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		
+		IfNode ifNode = (IfNode) statementNode;
+		
+		//条件式を取り出し、実行する
+		
+		//trueならthenを実行する
+		
+		//falseならelseを実行する
+		
 		return null;
 	}
 
@@ -80,7 +99,14 @@ public abstract class InterpreterImplementation implements Interpreter {
 	@Override
 	public ExecuteStatementResult executeWhileStatement(
 			StatementNode statementNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		
+		//条件式を取り出し、実行する
+		
+		//trueの場合、文を実行する
+		
+		//StatementResultFlagがBREAK_STATEMENT_RESULTになっている場合、ループの処理を終了する。
+		//ループの終了後、StatementResultFlagをNORMAL_STATEMENT_RESULTに戻す。
+		
 		return null;
 	}
 
@@ -90,7 +116,20 @@ public abstract class InterpreterImplementation implements Interpreter {
 	@Override
 	public ExecuteStatementResult executeForStatement(
 			StatementNode statementNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		
+		//初期化式を実行
+		
+		//条件式を実行
+		
+		//文を実行
+		
+		//後置き式を実行
+		
+		//条件式がtrueである限り、ループが継続する
+		
+		//StatementResultFlagがBREAK_STATEMENT_RESULTになっている場合、ループの処理を終了する。
+		//ループの終了後、StatementResultFlagをNORMAL_STATEMENT_RESULTに戻す。
+		
 		return null;
 	}
 
@@ -100,7 +139,9 @@ public abstract class InterpreterImplementation implements Interpreter {
 	@Override
 	public ExecuteStatementResult executeBreakStatement(
 			StatementNode statementNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		
+		//StatementResultFlagをBREAK_STATEMENT_RESULTにする
+		
 		return null;
 	}
 
@@ -110,7 +151,9 @@ public abstract class InterpreterImplementation implements Interpreter {
 	@Override
 	public ExecuteStatementResult executeReturnStatement(
 			StatementNode statementNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		
+		//StatementResultFlagをRETURN_STATEMENT_RESULTにする
+		
 		return null;
 	}
 
@@ -120,7 +163,9 @@ public abstract class InterpreterImplementation implements Interpreter {
 	@Override
 	public ExecuteStatementResult executeExpressionStatement(
 			StatementNode statementNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		
+		//式を実行する
+		
 		return null;
 	}
 
@@ -130,20 +175,28 @@ public abstract class InterpreterImplementation implements Interpreter {
 	@Override
 	public ExecuteStatementResult executeEmptyStatement(
 			StatementNode statementNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		
+		//何も実行しない
+		
 		return null;
 	}
 
 	@Override
 	public ExecuteStatementResult executeParameter(StatementNode statementNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		
+		//引数の値を返す
+		
 		return null;
 	}
 
 	@Override
 	public ExecuteStatementResult executeDeclareVariable(
 			StatementNode statementNode) {
-		// TODO 自動生成されたメソッド・スタブ
+		
+		//変数宣言
+		
+		//初期化式がある場合、代入を行う
+		
 		return null;
 	}
 
@@ -314,7 +367,7 @@ public abstract class InterpreterImplementation implements Interpreter {
 	 * ユーザー定義関数の呼び出し
 	 * @param callNode
 	 */
-	private void executeUserDefinedFunctionCall(ExpressionNode callNode) {
+	private void executeUserDefinedFunctionCall(IdentifierNode functionNode) {
 		
 		//引数をスタックに詰める
 		
@@ -334,7 +387,7 @@ public abstract class InterpreterImplementation implements Interpreter {
 	 * 標準関数の呼び出し
 	 * @param callNode
 	 */
-	private void executeStandardFunctionCall(ExpressionNode callNode) {
+	private void executeStandardFunctionCall(IdentifierNode functionNode) {
 		
 	}
 }

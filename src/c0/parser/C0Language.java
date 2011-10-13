@@ -33,6 +33,7 @@ public class C0Language implements C0LanguageConstants {
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case INT:
+      case BOOLEAN:
       case VOID:
         ;
         break;
@@ -47,6 +48,7 @@ public class C0Language implements C0LanguageConstants {
         } else {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case INT:
+          case BOOLEAN:
           case VOID:
             globalVariable = declareVariable();
                                                              if(globalVariable != null) globalVariables.add(globalVariable);
@@ -83,9 +85,10 @@ public class C0Language implements C0LanguageConstants {
         Identifier identifier = null;
     dataType = type();
     function = primaryExpression();
-    jj_consume_token(17);
+    jj_consume_token(20);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case INT:
+    case BOOLEAN:
     case VOID:
       parameters = parameters();
       break;
@@ -93,7 +96,7 @@ public class C0Language implements C0LanguageConstants {
       jj_la1[2] = jj_gen;
       ;
     }
-    jj_consume_token(18);
+    jj_consume_token(21);
     block = blockStatement();
                         function_i = (IdentifierNode)function;
 
@@ -126,7 +129,7 @@ public class C0Language implements C0LanguageConstants {
       } else {
         break label_2;
       }
-      jj_consume_token(19);
+      jj_consume_token(22);
       parameter2 = parameter();
                                                    if(parameter2 != null) parameters.add(parameter2);
     }
@@ -165,15 +168,15 @@ public class C0Language implements C0LanguageConstants {
     dataType = type();
     variable = primaryExpression();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 20:
-      jj_consume_token(20);
+    case 23:
+      jj_consume_token(23);
       expression = expression();
       break;
     default:
       jj_la1[3] = jj_gen;
       ;
     }
-    token = jj_consume_token(21);
+    token = jj_consume_token(24);
                         variable_i = (IdentifierNode)variable;
                         identifier = variable_i.getIdentifier();
                         identifier.setIdentifierType(IdentifierType.VARIABLE); //識別子�?種類�?変数
@@ -190,16 +193,28 @@ public class C0Language implements C0LanguageConstants {
         ExpressionNode elementNumber = null;
     if (jj_2_3(2147483647)) {
       jj_consume_token(INT);
-      jj_consume_token(22);
+      jj_consume_token(25);
       elementNumber = expression();
-      jj_consume_token(23);
+      jj_consume_token(26);
                 {if (true) return new DataTypeNode(DataType.INT_ARRAY, elementNumber);} //整数の配�?
+
+    } else if (jj_2_4(2147483647)) {
+      jj_consume_token(BOOLEAN);
+      jj_consume_token(25);
+      elementNumber = expression();
+      jj_consume_token(26);
+                {if (true) return new DataTypeNode(DataType.BOOLEAN_ARRAY, elementNumber);} //真偽値の配�?
 
     } else {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case INT:
         jj_consume_token(INT);
                 {if (true) return new DataTypeNode(DataType.INT, elementNumber);} //整数の変数
+
+        break;
+      case BOOLEAN:
+        jj_consume_token(BOOLEAN);
+                {if (true) return new DataTypeNode(DataType.BOOLEAN, elementNumber);} //真偽値の変数
 
         break;
       case VOID:
@@ -226,17 +241,19 @@ public class C0Language implements C0LanguageConstants {
   final public StatementNode statement() throws ParseException {
         StatementNode statementNode = null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TRUE:
+    case FALSE:
     case IDENTIFIER:
     case INTEGER:
     case STRING:
-    case 17:
-    case 35:
-    case 39:
-    case 40:
-    case 41:
+    case 20:
+    case 38:
+    case 42:
+    case 43:
+    case 44:
       statementNode = expressionStatement();
       break;
-    case 24:
+    case 27:
       statementNode = blockStatement();
       break;
     case IF:
@@ -252,7 +269,7 @@ public class C0Language implements C0LanguageConstants {
     case RETURN:
       statementNode = returnStatement();
       break;
-    case 21:
+    case 24:
       statementNode = emptyStatement();
       break;
     default:
@@ -270,10 +287,10 @@ public class C0Language implements C0LanguageConstants {
         Token token = null;
         List<DeclareVariableNode> localVariables = null; //ローカル変数の宣�?
         List<StatementNode> statements = null;
-    token = jj_consume_token(24);
+    token = jj_consume_token(27);
     localVariables = declareLocalVariables();
     statements = statements();
-    jj_consume_token(25);
+    jj_consume_token(28);
                 {if (true) return new BlockNode(new Location(this.getFileName(), token), localVariables, statements);}
     throw new Error("Missing return statement in function");
   }
@@ -290,16 +307,18 @@ public class C0Language implements C0LanguageConstants {
       case FOR:
       case RETURN:
       case BREAK:
+      case TRUE:
+      case FALSE:
       case IDENTIFIER:
       case INTEGER:
       case STRING:
-      case 17:
-      case 21:
+      case 20:
       case 24:
-      case 35:
-      case 39:
-      case 40:
-      case 41:
+      case 27:
+      case 38:
+      case 42:
+      case 43:
+      case 44:
         ;
         break;
       default:
@@ -322,6 +341,7 @@ public class C0Language implements C0LanguageConstants {
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case INT:
+      case BOOLEAN:
       case VOID:
         ;
         break;
@@ -354,9 +374,9 @@ public class C0Language implements C0LanguageConstants {
         StatementNode thenBody = null;
         StatementNode elseBody = null;
     token = jj_consume_token(IF);
-    jj_consume_token(17);
+    jj_consume_token(20);
     conditional = expression();
-    jj_consume_token(18);
+    jj_consume_token(21);
     thenBody = statement();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ELSE:
@@ -400,9 +420,9 @@ public class C0Language implements C0LanguageConstants {
         ExpressionNode conditional = null;
         StatementNode body = null;
     token = jj_consume_token(WHILE);
-    jj_consume_token(17);
+    jj_consume_token(20);
     conditional = expression();
-    jj_consume_token(18);
+    jj_consume_token(21);
     body = statement();
                                                                           {if (true) return new WhileNode(new Location(this.getFileName(), token), conditional, body);}
     throw new Error("Missing return statement in function");
@@ -418,55 +438,61 @@ public class C0Language implements C0LanguageConstants {
         ExpressionNode update = null;
         StatementNode body = null;
     token = jj_consume_token(FOR);
-    jj_consume_token(17);
+    jj_consume_token(20);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TRUE:
+    case FALSE:
     case IDENTIFIER:
     case INTEGER:
     case STRING:
-    case 17:
-    case 35:
-    case 39:
-    case 40:
-    case 41:
+    case 20:
+    case 38:
+    case 42:
+    case 43:
+    case 44:
       initialize = expression();
       break;
     default:
       jj_la1[10] = jj_gen;
       ;
     }
-    jj_consume_token(21);
+    jj_consume_token(24);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TRUE:
+    case FALSE:
     case IDENTIFIER:
     case INTEGER:
     case STRING:
-    case 17:
-    case 35:
-    case 39:
-    case 40:
-    case 41:
+    case 20:
+    case 38:
+    case 42:
+    case 43:
+    case 44:
       conditional = expression();
       break;
     default:
       jj_la1[11] = jj_gen;
       ;
     }
-    jj_consume_token(21);
+    jj_consume_token(24);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TRUE:
+    case FALSE:
     case IDENTIFIER:
     case INTEGER:
     case STRING:
-    case 17:
-    case 35:
-    case 39:
-    case 40:
-    case 41:
+    case 20:
+    case 38:
+    case 42:
+    case 43:
+    case 44:
       update = expression();
       break;
     default:
       jj_la1[12] = jj_gen;
       ;
     }
-    jj_consume_token(18);
+    jj_consume_token(21);
     body = statement();
           {if (true) return new ForNode(new Location(this.getFileName(), token), initialize, conditional, update, body);}
     throw new Error("Missing return statement in function");
@@ -477,7 +503,7 @@ public class C0Language implements C0LanguageConstants {
   final public StatementNode breakStatement() throws ParseException {
         Token token = null;
     token = jj_consume_token(BREAK);
-    jj_consume_token(21);
+    jj_consume_token(24);
                             {if (true) return new BreakNode(new Location(this.getFileName(), token));}
     throw new Error("Missing return statement in function");
   }
@@ -489,21 +515,23 @@ public class C0Language implements C0LanguageConstants {
         ExpressionNode expressionNode = null;
     token = jj_consume_token(RETURN);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TRUE:
+    case FALSE:
     case IDENTIFIER:
     case INTEGER:
     case STRING:
-    case 17:
-    case 35:
-    case 39:
-    case 40:
-    case 41:
+    case 20:
+    case 38:
+    case 42:
+    case 43:
+    case 44:
       expressionNode = expression();
       break;
     default:
       jj_la1[13] = jj_gen;
       ;
     }
-    jj_consume_token(21);
+    jj_consume_token(24);
                                                            {if (true) return new ReturnNode(new Location(this.getFileName(), token), expressionNode);}
     throw new Error("Missing return statement in function");
   }
@@ -513,7 +541,7 @@ public class C0Language implements C0LanguageConstants {
 //あとで見直�?
   final public StatementNode emptyStatement() throws ParseException {
         Token token = null;
-    token = jj_consume_token(21);
+    token = jj_consume_token(24);
                     {if (true) return new EmptyStatementNode(new Location(this.getFileName(), token));}
     throw new Error("Missing return statement in function");
   }
@@ -525,7 +553,7 @@ public class C0Language implements C0LanguageConstants {
         ExpressionNode expressionNode = null;
     //要修正。式�?コンストラクタとメソ�?��を追�?��てから書き換える
             expressionNode = expression();
-    token = jj_consume_token(21);
+    token = jj_consume_token(24);
                                                 {if (true) return new ExpressionStatementNode(new Location(this.getFileName(), token), expressionNode);}
     throw new Error("Missing return statement in function");
   }
@@ -538,21 +566,23 @@ public class C0Language implements C0LanguageConstants {
         ExpressionNode left = null;
         ExpressionNode right = null;
         ExpressionNode expressionNode = null;
-    if (jj_2_4(2147483647)) {
+    if (jj_2_5(2147483647)) {
       left = term();
-      jj_consume_token(20);
+      jj_consume_token(23);
       right = expression();
                         {if (true) return new AssignNode(left, right);}
     } else {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case TRUE:
+      case FALSE:
       case IDENTIFIER:
       case INTEGER:
       case STRING:
-      case 17:
-      case 35:
-      case 39:
-      case 40:
-      case 41:
+      case 20:
+      case 38:
+      case 42:
+      case 43:
+      case 44:
         expressionNode = expression5();
                         {if (true) return expressionNode;}
         break;
@@ -573,14 +603,14 @@ public class C0Language implements C0LanguageConstants {
     label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 26:
+      case 29:
         ;
         break;
       default:
         jj_la1[15] = jj_gen;
         break label_5;
       }
-      jj_consume_token(26);
+      jj_consume_token(29);
       right = expression4();
                                                        left = new LogicalOrNode(left, right);
     }
@@ -596,14 +626,14 @@ public class C0Language implements C0LanguageConstants {
     label_6:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 27:
+      case 30:
         ;
         break;
       default:
         jj_la1[16] = jj_gen;
         break label_6;
       }
-      jj_consume_token(27);
+      jj_consume_token(30);
       right = expression3();
                                                        left = new LogicalAndNode(left, right);
     }
@@ -620,12 +650,12 @@ public class C0Language implements C0LanguageConstants {
     label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 28:
-      case 29:
-      case 30:
       case 31:
       case 32:
       case 33:
+      case 34:
+      case 35:
+      case 36:
         ;
         break;
       default:
@@ -633,33 +663,33 @@ public class C0Language implements C0LanguageConstants {
         break label_7;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 28:
-        jj_consume_token(28);
-        right = expression2();
-                                                        left = new EquivalenceNode(left, right);
-        break;
-      case 29:
-        jj_consume_token(29);
-        right = expression2();
-                                                                        left = new NotEquivalenceNode(left, right);
-        break;
-      case 30:
-        jj_consume_token(30);
-        right = expression2();
-                                                                        left = new LessThanNode(left, right);
-        break;
       case 31:
         jj_consume_token(31);
         right = expression2();
-                                                                        left = new GreaterThanNode(left, right);
+                                                        left = new EquivalenceNode(left, right);
         break;
       case 32:
         jj_consume_token(32);
         right = expression2();
-                                                                        left = new LessThanOrEqualNode(left, right);
+                                                                        left = new NotEquivalenceNode(left, right);
         break;
       case 33:
         jj_consume_token(33);
+        right = expression2();
+                                                                        left = new LessThanNode(left, right);
+        break;
+      case 34:
+        jj_consume_token(34);
+        right = expression2();
+                                                                        left = new GreaterThanNode(left, right);
+        break;
+      case 35:
+        jj_consume_token(35);
+        right = expression2();
+                                                                        left = new LessThanOrEqualNode(left, right);
+        break;
+      case 36:
+        jj_consume_token(36);
         right = expression2();
                                                                         left = new GreaterThanOrEqualNode(left, right);
         break;
@@ -682,8 +712,8 @@ public class C0Language implements C0LanguageConstants {
     label_8:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 34:
-      case 35:
+      case 37:
+      case 38:
         ;
         break;
       default:
@@ -691,13 +721,13 @@ public class C0Language implements C0LanguageConstants {
         break label_8;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 34:
-        jj_consume_token(34);
+      case 37:
+        jj_consume_token(37);
         right = expression1();
                                                         left = new PlusNode(left, right);
         break;
-      case 35:
-        jj_consume_token(35);
+      case 38:
+        jj_consume_token(38);
         right = expression1();
                                                                             left = new MinusNode(left, right);
         break;
@@ -721,9 +751,9 @@ public class C0Language implements C0LanguageConstants {
     label_9:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 36:
-      case 37:
-      case 38:
+      case 39:
+      case 40:
+      case 41:
         ;
         break;
       default:
@@ -731,18 +761,18 @@ public class C0Language implements C0LanguageConstants {
         break label_9;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 36:
-        jj_consume_token(36);
+      case 39:
+        jj_consume_token(39);
         right = term();
                                          left = new MulNode(left, right);
         break;
-      case 37:
-        jj_consume_token(37);
+      case 40:
+        jj_consume_token(40);
         right = term();
                                                      left = new DivNode(left, right);
         break;
-      case 38:
-        jj_consume_token(38);
+      case 41:
+        jj_consume_token(41);
         right = term();
                                                      left = new ModNode(left, right);
         break;
@@ -769,30 +799,32 @@ public class C0Language implements C0LanguageConstants {
         Token token = null;
         ExpressionNode expressionNode = null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 39:
-      token = jj_consume_token(39);
+    case 42:
+      token = jj_consume_token(42);
       expressionNode = unaryExpression();
                                                         {if (true) return new PreIncrementNode(expressionNode);}
       break;
-    case 40:
-      token = jj_consume_token(40);
+    case 43:
+      token = jj_consume_token(43);
       expressionNode = unaryExpression();
                                                         {if (true) return new PreDecrementNode(expressionNode);}
       break;
-    case 35:
-      token = jj_consume_token(35);
+    case 38:
+      token = jj_consume_token(38);
       expressionNode = unaryExpression();
                                                        {if (true) return new UnaryMinusNode(expressionNode);}
       break;
-    case 41:
-      token = jj_consume_token(41);
+    case 44:
+      token = jj_consume_token(44);
       expressionNode = unaryExpression();
                                                        {if (true) return new ExclamationNode(expressionNode);}
       break;
+    case TRUE:
+    case FALSE:
     case IDENTIFIER:
     case INTEGER:
     case STRING:
-    case 17:
+    case 20:
       expressionNode = PostfixExpression();
                                                {if (true) return expressionNode;}
       break;
@@ -815,10 +847,10 @@ public class C0Language implements C0LanguageConstants {
     label_10:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 17:
-      case 22:
-      case 39:
-      case 40:
+      case 20:
+      case 25:
+      case 42:
+      case 43:
         ;
         break;
       default:
@@ -826,40 +858,42 @@ public class C0Language implements C0LanguageConstants {
         break label_10;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 39:
-        token = jj_consume_token(39);
+      case 42:
+        token = jj_consume_token(42);
                        expressionNode = new PostIncrementNode(expressionNode);
         break;
-      case 40:
-        token = jj_consume_token(40);
+      case 43:
+        token = jj_consume_token(43);
                        expressionNode = new PostDecrementNode(expressionNode);
         break;
-      case 22:
-        token = jj_consume_token(22);
+      case 25:
+        token = jj_consume_token(25);
         index = expression();
-        jj_consume_token(23);
+        jj_consume_token(26);
                         arrayName = (IdentifierNode)expressionNode;
                         expressionNode = new ArraySubscriptExpressionNode(arrayName, index); //添字�?
 
         break;
-      case 17:
-        token = jj_consume_token(17);
+      case 20:
+        token = jj_consume_token(20);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case TRUE:
+        case FALSE:
         case IDENTIFIER:
         case INTEGER:
         case STRING:
-        case 17:
-        case 35:
-        case 39:
-        case 40:
-        case 41:
+        case 20:
+        case 38:
+        case 42:
+        case 43:
+        case 44:
           arguments = arguments();
           break;
         default:
           jj_la1[25] = jj_gen;
           ;
         }
-        jj_consume_token(18);
+        jj_consume_token(21);
                                                   expressionNode = new CallNode(expressionNode, arguments);
         break;
       default:
@@ -881,14 +915,14 @@ public class C0Language implements C0LanguageConstants {
     label_11:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 19:
+      case 22:
         ;
         break;
       default:
         jj_la1[27] = jj_gen;
         break label_11;
       }
-      jj_consume_token(19);
+      jj_consume_token(22);
       argument = expression();
                                      arguments.add(argument);
     }
@@ -911,6 +945,14 @@ public class C0Language implements C0LanguageConstants {
       token = jj_consume_token(STRING);
                                 {if (true) return new LiteralNode(new Location(this.getFileName(), token), DataType.STRING, token.image);}
       break;
+    case TRUE:
+      token = jj_consume_token(TRUE);
+                                {if (true) return new LiteralNode(new Location(this.getFileName(), token), DataType.BOOLEAN, token.image);}
+      break;
+    case FALSE:
+      token = jj_consume_token(FALSE);
+                                {if (true) return new LiteralNode(new Location(this.getFileName(), token), DataType.BOOLEAN, token.image);}
+      break;
     case IDENTIFIER:
       token = jj_consume_token(IDENTIFIER);
                                 identifierNode = new IdentifierNode(new Location(this.getFileName(), token));
@@ -919,10 +961,10 @@ public class C0Language implements C0LanguageConstants {
 
                                 {if (true) return identifierNode;}
       break;
-    case 17:
-      jj_consume_token(17);
+    case 20:
+      jj_consume_token(20);
       expressionNode = expression();
-      jj_consume_token(18);
+      jj_consume_token(21);
                                 {if (true) return expressionNode;}
       break;
     default:
@@ -961,18 +1003,22 @@ public class C0Language implements C0LanguageConstants {
     finally { jj_save(3, xla); }
   }
 
+  private boolean jj_2_5(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_5(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(4, xla); }
+  }
+
   private boolean jj_3R_43() {
-    if (jj_3R_46()) return true;
+    if (jj_scan_token(25)) return true;
+    if (jj_3R_28()) return true;
+    if (jj_scan_token(26)) return true;
     return false;
   }
 
-  private boolean jj_3R_41() {
-    if (jj_3R_44()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_45()) { jj_scanpos = xsp; break; }
-    }
+  private boolean jj_3R_42() {
+    if (jj_scan_token(43)) return true;
     return false;
   }
 
@@ -981,283 +1027,306 @@ public class C0Language implements C0LanguageConstants {
     return false;
   }
 
-  private boolean jj_3R_40() {
-    if (jj_scan_token(17)) return true;
+  private boolean jj_3R_38() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_43()) jj_scanpos = xsp;
-    if (jj_scan_token(18)) return true;
+    if (jj_3R_41()) {
+    jj_scanpos = xsp;
+    if (jj_3R_42()) {
+    jj_scanpos = xsp;
+    if (jj_3R_43()) {
+    jj_scanpos = xsp;
+    if (jj_3R_44()) return true;
+    }
+    }
+    }
     return false;
   }
 
-  private boolean jj_3R_36() {
-    if (jj_scan_token(26)) return true;
-    if (jj_3R_35()) return true;
+  private boolean jj_3R_41() {
+    if (jj_scan_token(42)) return true;
     return false;
   }
 
   private boolean jj_3R_39() {
-    if (jj_scan_token(22)) return true;
-    if (jj_3R_24()) return true;
-    if (jj_scan_token(23)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_38() {
-    if (jj_scan_token(40)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_34() {
+    if (jj_3R_45()) return true;
     Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_37()) {
-    jj_scanpos = xsp;
-    if (jj_3R_38()) {
-    jj_scanpos = xsp;
-    if (jj_3R_39()) {
-    jj_scanpos = xsp;
-    if (jj_3R_40()) return true;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_46()) { jj_scanpos = xsp; break; }
     }
-    }
+    return false;
+  }
+
+  private boolean jj_3R_36() {
+    if (jj_3R_13()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_38()) { jj_scanpos = xsp; break; }
     }
     return false;
   }
 
   private boolean jj_3R_37() {
-    if (jj_scan_token(39)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_35() {
-    if (jj_3R_41()) return true;
+    if (jj_3R_39()) return true;
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3R_42()) { jj_scanpos = xsp; break; }
+      if (jj_3R_40()) { jj_scanpos = xsp; break; }
     }
-    return false;
-  }
-
-  private boolean jj_3R_32() {
-    if (jj_3R_13()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_34()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_scan_token(19)) return true;
-    if (jj_3R_14()) return true;
     return false;
   }
 
   private boolean jj_3R_33() {
-    if (jj_3R_35()) return true;
+    if (jj_3R_36()) return true;
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_scan_token(22)) return true;
+    if (jj_3R_14()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_32() {
+    if (jj_scan_token(44)) return true;
+    if (jj_3R_27()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_31() {
+    if (jj_scan_token(38)) return true;
+    if (jj_3R_27()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_65() {
+    if (jj_scan_token(41)) return true;
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_30() {
+    if (jj_scan_token(43)) return true;
+    if (jj_3R_27()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_64() {
+    if (jj_scan_token(40)) return true;
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_27() {
     Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_36()) { jj_scanpos = xsp; break; }
+    xsp = jj_scanpos;
+    if (jj_3R_29()) {
+    jj_scanpos = xsp;
+    if (jj_3R_30()) {
+    jj_scanpos = xsp;
+    if (jj_3R_31()) {
+    jj_scanpos = xsp;
+    if (jj_3R_32()) {
+    jj_scanpos = xsp;
+    if (jj_3R_33()) return true;
+    }
+    }
+    }
     }
     return false;
   }
 
   private boolean jj_3R_29() {
-    if (jj_3R_32()) return true;
+    if (jj_scan_token(42)) return true;
+    if (jj_3R_27()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_62() {
+    if (jj_scan_token(38)) return true;
+    if (jj_3R_51()) return true;
+    return false;
+  }
+
+  private boolean jj_3_5() {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(23)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_35() {
+    if (jj_3R_37()) return true;
     return false;
   }
 
   private boolean jj_3R_28() {
-    if (jj_scan_token(41)) return true;
-    if (jj_3R_23()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_27() {
-    if (jj_scan_token(35)) return true;
-    if (jj_3R_23()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_61() {
-    if (jj_scan_token(38)) return true;
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_26() {
-    if (jj_scan_token(40)) return true;
-    if (jj_3R_23()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_60() {
-    if (jj_scan_token(37)) return true;
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_23() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_25()) {
+    if (jj_3R_34()) {
     jj_scanpos = xsp;
-    if (jj_3R_26()) {
-    jj_scanpos = xsp;
-    if (jj_3R_27()) {
-    jj_scanpos = xsp;
-    if (jj_3R_28()) {
-    jj_scanpos = xsp;
-    if (jj_3R_29()) return true;
-    }
-    }
-    }
+    if (jj_3R_35()) return true;
     }
     return false;
   }
 
-  private boolean jj_3R_25() {
-    if (jj_scan_token(39)) return true;
-    if (jj_3R_23()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_58() {
-    if (jj_scan_token(35)) return true;
-    if (jj_3R_47()) return true;
-    return false;
-  }
-
-  private boolean jj_3_4() {
+  private boolean jj_3R_34() {
     if (jj_3R_15()) return true;
-    if (jj_scan_token(20)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_31() {
-    if (jj_3R_33()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_24() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_30()) {
-    jj_scanpos = xsp;
-    if (jj_3R_31()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_30() {
-    if (jj_3R_15()) return true;
-    if (jj_scan_token(20)) return true;
-    if (jj_3R_24()) return true;
+    if (jj_scan_token(23)) return true;
+    if (jj_3R_28()) return true;
     return false;
   }
 
   private boolean jj_3R_15() {
-    if (jj_3R_23()) return true;
+    if (jj_3R_27()) return true;
     return false;
   }
 
-  private boolean jj_3R_59() {
-    if (jj_scan_token(36)) return true;
+  private boolean jj_3R_63() {
+    if (jj_scan_token(39)) return true;
     if (jj_3R_15()) return true;
     return false;
   }
 
-  private boolean jj_3R_56() {
+  private boolean jj_3R_60() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_59()) {
+    if (jj_3R_63()) {
     jj_scanpos = xsp;
-    if (jj_3R_60()) {
+    if (jj_3R_64()) {
     jj_scanpos = xsp;
-    if (jj_3R_61()) return true;
+    if (jj_3R_65()) return true;
     }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_20() {
+    if (jj_scan_token(VOID)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_26() {
+    if (jj_scan_token(20)) return true;
+    if (jj_3R_28()) return true;
+    if (jj_scan_token(21)) return true;
+    return false;
+  }
+
+  private boolean jj_3_4() {
+    if (jj_scan_token(BOOLEAN)) return true;
+    if (jj_scan_token(25)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_19() {
+    if (jj_scan_token(BOOLEAN)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_61() {
+    if (jj_scan_token(37)) return true;
+    if (jj_3R_51()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_58() {
+    if (jj_scan_token(36)) return true;
+    if (jj_3R_48()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_52() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_61()) {
+    jj_scanpos = xsp;
+    if (jj_3R_62()) return true;
     }
     return false;
   }
 
   private boolean jj_3R_18() {
-    if (jj_scan_token(VOID)) return true;
-    return false;
-  }
-
-  private boolean jj_3_3() {
-    if (jj_scan_token(INT)) return true;
-    if (jj_scan_token(22)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_17() {
     if (jj_scan_token(INT)) return true;
     return false;
   }
 
   private boolean jj_3R_57() {
+    if (jj_scan_token(35)) return true;
+    if (jj_3R_48()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_56() {
     if (jj_scan_token(34)) return true;
-    if (jj_3R_47()) return true;
+    if (jj_3R_48()) return true;
+    return false;
+  }
+
+  private boolean jj_3_3() {
+    if (jj_scan_token(INT)) return true;
+    if (jj_scan_token(25)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_25() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_55() {
+    if (jj_scan_token(33)) return true;
+    if (jj_3R_48()) return true;
     return false;
   }
 
   private boolean jj_3R_54() {
-    if (jj_scan_token(33)) return true;
-    if (jj_3R_44()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_48() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_57()) {
-    jj_scanpos = xsp;
-    if (jj_3R_58()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_53() {
     if (jj_scan_token(32)) return true;
-    if (jj_3R_44()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_52() {
-    if (jj_scan_token(31)) return true;
-    if (jj_3R_44()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_22() {
-    if (jj_scan_token(17)) return true;
-    if (jj_3R_24()) return true;
-    if (jj_scan_token(18)) return true;
+    if (jj_3R_48()) return true;
     return false;
   }
 
   private boolean jj_3R_51() {
-    if (jj_scan_token(30)) return true;
-    if (jj_3R_44()) return true;
+    if (jj_3R_15()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_60()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_17() {
+    if (jj_scan_token(BOOLEAN)) return true;
+    if (jj_scan_token(25)) return true;
+    if (jj_3R_28()) return true;
+    if (jj_scan_token(26)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_24() {
+    if (jj_scan_token(FALSE)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_23() {
+    if (jj_scan_token(TRUE)) return true;
     return false;
   }
 
   private boolean jj_3_1() {
     if (jj_3R_12()) return true;
     if (jj_3R_13()) return true;
-    if (jj_scan_token(17)) return true;
+    if (jj_scan_token(20)) return true;
     return false;
   }
 
   private boolean jj_3R_16() {
     if (jj_scan_token(INT)) return true;
-    if (jj_scan_token(22)) return true;
-    if (jj_3R_24()) return true;
-    if (jj_scan_token(23)) return true;
+    if (jj_scan_token(25)) return true;
+    if (jj_3R_28()) return true;
+    if (jj_scan_token(26)) return true;
     return false;
   }
 
@@ -1268,39 +1337,24 @@ public class C0Language implements C0LanguageConstants {
     jj_scanpos = xsp;
     if (jj_3R_17()) {
     jj_scanpos = xsp;
-    if (jj_3R_18()) return true;
+    if (jj_3R_18()) {
+    jj_scanpos = xsp;
+    if (jj_3R_19()) {
+    jj_scanpos = xsp;
+    if (jj_3R_20()) return true;
+    }
+    }
     }
     }
     return false;
   }
 
-  private boolean jj_3R_50() {
-    if (jj_scan_token(29)) return true;
-    if (jj_3R_44()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_47() {
-    if (jj_3R_15()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_56()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_21() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_20() {
+  private boolean jj_3R_22() {
     if (jj_scan_token(STRING)) return true;
     return false;
   }
 
-  private boolean jj_3R_19() {
+  private boolean jj_3R_21() {
     if (jj_scan_token(INTEGER)) return true;
     return false;
   }
@@ -1308,76 +1362,112 @@ public class C0Language implements C0LanguageConstants {
   private boolean jj_3R_13() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_19()) {
-    jj_scanpos = xsp;
-    if (jj_3R_20()) {
-    jj_scanpos = xsp;
     if (jj_3R_21()) {
     jj_scanpos = xsp;
-    if (jj_3R_22()) return true;
+    if (jj_3R_22()) {
+    jj_scanpos = xsp;
+    if (jj_3R_23()) {
+    jj_scanpos = xsp;
+    if (jj_3R_24()) {
+    jj_scanpos = xsp;
+    if (jj_3R_25()) {
+    jj_scanpos = xsp;
+    if (jj_3R_26()) return true;
     }
     }
     }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_53() {
+    if (jj_scan_token(31)) return true;
+    if (jj_3R_48()) return true;
     return false;
   }
 
   private boolean jj_3R_49() {
-    if (jj_scan_token(28)) return true;
-    if (jj_3R_44()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_53()) {
+    jj_scanpos = xsp;
+    if (jj_3R_54()) {
+    jj_scanpos = xsp;
+    if (jj_3R_55()) {
+    jj_scanpos = xsp;
+    if (jj_3R_56()) {
+    jj_scanpos = xsp;
+    if (jj_3R_57()) {
+    jj_scanpos = xsp;
+    if (jj_3R_58()) return true;
+    }
+    }
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_48() {
+    if (jj_3R_51()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_52()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_59() {
+    if (jj_scan_token(22)) return true;
+    if (jj_3R_28()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_50() {
+    if (jj_3R_28()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_59()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_46() {
+    if (jj_scan_token(30)) return true;
+    if (jj_3R_45()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_47() {
+    if (jj_3R_50()) return true;
     return false;
   }
 
   private boolean jj_3R_45() {
+    if (jj_3R_48()) return true;
     Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_49()) {
-    jj_scanpos = xsp;
-    if (jj_3R_50()) {
-    jj_scanpos = xsp;
-    if (jj_3R_51()) {
-    jj_scanpos = xsp;
-    if (jj_3R_52()) {
-    jj_scanpos = xsp;
-    if (jj_3R_53()) {
-    jj_scanpos = xsp;
-    if (jj_3R_54()) return true;
-    }
-    }
-    }
-    }
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_49()) { jj_scanpos = xsp; break; }
     }
     return false;
   }
 
   private boolean jj_3R_44() {
-    if (jj_3R_47()) return true;
+    if (jj_scan_token(20)) return true;
     Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_48()) { jj_scanpos = xsp; break; }
-    }
+    xsp = jj_scanpos;
+    if (jj_3R_47()) jj_scanpos = xsp;
+    if (jj_scan_token(21)) return true;
     return false;
   }
 
-  private boolean jj_3R_55() {
-    if (jj_scan_token(19)) return true;
-    if (jj_3R_24()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_46() {
-    if (jj_3R_24()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_55()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_42() {
-    if (jj_scan_token(27)) return true;
-    if (jj_3R_41()) return true;
+  private boolean jj_3R_40() {
+    if (jj_scan_token(29)) return true;
+    if (jj_3R_39()) return true;
     return false;
   }
 
@@ -1400,12 +1490,12 @@ public class C0Language implements C0LanguageConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0xc,0xc,0xc,0x100000,0xc,0x1230fd0,0x1230fd0,0xc,0x20,0xc0,0x30c00,0x30c00,0x30c00,0x30c00,0x30c00,0x4000000,0x8000000,0xf0000000,0xf0000000,0x0,0x0,0x0,0x0,0x30c00,0x420000,0x30c00,0x420000,0x80000,0x30c00,};
+      jj_la1_0 = new int[] {0x1c,0x1c,0x1c,0x800000,0x1c,0x9187fa0,0x9187fa0,0x1c,0x40,0x180,0x187800,0x187800,0x187800,0x187800,0x187800,0x20000000,0x40000000,0x80000000,0x80000000,0x0,0x0,0x0,0x0,0x187800,0x2100000,0x187800,0x2100000,0x400000,0x187800,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x388,0x388,0x0,0x0,0x0,0x388,0x388,0x388,0x388,0x388,0x0,0x0,0x3,0x3,0xc,0xc,0x70,0x70,0x388,0x180,0x388,0x180,0x0,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x1c40,0x1c40,0x0,0x0,0x0,0x1c40,0x1c40,0x1c40,0x1c40,0x1c40,0x0,0x0,0x1f,0x1f,0x60,0x60,0x380,0x380,0x1c40,0xc00,0x1c40,0xc00,0x0,0x0,};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[4];
+  final private JJCalls[] jj_2_rtns = new JJCalls[5];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -1589,7 +1679,7 @@ public class C0Language implements C0LanguageConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[42];
+    boolean[] la1tokens = new boolean[45];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -1606,7 +1696,7 @@ public class C0Language implements C0LanguageConstants {
         }
       }
     }
-    for (int i = 0; i < 42; i++) {
+    for (int i = 0; i < 45; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
@@ -1633,7 +1723,7 @@ public class C0Language implements C0LanguageConstants {
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 5; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -1644,6 +1734,7 @@ public class C0Language implements C0LanguageConstants {
             case 1: jj_3_2(); break;
             case 2: jj_3_3(); break;
             case 3: jj_3_4(); break;
+            case 4: jj_3_5(); break;
           }
         }
         p = p.next;
