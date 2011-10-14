@@ -334,6 +334,40 @@ public abstract class InterpreterImplementation implements Interpreter {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
+	
+	/**
+	 * 式の実行
+	 */
+	@Override
+	public void evaluateExpression(ExpressionNode expression) {
+		
+		switch(expression.getNodeType()) {
+			case LITERAL: //定数（ここは後で修正する）
+			case IDENTIFIER: //識別
+			case ASSIGN: //"="
+			case EQUIVALENCE: //"=="
+			case NOT_EQUIVALENCE: //"!="
+			case LESS_THAN: //"<"
+			case LESS_THAN_OR_EQUAL: //"<="
+			case GREATER_THAN: //">"
+			case GREATER_THAN_OR_EQUAL: //">="
+			case LOGICAL_AND: //"&&"
+			case LOGICAL_OR: //"||"
+			case PLUS: //"+"
+			case MINUS: //"-"
+			case MUL: //"*"
+			case DIV: //"/"
+			case MOD: //"%"
+			case EXCLAMATION: //"!"
+			case UNARY_MINUS: //"-" 単項マイナス式
+			case PRE_INCREMENT: //"++" 前置増分
+			case PRE_DECREMENT: //"--" 前置減分
+			case POST_INCREMENT: //"++" 後置増分
+			case POST_DECREMENT: //"--" 後置減分
+			case CALL: //関数呼び出し
+		}
+		
+	}
 
 	/**
 	 * 関数呼び出し

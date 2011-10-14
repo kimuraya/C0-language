@@ -8,25 +8,26 @@ public enum NodeType {
 	IDENTIFIER, //識別子
 	ASSIGN, //"="
 	EQUIVALENCE, //"=="
-	NOTEQUIVALENCE, //"!="
-	LESSTHAN, //"<"
-	LESSTHANOREQUAL, //"<="
-	GREATERTHAN, //">"
-	GREATERTHANOREQUAL, //">="
-	LOGICALAND, //"&&"
-	LOGICALOR, //"||"
+	NOT_EQUIVALENCE, //"!="
+	LESS_THAN, //"<"
+	LESS_THAN_OR_EQUAL, //"<="
+	GREATER_THAN, //">"
+	GREATER_THAN_OR_EQUAL, //">="
+	LOGICAL_AND, //"&&"
+	LOGICAL_OR, //"||"
 	PLUS, //"+"
 	MINUS, //"-"
 	MUL, //"*"
 	DIV, //"/"
 	MOD, //"%"
 	EXCLAMATION, //"!"
-	UNARYMINUS, //"-" 単項マイナス式
-	PREINCREMENT, //"++" 前置増分
-	PREDECREMENT, //"--" 前置減分
-	POSTINCREMENT, //"++" 後置増分
-	POSTDECREMENT, //"--" 後置減分
+	UNARY_MINUS, //"-" 単項マイナス式
+	PRE_INCREMENT, //"++" 前置増分
+	PRE_DECREMENT, //"--" 前置減分
+	POST_INCREMENT, //"++" 後置増分
+	POST_DECREMENT, //"--" 後置減分
 	CALL, //関数呼び出し（ネイティブ関数を含む）
+	ARRAY_SUBSCRIPT, //添字式
 	STATEMENT, //文を表す
 	BLOCK_STATEMENT, //複合文
 	IF_STATEMENT, //if-else文

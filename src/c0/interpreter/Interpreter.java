@@ -61,4 +61,7 @@ public interface Interpreter {
 	void executeFunctionCall(ExpressionNode callNode); //関数呼び出し（ネイティブ関数を含む）
 	void PostIncrementExpression(ExpressionNode leftValue); //後置増分式
 	void PostDecrementExpression(ExpressionNode leftValue); //後置減分式
+	
+	//式の実行
+	void evaluateExpression(ExpressionNode expression);
 }
