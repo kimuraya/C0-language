@@ -25,8 +25,8 @@ public interface Interpreter {
 	
 	//一次式
 	void intLiteralExpression(ExpressionNode integer); //整数定数
-	void stringLiteralExpression(ExpressionNode integer); //文字列定数
-	void booleanLiteralExpression(ExpressionNode integer); //真偽値定数
+	void stringLiteralExpression(ExpressionNode string); //文字列定数
+	void booleanLiteralExpression(ExpressionNode bool); //真偽値定数
 	void identifierExpression(ExpressionNode identifier);//識別子
 	
 	//二項演算子

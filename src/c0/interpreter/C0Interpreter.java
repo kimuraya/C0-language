@@ -22,8 +22,9 @@ import c0.util.SymbolTable;
 //シンボルテーブルや環境を管理する
 public class C0Interpreter extends InterpreterImplementation {
 	
-	public C0Interpreter(Stack<StackElement> stack) {
-		super(stack);
+	public C0Interpreter(Stack<StackElement> callStack,
+			Stack<StackElement> operandStack) {
+		super(callStack, operandStack);
 	}
 
 	public static void main(String args[]) {
@@ -49,7 +50,10 @@ public class C0Interpreter extends InterpreterImplementation {
 		}
 		
 		//インタプリタのエントリーポイント
-		C0Interpreter interpreter = new C0Interpreter(new Stack<StackElement>());
+		Stack<StackElement> callStack = new Stack<StackElement>();
+		Stack<StackElement> operandStack = new Stack<StackElement>();
+		
+		C0Interpreter interpreter = new C0Interpreter(callStack, operandStack);
 		interpreter.interpretation(fileName, fileReader); //実行
 	}
 	

@@ -33,13 +33,16 @@ import c0.util.StackElement;
 
 public abstract class InterpreterImplementation implements Interpreter {
 	
-	private Stack<StackElement> stack = null; //局所変数、戻り値、戻り先、ベースポインタを積む
+	private Stack<StackElement> callStack = null; //局所変数、戻り値、戻り先、ベースポインタを積む
+	private Stack<StackElement> operandStack = null; //式の計算に使用する
 	
-	public InterpreterImplementation(Stack<StackElement> stack) {
+	public InterpreterImplementation(Stack<StackElement> callStack,
+			Stack<StackElement> operandStack) {
 		super();
-		this.stack = stack;
+		this.callStack = callStack;
+		this.operandStack = operandStack;
 	}
-	
+
 	/**
 	 * 文の処理
 	 * StatementResultFlagがBREAK_STATEMENT_RESULTになっている場合、ループの処理を終了する。
@@ -226,7 +229,10 @@ public abstract class InterpreterImplementation implements Interpreter {
 	 */
 	@Override
 	public void intLiteralExpression(ExpressionNode integer) {
-		// TODO 自動生成されたメソッド・スタブ
+		
+		//ノードから定数を取り出す
+		
+		//オペランドスタックに値を詰める
 
 	}
 
@@ -234,8 +240,11 @@ public abstract class InterpreterImplementation implements Interpreter {
 	 * 文字列定数
 	 */
 	@Override
-	public void stringLiteralExpression(ExpressionNode integer) {
-		// TODO 自動生成されたメソッド・スタブ
+	public void stringLiteralExpression(ExpressionNode string) {
+		
+		//ノードから定数を取り出す
+		
+		//オペランドスタックに値を詰める
 		
 	}
 
@@ -243,8 +252,11 @@ public abstract class InterpreterImplementation implements Interpreter {
 	 * 真偽値定数
 	 */
 	@Override
-	public void booleanLiteralExpression(ExpressionNode integer) {
-		// TODO 自動生成されたメソッド・スタブ
+	public void booleanLiteralExpression(ExpressionNode bool) {
+		
+		//ノードから定数を取り出す
+		
+		//オペランドスタックに値を詰める
 		
 	}
 
@@ -253,7 +265,12 @@ public abstract class InterpreterImplementation implements Interpreter {
 	 */
 	@Override
 	public void identifierExpression(ExpressionNode identifier) {
-		// TODO 自動生成されたメソッド・スタブ
+		
+		//コールスタックから識別子を探す
+		
+		//グローバル変数から識別子を探す
+		
+		//識別子が存在すれば、値を取り出し、オペランドスタックに詰める
 
 	}
 
@@ -262,7 +279,14 @@ public abstract class InterpreterImplementation implements Interpreter {
 	 */
 	@Override
 	public void plusExpression(ExpressionNode left, ExpressionNode right) {
-		// TODO 自動生成されたメソッド・スタブ
+		
+		//左右の値の式を実行する
+		
+		//オペランドスタックから左右の値の計算結果を取り出す
+		
+		//式を実行する
+		
+		//オペランドスタックに値を詰める
 
 	}
 
@@ -307,7 +331,16 @@ public abstract class InterpreterImplementation implements Interpreter {
 	 */
 	@Override
 	public void assignExpression(ExpressionNode left, ExpressionNode right) {
-		// TODO 自動生成されたメソッド・スタブ
+		
+		//式(right)を実行する
+		
+		//オペランドスタックから値を取り出す
+		
+		//コールスタックから代入先を探す（局所変数）
+		
+		//シンボルテーブルから代入先を探す（大域変数）
+		
+		//代入を実行する
 
 	}
 
