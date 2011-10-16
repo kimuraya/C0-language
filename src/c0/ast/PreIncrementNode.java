@@ -1,6 +1,7 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //"++" 前置増分
 public class PreIncrementNode extends ExpressionNode {
@@ -10,6 +11,7 @@ public class PreIncrementNode extends ExpressionNode {
 	public PreIncrementNode(ExpressionNode leftValue) {
 		super();
 		this.leftValue = leftValue;
+		this.nodeType = NodeType.PRE_INCREMENT;
 	}
 
 	@Override

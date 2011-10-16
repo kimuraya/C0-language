@@ -1,6 +1,7 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //">"
 public class GreaterThanNode extends ExpressionNode {
@@ -12,6 +13,7 @@ public class GreaterThanNode extends ExpressionNode {
 		super();
 		this.left = left;
 		this.right = right;
+		this.nodeType = NodeType.GREATER_THAN;
 	}
 
 	@Override

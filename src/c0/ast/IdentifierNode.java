@@ -5,6 +5,7 @@ import java.util.List;
 import c0.ast.Location;
 import c0.interpreter.Visitor;
 import c0.util.Identifier;
+import c0.util.NodeType;
 
 //識別子
 public class IdentifierNode extends ExpressionNode {
@@ -17,6 +18,7 @@ public class IdentifierNode extends ExpressionNode {
 	public IdentifierNode(Location location) {
 		super();
 		this.location = location;
+		this.nodeType = NodeType.IDENTIFIER;
 	}
 
 	public Identifier getIdentifier() {

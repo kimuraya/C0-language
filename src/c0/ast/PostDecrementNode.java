@@ -1,6 +1,7 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //"--" 後置減分
 public class PostDecrementNode extends ExpressionNode {
@@ -10,6 +11,7 @@ public class PostDecrementNode extends ExpressionNode {
 	public PostDecrementNode(ExpressionNode leftValue) {
 		super();
 		this.leftValue = leftValue;
+		this.nodeType = NodeType.POST_DECREMENT;
 	}
 
 	@Override

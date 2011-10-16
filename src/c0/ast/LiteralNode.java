@@ -2,6 +2,7 @@ package c0.ast;
 
 import c0.interpreter.Visitor;
 import c0.util.DataType;
+import c0.util.NodeType;
 import c0.util.Value;
 
 //定数
@@ -17,21 +18,24 @@ public class LiteralNode extends ExpressionNode {
 		
 		switch (dataType) {
 			case INT:
-				literal.setDataType(dataType);
-				literal.setInteger(Integer.parseInt(image, 10));
-			case INT_ARRAY:
+				this.literal.setDataType(dataType);
+				this.literal.setInteger(Integer.parseInt(image, 10));
+				this.nodeType = NodeType.INT_LITERAL;
 			case STRING:
-				literal.setDataType(dataType);
-				literal.setStringLiteral(image);
+				this.literal.setDataType(dataType);
+				this.literal.setStringLiteral(image);
+				this.nodeType = NodeType.STRING_LITERAL;
 			case BOOLEAN:
 				//trueの場合
 				if (image.equals("true")) {
-					literal.setDataType(dataType);
-					literal.setBooleanLiteral(true);
+					this.literal.setDataType(dataType);
+					this.literal.setBooleanLiteral(true);
+				//falseの場合
 				} else if (image.equals("false")) {
-					literal.setDataType(dataType);
-					literal.setBooleanLiteral(false);
+					this.literal.setDataType(dataType);
+					this.literal.setBooleanLiteral(false);
 				}
+				this.nodeType = NodeType.BOOLEAN_LITERAL;
 		}
 	}
 

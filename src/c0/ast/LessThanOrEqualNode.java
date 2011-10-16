@@ -1,6 +1,7 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //"<="
 public class LessThanOrEqualNode extends ExpressionNode {
@@ -12,6 +13,7 @@ public class LessThanOrEqualNode extends ExpressionNode {
 		super();
 		this.left = left;
 		this.right = right;
+		this.nodeType = NodeType.LESS_THAN_OR_EQUAL;
 	}
 
 	@Override

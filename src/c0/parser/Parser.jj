@@ -581,10 +581,10 @@ ExpressionNode primaryExpression():
 			{
 				return new LiteralNode(new Location(this.getFileName(), token), DataType.STRING, token.image);
 			}
-	| token=<TRUE> //真偽値リテラル : true
+	| token=<TRUE> //真偽値定数 : true
 			{
 				return new LiteralNode(new Location(this.getFileName(), token), DataType.BOOLEAN, token.image);			}
-	| token=<FALSE> //真偽値リテラル : false
+	| token=<FALSE> //真偽値定数 : false
 			{
 				return new LiteralNode(new Location(this.getFileName(), token), DataType.BOOLEAN, token.image);
 			}

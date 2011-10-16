@@ -1,6 +1,7 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //"="
 public class AssignNode extends ExpressionNode {
@@ -13,6 +14,7 @@ public class AssignNode extends ExpressionNode {
 		super();
 		this.leftValue = leftValue;
 		this.expression = expression;
+		this.nodeType = NodeType.ASSIGN;
 	}
 
 	@Override

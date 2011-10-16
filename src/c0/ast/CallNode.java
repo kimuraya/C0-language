@@ -3,6 +3,7 @@ package c0.ast;
 import java.util.List;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //関数呼び出し（ネイティブ関数を含む）
 public class CallNode extends ExpressionNode {
@@ -14,6 +15,7 @@ public class CallNode extends ExpressionNode {
 		super();
 		this.function = function;
 		this.parameters = parameters;
+		this.nodeType = NodeType.CALL;
 	}
 
 	@Override

@@ -4,7 +4,9 @@ public enum NodeType {
 	NODE, //全ての構文木の親クラス
 	AST, //グローバル変数の確保など、プログラム全体の初期処理と後処理を行う
 	EXPRESSION, //式を表す
-	LITERAL, //定数
+	INT_LITERAL, //10進定数
+	STRING_LITERAL, //文字列定数
+	BOOLEAN_LITERAL, //真偽値定数
 	IDENTIFIER, //識別子
 	ASSIGN, //"="
 	EQUIVALENCE, //"=="

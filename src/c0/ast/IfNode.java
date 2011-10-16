@@ -16,7 +16,7 @@ public class IfNode extends StatementNode {
 		this.conditionalExpression = expression;
 		this.thenStatement = thenStatement;
 		this.elseStatement = elseStatement;
-		nodeType = NodeType.IF_STATEMENT;
+		this.nodeType = NodeType.IF_STATEMENT;
 	}
 
 	public ExpressionNode getConditionalExpression() {

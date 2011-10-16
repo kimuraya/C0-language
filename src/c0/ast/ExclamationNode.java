@@ -1,6 +1,7 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //"!"
 public class ExclamationNode extends ExpressionNode {
@@ -10,6 +11,7 @@ public class ExclamationNode extends ExpressionNode {
 	public ExclamationNode(ExpressionNode leftValue) {
 		super();
 		this.leftValue = leftValue;
+		this.nodeType = NodeType.EXCLAMATION;
 	}
 
 	@Override

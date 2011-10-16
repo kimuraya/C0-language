@@ -1,6 +1,7 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //添字式
 public class ArraySubscriptExpressionNode extends ExpressionNode {
@@ -13,6 +14,7 @@ public class ArraySubscriptExpressionNode extends ExpressionNode {
 		super();
 		this.array = array;
 		this.index = index;
+		this.nodeType = NodeType.ARRAY_SUBSCRIPT;
 	}
 	
 	@Override

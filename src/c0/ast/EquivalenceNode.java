@@ -1,6 +1,7 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //"=="
 public class EquivalenceNode extends ExpressionNode {
@@ -11,7 +12,8 @@ public class EquivalenceNode extends ExpressionNode {
 	public EquivalenceNode(ExpressionNode left, ExpressionNode right) {
 		super();
 		this.left = left;
-		this.right = right;		
+		this.right = right;
+		this.nodeType = NodeType.EQUIVALENCE;
 	}
 
 	@Override

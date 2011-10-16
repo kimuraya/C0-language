@@ -2,10 +2,31 @@ package c0.interpreter;
 
 import java.util.Stack;
 
+import c0.ast.AssignNode;
+import c0.ast.CallNode;
+import c0.ast.DivNode;
+import c0.ast.EquivalenceNode;
+import c0.ast.ExclamationNode;
 import c0.ast.ExpressionNode;
+import c0.ast.GreaterThanNode;
+import c0.ast.GreaterThanOrEqualNode;
 import c0.ast.IdentifierNode;
 import c0.ast.IfNode;
+import c0.ast.LessThanNode;
+import c0.ast.LessThanOrEqualNode;
+import c0.ast.LogicalAndNode;
+import c0.ast.LogicalOrNode;
+import c0.ast.MinusNode;
+import c0.ast.ModNode;
+import c0.ast.MulNode;
+import c0.ast.NotEquivalenceNode;
+import c0.ast.PlusNode;
+import c0.ast.PostDecrementNode;
+import c0.ast.PostIncrementNode;
+import c0.ast.PreDecrementNode;
+import c0.ast.PreIncrementNode;
 import c0.ast.StatementNode;
+import c0.ast.UnaryMinusNode;
 import c0.util.ExecuteStatementResult;
 import c0.util.NodeType;
 import c0.util.StackElement;
@@ -200,141 +221,234 @@ public abstract class InterpreterImplementation implements Interpreter {
 		return null;
 	}
 
+	/**
+	 * 10進定数
+	 */
 	@Override
-	public void IntExpression(ExpressionNode integer) {
+	public void intLiteralExpression(ExpressionNode integer) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * 文字列定数
+	 */
 	@Override
-	public void IdentifierExpression(ExpressionNode identifier) {
+	public void stringLiteralExpression(ExpressionNode integer) {
+		// TODO 自動生成されたメソッド・スタブ
+		
+	}
+
+	/**
+	 * 真偽値定数
+	 */
+	@Override
+	public void booleanLiteralExpression(ExpressionNode integer) {
+		// TODO 自動生成されたメソッド・スタブ
+		
+	}
+
+	/**
+	 * 識別子
+	 */
+	@Override
+	public void identifierExpression(ExpressionNode identifier) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "+"
+	 */
 	@Override
-	public void StringExpression(ExpressionNode stringLiteral) {
+	public void plusExpression(ExpressionNode left, ExpressionNode right) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "-"
+	 */
 	@Override
-	public void PlusExpression(ExpressionNode left, ExpressionNode right) {
+	public void minusExpression(ExpressionNode left, ExpressionNode right) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "/"
+	 */
 	@Override
-	public void MinusExpression(ExpressionNode left, ExpressionNode right) {
+	public void divExpression(ExpressionNode left, ExpressionNode right) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "%"
+	 */
 	@Override
-	public void DivExpression(ExpressionNode left, ExpressionNode right) {
+	public void modExpression(ExpressionNode left, ExpressionNode right) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "*"
+	 */
 	@Override
-	public void ModExpression(ExpressionNode left, ExpressionNode right) {
+	public void mulExpression(ExpressionNode left, ExpressionNode right) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "="
+	 */
 	@Override
-	public void MulExpression(ExpressionNode left, ExpressionNode right) {
+	public void assignExpression(ExpressionNode left, ExpressionNode right) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "<"
+	 */
 	@Override
-	public void AssignExpression(ExpressionNode left, ExpressionNode right) {
+	public void lessThanExpression(ExpressionNode left, ExpressionNode right) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "<="
+	 */
 	@Override
-	public void LessThanExpression(ExpressionNode left, ExpressionNode right) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	@Override
-	public void LessThanOrEqualExpression(ExpressionNode left,
+	public void lessThanOrEqualExpression(ExpressionNode left,
 			ExpressionNode right) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * ">"
+	 */
 	@Override
-	public void GreaterThanExpression(ExpressionNode left, ExpressionNode right) {
+	public void greaterThanExpression(ExpressionNode left, ExpressionNode right) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * ">="
+	 */
 	@Override
-	public void GreaterThanOrEqualExpression(ExpressionNode left,
+	public void greaterThanOrEqualExpression(ExpressionNode left,
 			ExpressionNode right) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "=="
+	 */
 	@Override
-	public void EquivalenceExpression(ExpressionNode left, ExpressionNode right) {
+	public void equivalenceExpression(ExpressionNode left, ExpressionNode right) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "!="
+	 */
 	@Override
-	public void NotEquivalenceExpression(ExpressionNode left,
+	public void notEquivalenceExpression(ExpressionNode left,
 			ExpressionNode right) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "&&"
+	 */
 	@Override
-	public void LogicalAndExpression(ExpressionNode left, ExpressionNode right) {
+	public void logicalAndExpression(ExpressionNode left, ExpressionNode right) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "||"
+	 */
 	@Override
-	public void LogicalOrExpression(ExpressionNode left, ExpressionNode right) {
+	public void logicalOrExpression(ExpressionNode left, ExpressionNode right) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "-" 単項マイナス式
+	 */
 	@Override
-	public void UnaryMinusExpression(ExpressionNode leftValue) {
+	public void unaryMinusExpression(ExpressionNode leftValue) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "!"
+	 */
 	@Override
-	public void ExclamationExpression(ExpressionNode leftValue) {
+	public void exclamationExpression(ExpressionNode leftValue) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "++" 前置増分
+	 */
 	@Override
-	public void PreIncrementExpression(ExpressionNode leftValue) {
+	public void preIncrementExpression(ExpressionNode leftValue) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "--" 前置減分
+	 */
 	@Override
-	public void PreDecrementExpression(ExpressionNode leftValue) {
+	public void preDecrementExpression(ExpressionNode leftValue) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
+	/**
+	 * "++" 後置増分
+	 */
 	@Override
-	public void ArraySubscriptExpression(ExpressionNode arraySubscriptExpression) {
+	public void postIncrementExpression(ExpressionNode leftValue) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
-	
+
+	/**
+	 * "--" 後置減分
+	 */
+	@Override
+	public void postDecrementExpression(ExpressionNode leftValue) {
+		// TODO 自動生成されたメソッド・スタブ
+
+	}
+
+	/**
+	 * 添字式
+	 */
+	@Override
+	public void arraySubscriptExpression(ExpressionNode arraySubscriptExpression) {
+		// TODO 自動生成されたメソッド・スタブ
+
+	}
+
 	/**
 	 * 式の実行
 	 */
@@ -342,31 +456,104 @@ public abstract class InterpreterImplementation implements Interpreter {
 	public void evaluateExpression(ExpressionNode expression) {
 		
 		switch(expression.getNodeType()) {
-			case LITERAL: //定数（ここは後で修正する）
-			case IDENTIFIER: //識別
-			case ASSIGN: //"="
-			case EQUIVALENCE: //"=="
-			case NOT_EQUIVALENCE: //"!="
-			case LESS_THAN: //"<"
-			case LESS_THAN_OR_EQUAL: //"<="
-			case GREATER_THAN: //">"
-			case GREATER_THAN_OR_EQUAL: //">="
-			case LOGICAL_AND: //"&&"
-			case LOGICAL_OR: //"||"
-			case PLUS: //"+"
-			case MINUS: //"-"
-			case MUL: //"*"
-			case DIV: //"/"
-			case MOD: //"%"
-			case EXCLAMATION: //"!"
-			case UNARY_MINUS: //"-" 単項マイナス式
-			case PRE_INCREMENT: //"++" 前置増分
-			case PRE_DECREMENT: //"--" 前置減分
-			case POST_INCREMENT: //"++" 後置増分
-			case POST_DECREMENT: //"--" 後置減分
-			case CALL: //関数呼び出し
-		}
 		
+			case INT_LITERAL: //10進定数
+				this.intLiteralExpression(expression);
+				break;
+			case STRING_LITERAL: //文字列定数
+				this.stringLiteralExpression(expression);
+				break;
+			case BOOLEAN_LITERAL: //真偽値定数
+				this.booleanLiteralExpression(expression);
+				break;
+			case IDENTIFIER: //識別子
+				this.identifierExpression(expression);
+				break;
+			case ASSIGN: //"="
+				AssignNode assignNode = (AssignNode) expression;
+				this.assignExpression(assignNode.getLeftValue(), assignNode.getExpression());
+				break;
+			case EQUIVALENCE: //"=="
+				EquivalenceNode equivalenceNode = (EquivalenceNode) expression;
+				this.equivalenceExpression(equivalenceNode.getLeft(), equivalenceNode.getRight());
+				break;
+			case NOT_EQUIVALENCE: //"!="
+				NotEquivalenceNode notEquivalenceNode = (NotEquivalenceNode) expression;
+				this.notEquivalenceExpression(notEquivalenceNode.getLeft(), notEquivalenceNode.getRight());
+				break;
+			case LESS_THAN: //"<"
+				LessThanNode lessThanNode = (LessThanNode) expression;
+				this.lessThanExpression(lessThanNode.getLeft(), lessThanNode.getRight());
+				break;
+			case LESS_THAN_OR_EQUAL: //"<="
+				LessThanOrEqualNode lessThanOrEqualNode = (LessThanOrEqualNode) expression;
+				this.lessThanOrEqualExpression(lessThanOrEqualNode.getLeft(), lessThanOrEqualNode.getRight());
+				break;
+			case GREATER_THAN: //">"
+				GreaterThanNode greaterThanNode = (GreaterThanNode) expression;
+				this.greaterThanExpression(greaterThanNode.getLeft(), greaterThanNode.getRight());
+				break;
+			case GREATER_THAN_OR_EQUAL: //">="
+				GreaterThanOrEqualNode greaterThanOrEqualNode = (GreaterThanOrEqualNode) expression;
+				this.greaterThanOrEqualExpression(greaterThanOrEqualNode.getLeft(), greaterThanOrEqualNode.getRight());
+				break;
+			case LOGICAL_AND: //"&&"
+				LogicalAndNode logicalAndNode = (LogicalAndNode) expression;
+				this.logicalAndExpression(logicalAndNode.getLeft(), logicalAndNode.getRight());
+				break;
+			case LOGICAL_OR: //"||"
+				LogicalOrNode logicalOrNode = (LogicalOrNode) expression;
+				this.logicalOrExpression(logicalOrNode.getLeft(), logicalOrNode.getRight());
+				break;
+			case PLUS: //"+"
+				PlusNode plusNode = (PlusNode) expression;
+				this.plusExpression(plusNode.getLeft(), plusNode.getRight());
+				break;
+			case MINUS: //"-"
+				MinusNode minusNode = (MinusNode) expression;
+				this.minusExpression(minusNode.getLeft(), minusNode.getRight());
+				break;
+			case MUL: //"*"
+				MulNode mulNode = (MulNode) expression;
+				this.mulExpression(mulNode.getLeft(), mulNode.getRight());
+				break;
+			case DIV: //"/"
+				DivNode divNode = (DivNode) expression;
+				this.divExpression(divNode.getLeft(), divNode.getRight());
+				break;
+			case MOD: //"%"
+				ModNode modNode = (ModNode) expression;
+				this.modExpression(modNode.getLeft(), modNode.getRight());
+				break;
+			case EXCLAMATION: //"!"
+				ExclamationNode exclamationNode = (ExclamationNode) expression;
+				this.exclamationExpression(exclamationNode.getLeftValue());
+				break;
+			case UNARY_MINUS: //"-" 単項マイナス式
+				UnaryMinusNode unaryMinusNode = (UnaryMinusNode) expression;
+				this.unaryMinusExpression(unaryMinusNode.getLeftValue());
+				break;
+			case PRE_INCREMENT: //"++" 前置増分
+				PreIncrementNode preIncrementNode = (PreIncrementNode) expression;
+				this.preIncrementExpression(preIncrementNode.getLeftValue());
+				break;
+			case PRE_DECREMENT: //"--" 前置減分
+				PreDecrementNode preDecrementNode = (PreDecrementNode) expression;
+				this.preDecrementExpression(preDecrementNode.getLeftValue());
+				break;
+			case POST_INCREMENT: //"++" 後置増分
+				PostIncrementNode postIncrementNode = (PostIncrementNode) expression;
+				this.postIncrementExpression(postIncrementNode.getLeftValue());
+				break;
+			case POST_DECREMENT: //"--" 後置減分
+				PostDecrementNode postDecrementNode = (PostDecrementNode) expression;
+				this.postDecrementExpression(postDecrementNode.getLeftValue());
+				break;
+			case CALL: //関数呼び出し
+				CallNode callNode = (CallNode) expression;
+				this.executeFunctionCall(callNode);
+				break;
+		}
 	}
 
 	/**
@@ -382,20 +569,8 @@ public abstract class InterpreterImplementation implements Interpreter {
 		//ユーザー定義関数の呼び出し
 		
 	}
-	
-	
 
-	@Override
-	public void PostIncrementExpression(ExpressionNode leftValue) {
-		// TODO 自動生成されたメソッド・スタブ
 
-	}
-
-	@Override
-	public void PostDecrementExpression(ExpressionNode leftValue) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
 	
 	/**
 	 * ユーザー定義関数の呼び出し

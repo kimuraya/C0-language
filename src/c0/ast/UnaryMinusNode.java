@@ -1,6 +1,7 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
+import c0.util.NodeType;
 
 //"-" 単項マイナス式
 public class UnaryMinusNode extends ExpressionNode {
@@ -10,6 +11,7 @@ public class UnaryMinusNode extends ExpressionNode {
 	public UnaryMinusNode(ExpressionNode leftValue) {
 		super();
 		this.leftValue = leftValue;
+		this.nodeType = NodeType.UNARY_MINUS;
 	}
 
 	@Override
