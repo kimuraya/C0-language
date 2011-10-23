@@ -12,7 +12,7 @@ public class IdentifierNode extends ExpressionNode {
 	
 	private Identifier identifier;
 	private DataTypeNode returnDataType; //関数の戻り値のデータ型
-	private List<ParameterNode> parameters = new LinkedList<ParameterNode>(); //引数のリスト
+	private List<ParameterNode> parameters; //引数のリスト
 	private StatementNode block; //関数本体（複合文）
 	
 	public IdentifierNode(Location location) {

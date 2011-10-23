@@ -1,6 +1,7 @@
 package c0.interpreter;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -18,35 +19,54 @@ import c0.util.LocalScope;
 import c0.util.StackElement;
 import c0.util.SymbolTable;
 
-//ASTのノードを入力として受け取り、関数を実行する。
-//シンボルテーブルや環境を管理する
+/**
+ * ASTのノードを入力として受け取り、関数を実行する。
+ * シンボルテーブルや環境を管理する。
+ */
 public class C0Interpreter extends InterpreterImplementation {
 	
 	public C0Interpreter(Stack<StackElement> callStack,
 			Stack<StackElement> operandStack) {
 		super(callStack, operandStack);
 	}
-
+	
+	/**
+	 * 引数とファイルのチェックを行い、問題がなければインタプリタを実行する
+	 * @param args
+	 */
 	public static void main(String args[]) {
 		
 		//mainメソッドの引数をチェック。ファイル名が無ければ、警告を出して終了
-		//例外を使わないコードに書き換える
 		String fileName = null;
 		FileReader fileReader = null;
-		
 		try {
-			fileName = args[0];
-			fileReader = new FileReader(fileName);
+			
+			//引数チェック
+			if (args.length >= 1) {
+				fileName = args[0];
+			} else {
+				throw new Exception("引数にファイル名が指定されていません");
+			}
+			
+			File file = null;
+			if (fileName != null) {
+				file = new File(fileName);
+			}
+			
+			if (file.exists() && file.canRead()) {
+				fileReader = new FileReader(fileName);
+			} else if (!file.exists()) {
+				throw new Exception("ファイルが存在しません");
+			} else if (!file.canRead()) {
+				throw new Exception("ファイルが読み込めません");
+			}
+			
 		} catch (java.lang.ArrayIndexOutOfBoundsException e) {
-			System.out.println("引数にファイル名が指定されていません");
-			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return;
 		} catch (FileNotFoundException e) {
-			System.out.println("ファイルが開けません");
-			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return;
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 		//インタプリタのエントリーポイント
@@ -57,7 +77,11 @@ public class C0Interpreter extends InterpreterImplementation {
 		interpreter.interpretation(fileName, fileReader); //実行
 	}
 	
-	//インタプリタの実行
+	/**
+	 * インタプリタの実行
+	 * @param fileName
+	 * @param fileReader
+	 */
 	private void interpretation(String fileName, FileReader fileReader) {
 		
 		AstNode program = null; //構文木

@@ -49,6 +49,9 @@ import c0.util.LocalScope;
 import c0.util.StackElement;
 import c0.util.SymbolTable;
 
+/**
+ * プログラム全体の起点
+ */
 public class AstVisitor implements Visitor {
 	
 	//シンボルテーブル
@@ -303,7 +306,7 @@ public class AstVisitor implements Visitor {
 	@Override
 	public void visit(CallNode callNode) {
 		callNode.getFunction().accept(this);
-		List<ExpressionNode> parameters = callNode.getParameters();
+		List<ExpressionNode> parameters = callNode.getArguments();
 		
 		for (ExpressionNode parameter : parameters) {
 			parameter.accept(this);

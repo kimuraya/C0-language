@@ -1,5 +1,6 @@
 package c0.interpreter;
 
+import java.util.List;
 import java.util.Stack;
 
 import c0.ast.AssignNode;
@@ -20,6 +21,7 @@ import c0.ast.MinusNode;
 import c0.ast.ModNode;
 import c0.ast.MulNode;
 import c0.ast.NotEquivalenceNode;
+import c0.ast.ParameterNode;
 import c0.ast.PlusNode;
 import c0.ast.PostDecrementNode;
 import c0.ast.PostIncrementNode;
@@ -28,6 +30,8 @@ import c0.ast.PreIncrementNode;
 import c0.ast.StatementNode;
 import c0.ast.UnaryMinusNode;
 import c0.util.ExecuteStatementResult;
+import c0.util.Identifier;
+import c0.util.LocalVariable;
 import c0.util.NodeType;
 import c0.util.StackElement;
 
@@ -596,11 +600,28 @@ public abstract class InterpreterImplementation implements Interpreter {
 	public void executeFunctionCall(ExpressionNode callNode) {
 		
 		//呼び出そうとしている関数が標準関数か、ユーザー定義関数かチェックする
+		CallNode functionCall = (CallNode) callNode;
+		IdentifierNode functionNode = (IdentifierNode) functionCall.getFunction();
 		
 		//標準関数の呼び出し
-		
+		if (functionNode.getIdentifier().isStandardFunctionFlag()) {
+			this.executeStandardFunctionCall(functionNode);
+			
 		//ユーザー定義関数の呼び出し
+		} else if (!functionNode.getIdentifier().isStandardFunctionFlag()) {
+			
+			//式を計算し、引数をスタックに積む
+			List<ExpressionNode> arguments = functionCall.getArguments();
+			
+			//引数の式を計算する
+			for (ExpressionNode argument : arguments) {
+				this.evaluateExpression(argument);
+			}
+			
+			this.executeUserDefinedFunctionCall(functionNode);
+		}
 		
+		return;
 	}
 
 
@@ -611,7 +632,15 @@ public abstract class InterpreterImplementation implements Interpreter {
 	 */
 	private void executeUserDefinedFunctionCall(IdentifierNode functionNode) {
 		
-		//引数をスタックに詰める
+		//式を実行し引数をスタックに詰める
+		List<ParameterNode> parameters = functionNode.getParameters();
+		
+		for (ParameterNode parameter : parameters) {
+			
+			IdentifierNode identifier = parameter.getIdentifier();
+			
+			LocalVariable variable;
+		}
 		
 		//呼び出し元の戻り先を保存する
 		

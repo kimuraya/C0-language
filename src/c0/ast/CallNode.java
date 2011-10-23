@@ -9,12 +9,12 @@ import c0.util.NodeType;
 public class CallNode extends ExpressionNode {
 	
 	private ExpressionNode function;
-	private List<ExpressionNode> parameters; //引数
+	private List<ExpressionNode> arguments; //引数
 	
 	public CallNode(ExpressionNode function, List<ExpressionNode> parameters) {
 		super();
 		this.function = function;
-		this.parameters = parameters;
+		this.arguments = parameters;
 		this.nodeType = NodeType.CALL;
 	}
 
@@ -32,12 +32,12 @@ public class CallNode extends ExpressionNode {
 		this.function = function;
 	}
 
-	public List<ExpressionNode> getParameters() {
-		return parameters;
+	public List<ExpressionNode> getArguments() {
+		return arguments;
 	}
 
-	public void setParameters(List<ExpressionNode> parameters) {
-		this.parameters = parameters;
+	public void setArguments(List<ExpressionNode> parameters) {
+		this.arguments = parameters;
 	}
 
 	@Override
@@ -62,10 +62,10 @@ public class CallNode extends ExpressionNode {
 			this.printIndent(depth);
 		}
 		
-		if (this.parameters != null) {
+		if (this.arguments != null) {
 			System.out.println("parameters");
 			
-			for(ExpressionNode parameter : this.parameters) {
+			for(ExpressionNode parameter : this.arguments) {
 				parameter.dump(depth, true);
 			}
 		}
