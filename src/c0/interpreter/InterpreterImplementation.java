@@ -15,6 +15,7 @@ import c0.ast.IdentifierNode;
 import c0.ast.IfNode;
 import c0.ast.LessThanNode;
 import c0.ast.LessThanOrEqualNode;
+import c0.ast.LiteralNode;
 import c0.ast.LogicalAndNode;
 import c0.ast.LogicalOrNode;
 import c0.ast.MinusNode;
@@ -34,6 +35,7 @@ import c0.util.Identifier;
 import c0.util.LocalVariable;
 import c0.util.NodeType;
 import c0.util.StackElement;
+import c0.util.StackElementType;
 
 public abstract class InterpreterImplementation implements Interpreter {
 	
@@ -235,9 +237,17 @@ public abstract class InterpreterImplementation implements Interpreter {
 	public void intLiteralExpression(ExpressionNode integer) {
 		
 		//ノードから定数を取り出す
+		LiteralNode integerLiteral = (LiteralNode) integer;
+		
+		//スタックの要素の作製
+		StackElement stackElement = new StackElement();
+		stackElement.setStackElementType(StackElementType.Literal);
+		stackElement.setValue(integerLiteral.getLiteral());
 		
 		//オペランドスタックに値を詰める
-
+		this.operandStack.add(stackElement);
+		
+		return;
 	}
 
 	/**
