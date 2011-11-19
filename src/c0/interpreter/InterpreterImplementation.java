@@ -9,6 +9,7 @@ import c0.ast.DivNode;
 import c0.ast.EquivalenceNode;
 import c0.ast.ExclamationNode;
 import c0.ast.ExpressionNode;
+import c0.ast.ExpressionStatementNode;
 import c0.ast.GreaterThanNode;
 import c0.ast.GreaterThanOrEqualNode;
 import c0.ast.IdentifierNode;
@@ -195,6 +196,11 @@ public abstract class InterpreterImplementation implements Interpreter {
 			StatementNode statementNode) {
 		
 		//式を実行する
+		ExpressionStatementNode expressionStatementNode = (ExpressionStatementNode) statementNode;
+		this.evaluateExpression(expressionStatementNode.getExpression());
+		
+		//ExecuteStatementResultを作る
+		//スタックから値を取り出す
 		
 		return null;
 	}
@@ -257,6 +263,7 @@ public abstract class InterpreterImplementation implements Interpreter {
 	public void stringLiteralExpression(ExpressionNode string) {
 		
 		//ノードから定数を取り出す
+		LiteralNode integerLiteral = (LiteralNode) string;
 		
 		//オペランドスタックに値を詰める
 		
@@ -295,6 +302,8 @@ public abstract class InterpreterImplementation implements Interpreter {
 	public void plusExpression(ExpressionNode left, ExpressionNode right) {
 		
 		//左右の値の式を実行する
+		this.evaluateExpression(left);
+		this.evaluateExpression(right);
 		
 		//オペランドスタックから左右の値の計算結果を取り出す
 		
