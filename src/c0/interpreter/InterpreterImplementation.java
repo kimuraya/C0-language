@@ -328,7 +328,7 @@ public class InterpreterImplementation implements Interpreter {
 		StackElement stackLeft = this.operandStack.pop();
 		
 		// TODO この部分は要修正
-		//スタックの要素から値を取り出す前にデータ型のチェックして、
+		//スタックの要素から値を取り出す前にデータ型のチェックする処理を追加する
 		int leftInt = stackLeft.getValue().getInteger();
 		int rightInt = stackRight.getValue().getInteger();
 		
