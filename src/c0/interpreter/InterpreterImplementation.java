@@ -31,14 +31,16 @@ import c0.ast.PreDecrementNode;
 import c0.ast.PreIncrementNode;
 import c0.ast.StatementNode;
 import c0.ast.UnaryMinusNode;
+import c0.util.DataType;
 import c0.util.ExecuteStatementResult;
 import c0.util.Identifier;
 import c0.util.LocalVariable;
 import c0.util.NodeType;
 import c0.util.StackElement;
 import c0.util.StackElementType;
+import c0.util.Value;
 
-public abstract class InterpreterImplementation implements Interpreter {
+public class InterpreterImplementation implements Interpreter {
 	
 	private Stack<StackElement> callStack = null; //局所変数、戻り値、戻り先、ベースポインタを積む
 	private Stack<StackElement> operandStack = null; //式の計算に使用する
@@ -47,6 +49,22 @@ public abstract class InterpreterImplementation implements Interpreter {
 			Stack<StackElement> operandStack) {
 		super();
 		this.callStack = callStack;
+		this.operandStack = operandStack;
+	}
+
+	public Stack<StackElement> getCallStack() {
+		return callStack;
+	}
+
+	public void setCallStack(Stack<StackElement> callStack) {
+		this.callStack = callStack;
+	}
+
+	public Stack<StackElement> getOperandStack() {
+		return operandStack;
+	}
+
+	public void setOperandStack(Stack<StackElement> operandStack) {
 		this.operandStack = operandStack;
 	}
 
@@ -306,11 +324,29 @@ public abstract class InterpreterImplementation implements Interpreter {
 		this.evaluateExpression(right);
 		
 		//オペランドスタックから左右の値の計算結果を取り出す
+		StackElement stackRight = this.operandStack.pop();
+		StackElement stackLeft = this.operandStack.pop();
+		
+		// TODO この部分は要修正
+		//スタックの要素から値を取り出す前にデータ型のチェックして、
+		int leftInt = stackLeft.getValue().getInteger();
+		int rightInt = stackRight.getValue().getInteger();
 		
 		//式を実行する
+		int result = leftInt + rightInt;
+		
+		//実行結果をインタプリタで扱える形式にする
+		Value resultValue = new Value();
+		resultValue.setInteger(result);
+		resultValue.setDataType(DataType.INT);
+		
+		StackElement resultElement = new StackElement();
+		resultElement.setValue(resultValue);
 		
 		//オペランドスタックに値を詰める
-
+		this.operandStack.push(resultElement);
+		
+		return;
 	}
 
 	/**
