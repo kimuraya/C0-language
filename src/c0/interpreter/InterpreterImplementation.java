@@ -312,12 +312,46 @@ public class InterpreterImplementation implements Interpreter {
 		//識別子が存在すれば、値を取り出し、オペランドスタックに詰める
 
 	}
-
+	
 	/**
-	 * "+"
+	 * 二項演算子の式
+	 * 加算式, 減算式, 乗算, 除算式, 剰余式
+	 * +, -, *, /, %
 	 */
-	@Override
-	public void plusExpression(ExpressionNode left, ExpressionNode right) {
+	public void binaryOperatorExpression(ExpressionNode expression) {
+		
+		ExpressionNode left = null;
+		ExpressionNode right = null;
+		
+		//ノードの種類によって、処理を分ける
+		switch(expression.getNodeType()) {
+			
+			case PLUS: //"+"
+				PlusNode plusNode = (PlusNode) expression;
+				left = plusNode.getLeft();
+				right = plusNode.getRight();
+				break;
+			case MINUS: //"-"
+				MinusNode minusNode = (MinusNode) expression;
+				left = minusNode.getLeft();
+				right = minusNode.getRight();
+				break;
+			case MUL: //"*"
+				MulNode mulNode = (MulNode) expression;
+				left = mulNode.getLeft();
+				right = mulNode.getRight();
+				break;
+			case DIV: //"/"
+				DivNode divNode = (DivNode) expression;
+				left = divNode.getLeft();
+				right = divNode.getRight();
+				break;
+			case MOD: //"%"
+				ModNode modNode = (ModNode) expression;
+				left = modNode.getLeft();
+				right = modNode.getRight();
+				break;
+		}
 		
 		//左右の値の式を実行する
 		this.evaluateExpression(left);
@@ -328,12 +362,32 @@ public class InterpreterImplementation implements Interpreter {
 		StackElement stackLeft = this.operandStack.pop();
 		
 		// TODO この部分は要修正
-		//スタックの要素から値を取り出す前にデータ型のチェックする処理を追加する
+		// TODO スタックの要素から値を取り出す前にデータ型のチェックする処理を追加する
 		int leftInt = stackLeft.getValue().getInteger();
 		int rightInt = stackRight.getValue().getInteger();
 		
 		//式を実行する
-		int result = leftInt + rightInt;
+		int result = 0;
+		
+		//ノードの種類によって、処理を分ける
+		switch(expression.getNodeType()) {
+			
+			case PLUS: //"+"
+				result = leftInt + rightInt;
+				break;
+			case MINUS: //"-"
+				result = leftInt - rightInt;
+				break;
+			case MUL: //"*"
+				result = leftInt * rightInt;
+				break;
+			case DIV: //"/"
+				result = leftInt / rightInt;
+				break;
+			case MOD: //"%"
+				result = leftInt % rightInt;
+				break;
+		}
 		
 		//実行結果をインタプリタで扱える形式にする
 		Value resultValue = new Value();
@@ -347,42 +401,6 @@ public class InterpreterImplementation implements Interpreter {
 		this.operandStack.push(resultElement);
 		
 		return;
-	}
-
-	/**
-	 * "-"
-	 */
-	@Override
-	public void minusExpression(ExpressionNode left, ExpressionNode right) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * "/"
-	 */
-	@Override
-	public void divExpression(ExpressionNode left, ExpressionNode right) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * "%"
-	 */
-	@Override
-	public void modExpression(ExpressionNode left, ExpressionNode right) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * "*"
-	 */
-	@Override
-	public void mulExpression(ExpressionNode left, ExpressionNode right) {
-		// TODO 自動生成されたメソッド・スタブ
-
 	}
 
 	/**
@@ -598,24 +616,11 @@ public class InterpreterImplementation implements Interpreter {
 				this.logicalOrExpression(logicalOrNode.getLeft(), logicalOrNode.getRight());
 				break;
 			case PLUS: //"+"
-				PlusNode plusNode = (PlusNode) expression;
-				this.plusExpression(plusNode.getLeft(), plusNode.getRight());
-				break;
 			case MINUS: //"-"
-				MinusNode minusNode = (MinusNode) expression;
-				this.minusExpression(minusNode.getLeft(), minusNode.getRight());
-				break;
 			case MUL: //"*"
-				MulNode mulNode = (MulNode) expression;
-				this.mulExpression(mulNode.getLeft(), mulNode.getRight());
-				break;
 			case DIV: //"/"
-				DivNode divNode = (DivNode) expression;
-				this.divExpression(divNode.getLeft(), divNode.getRight());
-				break;
 			case MOD: //"%"
-				ModNode modNode = (ModNode) expression;
-				this.modExpression(modNode.getLeft(), modNode.getRight());
+				this.binaryOperatorExpression(expression);
 				break;
 			case EXCLAMATION: //"!"
 				ExclamationNode exclamationNode = (ExclamationNode) expression;

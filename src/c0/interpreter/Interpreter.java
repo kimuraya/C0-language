@@ -1,7 +1,5 @@
 package c0.interpreter;
 
-import java.util.List;
-
 import c0.ast.ExpressionNode;
 import c0.ast.StatementNode;
 import c0.util.ExecuteStatementResult;
@@ -30,11 +28,7 @@ public interface Interpreter {
 	void identifierExpression(ExpressionNode identifier);//識別子
 	
 	//二項演算子
-	void plusExpression(ExpressionNode left, ExpressionNode right); //加算式
-	void minusExpression(ExpressionNode left, ExpressionNode right); //減算式
-	void divExpression(ExpressionNode left, ExpressionNode right); //除算式
-	void modExpression(ExpressionNode left, ExpressionNode right); //剰余式
-	void mulExpression(ExpressionNode left, ExpressionNode right); //乗算式
+	void binaryOperatorExpression(ExpressionNode expression); //加算式, 減算式, 乗算, 除算式, 剰余式
 	void assignExpression(ExpressionNode left, ExpressionNode right); //代入式
 	
 	//関係式
