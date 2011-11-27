@@ -314,11 +314,10 @@ public class InterpreterImplementation implements Interpreter {
 	}
 	
 	/**
-	 * 二項演算子の式
-	 * 加算式, 減算式, 乗算, 除算式, 剰余式
-	 * +, -, *, /, %
+	 * 二項演算子の前処理。データ型のチェック
+	 * @param expression
 	 */
-	public void binaryOperatorExpression(ExpressionNode expression) {
+	public void binaryOperatorExpressionInit(ExpressionNode expression) {
 		
 		ExpressionNode left = null;
 		ExpressionNode right = null;
@@ -363,29 +362,43 @@ public class InterpreterImplementation implements Interpreter {
 		
 		// TODO この部分は要修正
 		// TODO スタックの要素から値を取り出す前にデータ型のチェックする処理を追加する
-		int leftInt = stackLeft.getValue().getInteger();
-		int rightInt = stackRight.getValue().getInteger();
+		Value leftValue = stackLeft.getValue();
+		Value rightValue = stackRight.getValue();
+		
+		//TODO データ型のチェック
+		
+		
+		//TODO 計算が正しく出来る組み合わせの式を呼び出す
+		this.integerBinaryOperatorExpression(leftValue.getInteger(), rightValue.getInteger(), expression.getNodeType());
+	}
+	
+	/**
+	 * 二項演算子の式
+	 * 加算式, 減算式, 乗算, 除算式, 剰余式
+	 * +, -, *, /, %
+	 */
+	public void integerBinaryOperatorExpression(int left, int right, NodeType expressionType) {
 		
 		//式を実行する
 		int result = 0;
 		
 		//ノードの種類によって、処理を分ける
-		switch(expression.getNodeType()) {
+		switch(expressionType) {
 			
 			case PLUS: //"+"
-				result = leftInt + rightInt;
+				result = left + right;
 				break;
 			case MINUS: //"-"
-				result = leftInt - rightInt;
+				result = left - right;
 				break;
 			case MUL: //"*"
-				result = leftInt * rightInt;
+				result = left * right;
 				break;
 			case DIV: //"/"
-				result = leftInt / rightInt;
+				result = left / right;
 				break;
 			case MOD: //"%"
-				result = leftInt % rightInt;
+				result = left % right;
 				break;
 		}
 		
@@ -620,7 +633,7 @@ public class InterpreterImplementation implements Interpreter {
 			case MUL: //"*"
 			case DIV: //"/"
 			case MOD: //"%"
-				this.binaryOperatorExpression(expression);
+				this.binaryOperatorExpressionInit(expression);
 				break;
 			case EXCLAMATION: //"!"
 				ExclamationNode exclamationNode = (ExclamationNode) expression;

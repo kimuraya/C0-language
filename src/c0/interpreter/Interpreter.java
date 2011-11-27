@@ -3,6 +3,8 @@ package c0.interpreter;
 import c0.ast.ExpressionNode;
 import c0.ast.StatementNode;
 import c0.util.ExecuteStatementResult;
+import c0.util.NodeType;
+import c0.util.Value;
 
 public interface Interpreter {
 	
@@ -28,7 +30,8 @@ public interface Interpreter {
 	void identifierExpression(ExpressionNode identifier);//識別子
 	
 	//二項演算子
-	void binaryOperatorExpression(ExpressionNode expression); //加算式, 減算式, 乗算, 除算式, 剰余式
+	void binaryOperatorExpressionInit(ExpressionNode expression); //二項演算子の前処理。データ型のチェック
+	void integerBinaryOperatorExpression(int left, int right, NodeType expressionType); //整数の加算式, 減算式, 乗算, 除算式, 剰余式
 	void assignExpression(ExpressionNode left, ExpressionNode right); //代入式
 	
 	//関係式
