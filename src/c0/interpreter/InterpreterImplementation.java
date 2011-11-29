@@ -325,6 +325,36 @@ public class InterpreterImplementation implements Interpreter {
 		//ノードの種類によって、処理を分ける
 		switch(expression.getNodeType()) {
 			
+			case EQUIVALENCE: //"=="
+				EquivalenceNode equivalenceNode = (EquivalenceNode) expression;
+				left = equivalenceNode.getLeft();
+				right = equivalenceNode.getRight();
+				break;
+			case NOT_EQUIVALENCE: //"!="
+				NotEquivalenceNode notEquivalenceNode = (NotEquivalenceNode) expression;
+				left = notEquivalenceNode.getLeft();
+				right = notEquivalenceNode.getRight();
+				break;
+			case LESS_THAN: //"<"
+				LessThanNode lessThanNode = (LessThanNode) expression;
+				left = lessThanNode.getLeft();
+				right = lessThanNode.getRight();
+				break;
+			case LESS_THAN_OR_EQUAL: //"<="
+				LessThanOrEqualNode lessThanOrEqualNode = (LessThanOrEqualNode) expression;
+				left = lessThanOrEqualNode.getLeft();
+				right = lessThanOrEqualNode.getRight();
+				break;
+			case GREATER_THAN: //">"
+				GreaterThanNode greaterThanNode = (GreaterThanNode) expression;
+				left = greaterThanNode.getLeft();
+				right = greaterThanNode.getRight();
+				break;
+			case GREATER_THAN_OR_EQUAL: //">="
+				GreaterThanOrEqualNode greaterThanOrEqualNode = (GreaterThanOrEqualNode) expression;
+				left = greaterThanOrEqualNode.getLeft();
+				right = greaterThanOrEqualNode.getRight();
+				break;
 			case PLUS: //"+"
 				PlusNode plusNode = (PlusNode) expression;
 				left = plusNode.getLeft();
@@ -366,46 +396,129 @@ public class InterpreterImplementation implements Interpreter {
 		Value rightValue = stackRight.getValue();
 		
 		//TODO データ型のチェック
+		//整数の式
+		if ((leftValue.getDataType() == DataType.INT) && (rightValue.getDataType() == DataType.INT)) {
+			
+			this.integerBinaryOperatorExpression(leftValue.getInteger(), rightValue.getInteger(), expression.getNodeType());
+			
+		//真偽値の式
+		} else if ((leftValue.getDataType() == DataType.BOOLEAN) && (rightValue.getDataType() == DataType.BOOLEAN)) {
+			
+			this.booleanBinaryOperatorExpression(leftValue.isBooleanLiteral(), rightValue.isBooleanLiteral(), expression.getNodeType());
+			
+		} else {
+			//TODO データ型のチェックに引っかからなかった場合
+			//TODO エラーが起こった行数を保存して、例外を投げる
+			
+		}
 		
 		
-		//TODO 計算が正しく出来る組み合わせの式を呼び出す
-		this.integerBinaryOperatorExpression(leftValue.getInteger(), rightValue.getInteger(), expression.getNodeType());
 	}
 	
 	/**
 	 * 二項演算子の式
 	 * 加算式, 減算式, 乗算, 除算式, 剰余式
+	 * 小なり比較演算子, 以下比較演算子, 大なり比較演算子, 以上比較演算子
 	 * +, -, *, /, %
+	 * @param left
+	 * @param right
+	 * @param expressionType
 	 */
 	public void integerBinaryOperatorExpression(int left, int right, NodeType expressionType) {
 		
 		//式を実行する
-		int result = 0;
+		int resultInt = 0;
+		boolean resultBool = false;
+		boolean operationResultInt = false; //演算結果が整数
+		boolean operationResultBool = false; //演算結果が真偽値
 		
 		//ノードの種類によって、処理を分ける
 		switch(expressionType) {
 			
 			case PLUS: //"+"
-				result = left + right;
+				resultInt = left + right;
+				operationResultInt = true;
 				break;
 			case MINUS: //"-"
-				result = left - right;
+				resultInt = left - right;
+				operationResultInt = true;
 				break;
 			case MUL: //"*"
-				result = left * right;
+				resultInt = left * right;
+				operationResultInt = true;
 				break;
 			case DIV: //"/"
-				result = left / right;
+				resultInt = left / right;
+				operationResultInt = true;
 				break;
 			case MOD: //"%"
-				result = left % right;
+				resultInt = left % right;
+				operationResultInt = true;
+				break;
+			case LESS_THAN: //"<"
+				resultBool = left < right;
+				operationResultBool = true;
+				break;
+			case LESS_THAN_OR_EQUAL: //"<="
+				resultBool = left <= right;
+				operationResultBool = true;
+				break;
+			case GREATER_THAN: //">"
+				resultBool = left > right;
+				operationResultBool = true;
+				break;
+			case GREATER_THAN_OR_EQUAL: //">="
+				resultBool = left >= right;
+				operationResultBool = true;
 				break;
 		}
 		
 		//実行結果をインタプリタで扱える形式にする
 		Value resultValue = new Value();
-		resultValue.setInteger(result);
-		resultValue.setDataType(DataType.INT);
+		
+		if (operationResultInt) {
+			resultValue.setInteger(resultInt);
+			resultValue.setDataType(DataType.INT);
+		} else if (operationResultBool) {
+			resultValue.setBooleanLiteral(resultBool);
+			resultValue.setDataType(DataType.BOOLEAN);
+		}
+		
+		StackElement resultElement = new StackElement();
+		resultElement.setValue(resultValue);
+		
+		//オペランドスタックに値を詰める
+		this.operandStack.push(resultElement);
+		
+		return;
+	}
+	
+	/**
+	 * 二項演算子の式
+	 * 同等演算子, 不等演算子
+	 * @param left
+	 * @param right
+	 * @param expressionType
+	 */
+	public void booleanBinaryOperatorExpression(boolean left, boolean right, NodeType expressionType) {
+		//式を実行する
+		boolean result = false;
+		
+		//ノードの種類によって、処理を分ける
+		switch(expressionType) {
+			
+			case EQUIVALENCE: //"=="
+				result = left == right;
+				break;
+			case NOT_EQUIVALENCE: //"!="
+				result = left != right;
+				break;
+		}
+		
+		//実行結果をインタプリタで扱える形式にする
+		Value resultValue = new Value();
+		resultValue.setBooleanLiteral(result);
+		resultValue.setDataType(DataType.BOOLEAN);
 		
 		StackElement resultElement = new StackElement();
 		resultElement.setValue(resultValue);
