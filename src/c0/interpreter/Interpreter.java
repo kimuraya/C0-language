@@ -31,18 +31,9 @@ public interface Interpreter {
 	
 	//二項演算子
 	void binaryOperatorExpressionInit(ExpressionNode expression); //二項演算子の前処理。データ型のチェック
-	void integerBinaryOperatorExpression(int left, int right, NodeType expressionType); //整数の加算式, 減算式, 乗算, 除算式, 剰余式
+	void binaryOperatorExpression(int left, int right, NodeType expressionType); //整数の加算式, 減算式, 乗算, 除算式, 剰余式, 小なり比較演算子, 以下比較演算子, 大なり比較演算子, 以上比較演算子
+	void binaryOperatorExpression(boolean left, boolean right, NodeType expressionType); //同等演算子, 不等演算子
 	void assignExpression(ExpressionNode left, ExpressionNode right); //代入式
-	
-	//関係式
-	void lessThanExpression(ExpressionNode left, ExpressionNode right); //小なり比較演算子
-	void lessThanOrEqualExpression(ExpressionNode left, ExpressionNode right); //以下比較演算子
-	void greaterThanExpression(ExpressionNode left, ExpressionNode right); //大なり比較演算子
-	void greaterThanOrEqualExpression(ExpressionNode left, ExpressionNode right); //以上比較演算子
-	
-	//同等式
-	void equivalenceExpression(ExpressionNode left, ExpressionNode right); //同等演算子
-	void notEquivalenceExpression(ExpressionNode left, ExpressionNode right); //不等演算子
 	
 	//論理式
 	void logicalAndExpression(ExpressionNode left, ExpressionNode right); //条件積演算子

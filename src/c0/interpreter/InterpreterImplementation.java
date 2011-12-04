@@ -390,8 +390,6 @@ public class InterpreterImplementation implements Interpreter {
 		StackElement stackRight = this.operandStack.pop();
 		StackElement stackLeft = this.operandStack.pop();
 		
-		// TODO この部分は要修正
-		// TODO スタックの要素から値を取り出す前にデータ型のチェックする処理を追加する
 		Value leftValue = stackLeft.getValue();
 		Value rightValue = stackRight.getValue();
 		
@@ -399,12 +397,12 @@ public class InterpreterImplementation implements Interpreter {
 		//整数の式
 		if ((leftValue.getDataType() == DataType.INT) && (rightValue.getDataType() == DataType.INT)) {
 			
-			this.integerBinaryOperatorExpression(leftValue.getInteger(), rightValue.getInteger(), expression.getNodeType());
+			this.binaryOperatorExpression(leftValue.getInteger(), rightValue.getInteger(), expression.getNodeType());
 			
 		//真偽値の式
 		} else if ((leftValue.getDataType() == DataType.BOOLEAN) && (rightValue.getDataType() == DataType.BOOLEAN)) {
 			
-			this.booleanBinaryOperatorExpression(leftValue.isBooleanLiteral(), rightValue.isBooleanLiteral(), expression.getNodeType());
+			this.binaryOperatorExpression(leftValue.isBooleanLiteral(), rightValue.isBooleanLiteral(), expression.getNodeType());
 			
 		} else {
 			//TODO データ型のチェックに引っかからなかった場合
@@ -424,7 +422,7 @@ public class InterpreterImplementation implements Interpreter {
 	 * @param right
 	 * @param expressionType
 	 */
-	public void integerBinaryOperatorExpression(int left, int right, NodeType expressionType) {
+	public void binaryOperatorExpression(int left, int right, NodeType expressionType) {
 		
 		//式を実行する
 		int resultInt = 0;
@@ -471,6 +469,14 @@ public class InterpreterImplementation implements Interpreter {
 				resultBool = left >= right;
 				operationResultBool = true;
 				break;
+			case EQUIVALENCE: //"=="
+				resultBool = left == right;
+				operationResultBool = true;
+				break;
+			case NOT_EQUIVALENCE: //"!="
+				resultBool = left != right;
+				operationResultBool = true;
+				break;
 		}
 		
 		//実行結果をインタプリタで扱える形式にする
@@ -500,7 +506,8 @@ public class InterpreterImplementation implements Interpreter {
 	 * @param right
 	 * @param expressionType
 	 */
-	public void booleanBinaryOperatorExpression(boolean left, boolean right, NodeType expressionType) {
+	public void binaryOperatorExpression(boolean left, boolean right, NodeType expressionType) {
+		
 		//式を実行する
 		boolean result = false;
 		
@@ -546,64 +553,7 @@ public class InterpreterImplementation implements Interpreter {
 		//代入を実行する
 
 	}
-
-	/**
-	 * "<"
-	 */
-	@Override
-	public void lessThanExpression(ExpressionNode left, ExpressionNode right) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * "<="
-	 */
-	@Override
-	public void lessThanOrEqualExpression(ExpressionNode left,
-			ExpressionNode right) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * ">"
-	 */
-	@Override
-	public void greaterThanExpression(ExpressionNode left, ExpressionNode right) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * ">="
-	 */
-	@Override
-	public void greaterThanOrEqualExpression(ExpressionNode left,
-			ExpressionNode right) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * "=="
-	 */
-	@Override
-	public void equivalenceExpression(ExpressionNode left, ExpressionNode right) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * "!="
-	 */
-	@Override
-	public void notEquivalenceExpression(ExpressionNode left,
-			ExpressionNode right) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
+	
 	/**
 	 * "&&"
 	 */
@@ -709,30 +659,6 @@ public class InterpreterImplementation implements Interpreter {
 				AssignNode assignNode = (AssignNode) expression;
 				this.assignExpression(assignNode.getLeftValue(), assignNode.getExpression());
 				break;
-			case EQUIVALENCE: //"=="
-				EquivalenceNode equivalenceNode = (EquivalenceNode) expression;
-				this.equivalenceExpression(equivalenceNode.getLeft(), equivalenceNode.getRight());
-				break;
-			case NOT_EQUIVALENCE: //"!="
-				NotEquivalenceNode notEquivalenceNode = (NotEquivalenceNode) expression;
-				this.notEquivalenceExpression(notEquivalenceNode.getLeft(), notEquivalenceNode.getRight());
-				break;
-			case LESS_THAN: //"<"
-				LessThanNode lessThanNode = (LessThanNode) expression;
-				this.lessThanExpression(lessThanNode.getLeft(), lessThanNode.getRight());
-				break;
-			case LESS_THAN_OR_EQUAL: //"<="
-				LessThanOrEqualNode lessThanOrEqualNode = (LessThanOrEqualNode) expression;
-				this.lessThanOrEqualExpression(lessThanOrEqualNode.getLeft(), lessThanOrEqualNode.getRight());
-				break;
-			case GREATER_THAN: //">"
-				GreaterThanNode greaterThanNode = (GreaterThanNode) expression;
-				this.greaterThanExpression(greaterThanNode.getLeft(), greaterThanNode.getRight());
-				break;
-			case GREATER_THAN_OR_EQUAL: //">="
-				GreaterThanOrEqualNode greaterThanOrEqualNode = (GreaterThanOrEqualNode) expression;
-				this.greaterThanOrEqualExpression(greaterThanOrEqualNode.getLeft(), greaterThanOrEqualNode.getRight());
-				break;
 			case LOGICAL_AND: //"&&"
 				LogicalAndNode logicalAndNode = (LogicalAndNode) expression;
 				this.logicalAndExpression(logicalAndNode.getLeft(), logicalAndNode.getRight());
@@ -741,6 +667,12 @@ public class InterpreterImplementation implements Interpreter {
 				LogicalOrNode logicalOrNode = (LogicalOrNode) expression;
 				this.logicalOrExpression(logicalOrNode.getLeft(), logicalOrNode.getRight());
 				break;
+			case EQUIVALENCE: //"=="
+			case NOT_EQUIVALENCE: //"!="
+			case LESS_THAN: //"<"
+			case LESS_THAN_OR_EQUAL: //"<="
+			case GREATER_THAN: //">"
+			case GREATER_THAN_OR_EQUAL: //">="
 			case PLUS: //"+"
 			case MINUS: //"-"
 			case MUL: //"*"
