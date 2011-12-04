@@ -314,6 +314,121 @@ public class InterpreterImplementation implements Interpreter {
 	}
 	
 	/**
+	 * 論理AND, 論理ORの処理
+	 * @param expression
+	 */
+	public void logicalOperatorExpression(ExpressionNode expression) {
+		
+		ExpressionNode left = null;
+		ExpressionNode right = null;
+		boolean result = false;
+		
+		//ノードの種類によって、処理を分ける
+		StackElement stackLeft = null;
+		StackElement stackRight = null;
+		Value leftValue = null;
+		Value rightValue = null;
+		switch(expression.getNodeType()) {
+		
+			case LOGICAL_AND: //"&&"
+				
+				LogicalAndNode logicalAndNode = (LogicalAndNode) expression;
+				left = logicalAndNode.getLeft();
+				right = logicalAndNode.getRight();
+				
+				//左の式を実行
+				this.evaluateExpression(left);
+				stackLeft = this.operandStack.pop();
+				leftValue = stackLeft.getValue();
+				
+				//データ型のチェック
+				if (leftValue.getDataType() == DataType.BOOLEAN) {
+					
+					//左がtrueだった場合のみ、右を評価する
+					if (leftValue.isBooleanLiteral()) {
+						
+						//右の式を実行
+						this.evaluateExpression(right);
+						stackRight = this.operandStack.pop();
+						rightValue = stackRight.getValue();
+						
+						if (rightValue.getDataType() == DataType.BOOLEAN) {
+							
+							//右もtrue？
+							if (rightValue.isBooleanLiteral()) {
+								result = true; //左右の結果、両方がtrue
+							}
+							
+						} else {
+							//TODO 例外を投げる
+							//右の結果がbooleanではない
+						}
+					} else {
+						//TODO 例外を投げる
+						//左の結果がbooleanではない
+					}
+				}
+				
+				break;
+				
+			case LOGICAL_OR: //"||"
+				
+				LogicalOrNode logicalOrNode = (LogicalOrNode) expression;
+				left = logicalOrNode.getLeft();
+				right = logicalOrNode.getRight();
+				
+				//左の式を実行
+				this.evaluateExpression(left);
+				stackLeft = this.operandStack.pop();
+				leftValue = stackLeft.getValue();
+				
+				//データ型のチェック
+				if (leftValue.getDataType() == DataType.BOOLEAN) {
+					
+					//左の式の結果を保存
+					result = leftValue.isBooleanLiteral();
+					
+					//左の結果がtrueではない場合のみ。右を実行
+					if (!leftValue.isBooleanLiteral()) {
+						
+						//右の式を実行
+						this.evaluateExpression(right);
+						stackRight = this.operandStack.pop();
+						rightValue = stackRight.getValue();
+						
+						//左の結果を代入
+						//左右両方の結果がfalse
+						if (rightValue.getDataType() == DataType.BOOLEAN) {
+							result = rightValue.isBooleanLiteral();
+						} else {
+							//TODO 例外を投げる
+							//右の結果がbooleanではない
+						}
+					}
+				} else {
+					//TODO 例外を投げる
+					//左の結果がbooleanではない
+				}
+				
+				break;
+		}
+		
+		//実行結果をインタプリタで扱える形式にする
+		Value resultValue = new Value();
+		
+		resultValue.setBooleanLiteral(result);
+		resultValue.setDataType(DataType.BOOLEAN);
+		
+		StackElement resultElement = new StackElement();
+		resultElement.setValue(resultValue);
+		
+		//オペランドスタックに値を詰める
+		this.operandStack.push(resultElement);
+		
+		return;
+	}
+	
+	/**
 	 * 二項演算子の前処理。データ型のチェック
 	 * @param expression
 	 */
@@ -660,12 +775,8 @@ public class InterpreterImplementation implements Interpreter {
 				this.assignExpression(assignNode.getLeftValue(), assignNode.getExpression());
 				break;
 			case LOGICAL_AND: //"&&"
-				LogicalAndNode logicalAndNode = (LogicalAndNode) expression;
-				this.logicalAndExpression(logicalAndNode.getLeft(), logicalAndNode.getRight());
-				break;
 			case LOGICAL_OR: //"||"
-				LogicalOrNode logicalOrNode = (LogicalOrNode) expression;
-				this.logicalOrExpression(logicalOrNode.getLeft(), logicalOrNode.getRight());
+				this.logicalOperatorExpression(expression);
 				break;
 			case EQUIVALENCE: //"=="
 			case NOT_EQUIVALENCE: //"!="
