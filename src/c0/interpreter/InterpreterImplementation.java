@@ -397,7 +397,6 @@ public class InterpreterImplementation implements Interpreter {
 						rightValue = stackRight.getValue();
 						
 						//左の結果を代入
-						//左右両方の結果がfalse
 						if (rightValue.getDataType() == DataType.BOOLEAN) {
 							result = rightValue.isBooleanLiteral();
 						} else {
@@ -650,6 +649,146 @@ public class InterpreterImplementation implements Interpreter {
 		
 		return;
 	}
+	
+	/**
+	 * 単項演算子
+	 * @param expression
+	 */
+	public void unaryOperatorExpressionInit(ExpressionNode expression) {
+		//TODO
+		ExpressionNode left = null;
+		
+		//ノードの種類によって、処理を分ける
+		switch(expression.getNodeType()) {
+			case EXCLAMATION: //"!"
+				ExclamationNode exclamationNode = (ExclamationNode) expression;
+				left = exclamationNode.getLeftValue();
+				break;
+			case UNARY_MINUS: //"-" 単項マイナス式
+				UnaryMinusNode unaryMinusNode = (UnaryMinusNode) expression;
+				left = unaryMinusNode.getLeftValue();
+				break;
+			case PRE_INCREMENT: //"++" 前置増分
+				PreIncrementNode preIncrementNode = (PreIncrementNode) expression;
+				left = preIncrementNode.getLeftValue();
+				break;
+			case PRE_DECREMENT: //"--" 前置減分
+				PreDecrementNode preDecrementNode = (PreDecrementNode) expression;
+				left = preDecrementNode.getLeftValue();
+				break;
+			case POST_INCREMENT: //"++" 後置増分
+				PostIncrementNode postIncrementNode = (PostIncrementNode) expression;
+				left = postIncrementNode.getLeftValue();
+				break;
+			case POST_DECREMENT: //"--" 後置減分
+				PostDecrementNode postDecrementNode = (PostDecrementNode) expression;
+				left = postDecrementNode.getLeftValue();
+				break;
+		}
+		
+		//左右の値の式を実行する
+		this.evaluateExpression(left);
+		
+		//オペランドスタックから左右の値の計算結果を取り出す
+		StackElement stackLeft = this.operandStack.pop();
+		
+		Value leftValue = stackLeft.getValue();
+		
+		//TODO データ型のチェック
+		//整数の式
+		if (leftValue.getDataType() == DataType.INT) {
+			
+			this.unaryOperatorExpression(leftValue.getInteger(), expression.getNodeType());
+			
+		//真偽値の式
+		} else if (leftValue.getDataType() == DataType.BOOLEAN) {
+			
+			this.unaryOperatorExpression(leftValue.isBooleanLiteral(), expression.getNodeType());
+			
+		} else {
+			//TODO データ型のチェックに引っかからなかった場合
+			//TODO エラーが起こった行数を保存して、例外を投げる
+			
+		}
+		
+		return;
+	}
+	
+	/**
+	 * 単項演算子の式
+	 * @param left
+	 * @param expressionType
+	 */
+	public void unaryOperatorExpression(int left, NodeType expressionType) {
+		
+		//式を実行する
+		int result = 0;
+		
+		//ノードの種類によって、処理を分ける
+		switch(expressionType) {
+			case UNARY_MINUS: //"-" 単項マイナス式
+				result = -left;
+				break;
+			case PRE_INCREMENT: //"++" 前置増分
+				result = left++; //TODO 再検討
+				break;
+			case PRE_DECREMENT: //"--" 前置減分
+				result = left--; //TODO 再検討
+				break;
+			case POST_INCREMENT: //"++" 後置増分
+				result = ++left; //TODO 再検討
+				break;
+			case POST_DECREMENT: //"--" 後置減分
+				result = --left; //TODO 再検討
+				break;
+		}
+		
+		//実行結果をインタプリタで扱える形式にする
+		Value resultValue = new Value();
+		
+		resultValue.setInteger(result);
+		resultValue.setDataType(DataType.INT);
+		
+		StackElement resultElement = new StackElement();
+		resultElement.setValue(resultValue);
+		
+		//オペランドスタックに値を詰める
+		this.operandStack.push(resultElement);
+		
+		return;
+	}
+	
+	/**
+	 * 単項演算子の式
+	 * @param left
+	 * @param expressionType
+	 */
+	public void unaryOperatorExpression(boolean left, NodeType expressionType) {
+		
+		//式を実行する
+		boolean result = false;
+		
+		//ノードの種類によって、処理を分ける
+		switch(expressionType) {
+			case EXCLAMATION: //"!"
+				result = !left;
+				break;
+		}
+		
+		//実行結果をインタプリタで扱える形式にする
+		Value resultValue = new Value();
+		
+		resultValue.setBooleanLiteral(result);
+		resultValue.setDataType(DataType.BOOLEAN);
+		
+		StackElement resultElement = new StackElement();
+		resultElement.setValue(resultValue);
+		
+		//オペランドスタックに値を詰める
+		this.operandStack.push(resultElement);
+		
+		return;
+	}
 
 	/**
 	 * "="
@@ -796,24 +935,11 @@ public class InterpreterImplementation implements Interpreter {
 				this.exclamationExpression(exclamationNode.getLeftValue());
 				break;
 			case UNARY_MINUS: //"-" 単項マイナス式
-				UnaryMinusNode unaryMinusNode = (UnaryMinusNode) expression;
-				this.unaryMinusExpression(unaryMinusNode.getLeftValue());
-				break;
 			case PRE_INCREMENT: //"++" 前置増分
-				PreIncrementNode preIncrementNode = (PreIncrementNode) expression;
-				this.preIncrementExpression(preIncrementNode.getLeftValue());
-				break;
 			case PRE_DECREMENT: //"--" 前置減分
-				PreDecrementNode preDecrementNode = (PreDecrementNode) expression;
-				this.preDecrementExpression(preDecrementNode.getLeftValue());
-				break;
 			case POST_INCREMENT: //"++" 後置増分
-				PostIncrementNode postIncrementNode = (PostIncrementNode) expression;
-				this.postIncrementExpression(postIncrementNode.getLeftValue());
-				break;
 			case POST_DECREMENT: //"--" 後置減分
-				PostDecrementNode postDecrementNode = (PostDecrementNode) expression;
-				this.postDecrementExpression(postDecrementNode.getLeftValue());
+				this.unaryOperatorExpressionInit(expression);
 				break;
 			case CALL: //関数呼び出し
 				CallNode callNode = (CallNode) expression;
