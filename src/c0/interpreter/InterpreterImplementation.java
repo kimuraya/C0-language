@@ -33,6 +33,7 @@ import c0.ast.StatementNode;
 import c0.ast.UnaryMinusNode;
 import c0.util.DataType;
 import c0.util.ExecuteStatementResult;
+import c0.util.FramePointer;
 import c0.util.Identifier;
 import c0.util.LocalVariable;
 import c0.util.NodeType;
@@ -281,9 +282,17 @@ public class InterpreterImplementation implements Interpreter {
 	public void stringLiteralExpression(ExpressionNode string) {
 		
 		//ノードから定数を取り出す
-		LiteralNode integerLiteral = (LiteralNode) string;
+		LiteralNode stringLiteral = (LiteralNode) string;
+		
+		//スタックの要素の作製
+		StackElement stackElement = new StackElement();
+		stackElement.setStackElementType(StackElementType.Literal);
+		stackElement.setValue(stringLiteral.getLiteral());
 		
 		//オペランドスタックに値を詰める
+		this.operandStack.add(stackElement);
+		
+		return;
 		
 	}
 
@@ -294,8 +303,17 @@ public class InterpreterImplementation implements Interpreter {
 	public void booleanLiteralExpression(ExpressionNode bool) {
 		
 		//ノードから定数を取り出す
+		LiteralNode booleanLiteral = (LiteralNode) bool;
+		
+		//スタックの要素の作製
+		StackElement stackElement = new StackElement();
+		stackElement.setStackElementType(StackElementType.Literal);
+		stackElement.setValue(booleanLiteral.getLiteral());
 		
 		//オペランドスタックに値を詰める
+		this.operandStack.add(stackElement);
+		
+		return;
 		
 	}
 
@@ -305,12 +323,18 @@ public class InterpreterImplementation implements Interpreter {
 	@Override
 	public void identifierExpression(ExpressionNode identifier) {
 		
-		//コールスタックから識別子を探す
+		//TODO
+		//コールスタック（ローカル変数）から識別子を探す
+		//フレームポインタにぶつかるまでコールスタックを検索する
+		for (int i = 0; this.callStack.get(i).getStackElementType() != StackElementType.FramePointer; i++) {
+			StackElement localVariable = this.callStack.get(i);
+		}
 		
-		//グローバル変数から識別子を探す
+		//グローバル変数（シンボルテーブル）から識別子を探す
 		
 		//識別子が存在すれば、値を取り出し、オペランドスタックに詰める
-
+		
+		//識別子がローカル変数にも、グローバル変数にも存在しない場合、例外を投げる
 	}
 	
 	/**
@@ -931,9 +955,6 @@ public class InterpreterImplementation implements Interpreter {
 				this.binaryOperatorExpressionInit(expression);
 				break;
 			case EXCLAMATION: //"!"
-				ExclamationNode exclamationNode = (ExclamationNode) expression;
-				this.exclamationExpression(exclamationNode.getLeftValue());
-				break;
 			case UNARY_MINUS: //"-" 単項マイナス式
 			case PRE_INCREMENT: //"++" 前置増分
 			case PRE_DECREMENT: //"--" 前置減分
@@ -974,6 +995,8 @@ public class InterpreterImplementation implements Interpreter {
 			}
 			
 			this.executeUserDefinedFunctionCall(functionNode);
+		} else {
+			//ここに到達した場合、例外を投げる
 		}
 		
 		return;
@@ -986,6 +1009,12 @@ public class InterpreterImplementation implements Interpreter {
 	 * @param callNode
 	 */
 	private void executeUserDefinedFunctionCall(IdentifierNode functionNode) {
+		
+		//コールスタックにフレームポインタを詰める
+		FramePointer framePointer = new FramePointer();
+		StackElement stackElement = new StackElement();
+		stackElement.setStackElementType(StackElementType.FramePointer);
+		stackElement.setFramePointer(framePointer);
 		
 		//式を実行し引数をスタックに詰める
 		List<ParameterNode> parameters = functionNode.getParameters();

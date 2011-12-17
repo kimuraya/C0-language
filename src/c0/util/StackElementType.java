@@ -5,5 +5,5 @@ public enum StackElementType {
 	Variable,
 	ReturnAddress,
 	ReturnValue,
-	BasePointer;
+	FramePointer;
 }

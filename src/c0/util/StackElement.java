@@ -5,7 +5,7 @@ public class StackElement {
 	private StackElementType stackElementType = null; //スタックに積む際の要素の種類
 	private LocalVariable variable = null; //変数
 	private Value value = null; //戻り値と戻り先のアドレス
-	private BasePointer basePointer = null; //ベースポインタ
+	private FramePointer framePointer = null; //フレームポインタ
 	
 	public StackElementType getStackElementType() {
 		return stackElementType;
@@ -25,10 +25,10 @@ public class StackElement {
 	public void setValue(Value value) {
 		this.value = value;
 	}
-	public BasePointer getBasePointer() {
-		return basePointer;
+	public FramePointer getFramePointer() {
+		return framePointer;
 	}
-	public void setBasePointer(BasePointer basePointer) {
-		this.basePointer = basePointer;
+	public void setFramePointer(FramePointer framePointer) {
+		this.framePointer = framePointer;
 	}
 }
