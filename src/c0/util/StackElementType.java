@@ -1,9 +1,9 @@
 package c0.util;
 
 public enum StackElementType {
-	Literal,
-	Variable,
-	ReturnAddress,
-	ReturnValue,
-	FramePointer;
+	LITERAL,
+	VARIABLE,
+	RETURN_ADDRESS,
+	RETURN_VALUE,
+	FRAME_POINTER;
 }

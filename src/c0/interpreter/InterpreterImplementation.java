@@ -266,7 +266,7 @@ public class InterpreterImplementation implements Interpreter {
 		
 		//スタックの要素の作製
 		StackElement stackElement = new StackElement();
-		stackElement.setStackElementType(StackElementType.Literal);
+		stackElement.setStackElementType(StackElementType.LITERAL);
 		stackElement.setValue(integerLiteral.getLiteral());
 		
 		//オペランドスタックに値を詰める
@@ -286,7 +286,7 @@ public class InterpreterImplementation implements Interpreter {
 		
 		//スタックの要素の作製
 		StackElement stackElement = new StackElement();
-		stackElement.setStackElementType(StackElementType.Literal);
+		stackElement.setStackElementType(StackElementType.LITERAL);
 		stackElement.setValue(stringLiteral.getLiteral());
 		
 		//オペランドスタックに値を詰める
@@ -307,7 +307,7 @@ public class InterpreterImplementation implements Interpreter {
 		
 		//スタックの要素の作製
 		StackElement stackElement = new StackElement();
-		stackElement.setStackElementType(StackElementType.Literal);
+		stackElement.setStackElementType(StackElementType.LITERAL);
 		stackElement.setValue(booleanLiteral.getLiteral());
 		
 		//オペランドスタックに値を詰める
@@ -326,7 +326,7 @@ public class InterpreterImplementation implements Interpreter {
 		//TODO
 		//コールスタック（ローカル変数）から識別子を探す
 		//フレームポインタにぶつかるまでコールスタックを検索する
-		for (int i = 0; this.callStack.get(i).getStackElementType() != StackElementType.FramePointer; i++) {
+		for (int i = 0; this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i++) {
 			StackElement localVariable = this.callStack.get(i);
 		}
 		
@@ -986,15 +986,48 @@ public class InterpreterImplementation implements Interpreter {
 		//ユーザー定義関数の呼び出し
 		} else if (!functionNode.getIdentifier().isStandardFunctionFlag()) {
 			
+			//コールスタックにフレームポインタを詰める
+			FramePointer framePointer = new FramePointer();
+			StackElement frameElement = new StackElement();
+			frameElement.setStackElementType(StackElementType.FRAME_POINTER);
+			frameElement.setFramePointer(framePointer);
+			
+			this.callStack.push(frameElement);
+			
 			//式を計算し、引数をスタックに積む
 			List<ExpressionNode> arguments = functionCall.getArguments();
 			
 			//引数の式を計算する
 			for (ExpressionNode argument : arguments) {
+				
+				//式の実行
 				this.evaluateExpression(argument);
+				
+				//結果を変数として、コールスタックに詰める
+				StackElement result = this.operandStack.pop();
+				Value value = result.getValue();
+				
+				//計算結果を引数（ローカル変数）にバインドする
+				LocalVariable variable = new LocalVariable();
+				variable.setVariable(functionNode.getIdentifier()); //識別子をセットする
+				variable.setValue(value); //値をセットする
+				
+				//コールスタックに引数を詰める
+				StackElement variableElement = new StackElement();
+				variableElement.setStackElementType(StackElementType.VARIABLE);
+				variableElement.setVariable(variable);
+				
+				this.callStack.push(variableElement);
 			}
 			
+			//ユーザー定義関数の呼び出し
 			this.executeUserDefinedFunctionCall(functionNode);
+			
+			//フレームポインタと引数をコールスタックから除去
+			for (int i = arguments.size() + 1; i <= 0; i--) {
+				this.callStack.pop();
+			}
+			
 		} else {
 			//ここに到達した場合、例外を投げる
 		}
@@ -1010,27 +1043,7 @@ public class InterpreterImplementation implements Interpreter {
 	 */
 	private void executeUserDefinedFunctionCall(IdentifierNode functionNode) {
 		
-		//コールスタックにフレームポインタを詰める
-		FramePointer framePointer = new FramePointer();
-		StackElement stackElement = new StackElement();
-		stackElement.setStackElementType(StackElementType.FramePointer);
-		stackElement.setFramePointer(framePointer);
-		
-		//式を実行し引数をスタックに詰める
-		List<ParameterNode> parameters = functionNode.getParameters();
-		
-		for (ParameterNode parameter : parameters) {
-			
-			IdentifierNode identifier = parameter.getIdentifier();
-			
-			LocalVariable variable;
-		}
-		
-		//呼び出し元の戻り先を保存する
-		
 		//複合文（関数本体）の実行
-		
-		//引数をスタックから取り除く
 		
 		//スタックに戻り値を詰める
 		
