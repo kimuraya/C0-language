@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Stack;
 
 import c0.ast.AssignNode;
+import c0.ast.BlockNode;
 import c0.ast.CallNode;
+import c0.ast.DeclareVariableNode;
 import c0.ast.DivNode;
 import c0.ast.EquivalenceNode;
 import c0.ast.ExclamationNode;
@@ -41,9 +43,12 @@ import c0.util.StackElement;
 import c0.util.StackElementType;
 import c0.util.Value;
 
+/**
+ * インタプリタの実処理
+ */
 public class InterpreterImplementation implements Interpreter {
 	
-	private Stack<StackElement> callStack = null; //局所変数、戻り値、戻り先、ベースポインタを積む
+	private Stack<StackElement> callStack = null; //局所変数、戻り値、戻り先、フレームポインタを積む
 	private Stack<StackElement> operandStack = null; //式の計算に使用する
 	
 	public InterpreterImplementation(Stack<StackElement> callStack,
@@ -117,13 +122,46 @@ public class InterpreterImplementation implements Interpreter {
 	public ExecuteStatementResult executeBlockStatement(
 			StatementNode statementNode) {
 		
+		BlockNode block = (BlockNode) statementNode;
+		ExecuteStatementResult ret = null;
+		
 		//局所変数をスタックに詰める
+		List<DeclareVariableNode> localVariables = block.getLocalVariables();
+		for (DeclareVariableNode declareVariableNode : localVariables) {
+			
+			//初期化式の実行
+			ExpressionNode expression = declareVariableNode.getExpression();
+			this.evaluateExpression(expression);
+			
+			StackElement result = this.operandStack.pop();
+			Value value = result.getValue();
+			
+			//計算結果をローカル変数にバインドする
+			LocalVariable variable = new LocalVariable();
+			variable.setVariable(declareVariableNode.getIdentifier().getIdentifier()); //識別子をセットする
+			variable.setValue(value); //値をセットする
+			
+			//コールスタックに引数を詰める
+			StackElement variableElement = new StackElement();
+			variableElement.setStackElementType(StackElementType.VARIABLE);
+			variableElement.setVariable(variable);
+			
+			//局所変数をコールスタックに詰める
+			this.callStack.push(variableElement);
+		}
 		
 		//文を実行する
+		List<StatementNode> statements = block.getStatements();
+		for (StatementNode statement : statements) {
+			ret = this.executeStatement(statement);
+		}
 		
 		//局所変数をスタックから破棄する
+		for (int i = localVariables.size(); i >= 0; i--) {
+			this.callStack.pop();
+		}
 		
-		return null;
+		return ret;
 	}
 
 	/**
@@ -203,6 +241,10 @@ public class InterpreterImplementation implements Interpreter {
 			StatementNode statementNode) {
 		
 		//StatementResultFlagをRETURN_STATEMENT_RESULTにする
+		
+		//戻り値を計算する
+		
+		//戻り値をスタックに詰める
 		
 		return null;
 	}
@@ -326,8 +368,11 @@ public class InterpreterImplementation implements Interpreter {
 		//TODO
 		//コールスタック（ローカル変数）から識別子を探す
 		//フレームポインタにぶつかるまでコールスタックを検索する
-		for (int i = 0; this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i++) {
+		for (int i = this.callStack.size(); this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
+			
 			StackElement localVariable = this.callStack.get(i);
+			
+			//目的の識別子が見つかった場合、breakする
 		}
 		
 		//グローバル変数（シンボルテーブル）から識別子を探す
@@ -981,6 +1026,7 @@ public class InterpreterImplementation implements Interpreter {
 		
 		//標準関数の呼び出し
 		if (functionNode.getIdentifier().isStandardFunctionFlag()) {
+			
 			this.executeStandardFunctionCall(functionNode);
 			
 		//ユーザー定義関数の呼び出し
@@ -1024,7 +1070,7 @@ public class InterpreterImplementation implements Interpreter {
 			this.executeUserDefinedFunctionCall(functionNode);
 			
 			//フレームポインタと引数をコールスタックから除去
-			for (int i = arguments.size() + 1; i <= 0; i--) {
+			for (int i = arguments.size() + 1; i >= 0; i--) {
 				this.callStack.pop();
 			}
 			
@@ -1034,8 +1080,6 @@ public class InterpreterImplementation implements Interpreter {
 		
 		return;
 	}
-
-
 	
 	/**
 	 * ユーザー定義関数の呼び出し
@@ -1044,11 +1088,10 @@ public class InterpreterImplementation implements Interpreter {
 	private void executeUserDefinedFunctionCall(IdentifierNode functionNode) {
 		
 		//複合文（関数本体）の実行
+		BlockNode block = (BlockNode) functionNode.getBlock();
+		this.executeBlockStatement(block);
 		
-		//スタックに戻り値を詰める
-		
-		//呼び出し元に戻る
-		
+		return;
 	}
 	
 	/**
