@@ -29,11 +29,11 @@ public class LiteralNode extends ExpressionNode {
 				//trueの場合
 				if (image.equals("true")) {
 					this.literal.setDataType(dataType);
-					this.literal.setBooleanLiteral(true);
+					this.literal.setBool(true);
 				//falseの場合
 				} else if (image.equals("false")) {
 					this.literal.setDataType(dataType);
-					this.literal.setBooleanLiteral(false);
+					this.literal.setBool(false);
 				}
 				this.nodeType = NodeType.BOOLEAN_LITERAL;
 		}
@@ -113,7 +113,7 @@ public class LiteralNode extends ExpressionNode {
 					this.printIndent(depth);
 				}
 				
-				System.out.println("value : " + this.literal.isBooleanLiteral());
+				System.out.println("value : " + this.literal.isBool());
 				break;
 				
 			case BOOLEAN_ARRAY:

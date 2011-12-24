@@ -12,6 +12,7 @@ import c0.ast.EquivalenceNode;
 import c0.ast.ExclamationNode;
 import c0.ast.ExpressionNode;
 import c0.ast.ExpressionStatementNode;
+import c0.ast.ForNode;
 import c0.ast.GreaterThanNode;
 import c0.ast.GreaterThanOrEqualNode;
 import c0.ast.IdentifierNode;
@@ -167,7 +168,9 @@ public class InterpreterImplementation implements Interpreter {
 		//文を実行する
 		List<StatementNode> statements = block.getStatements();
 		for (StatementNode statement : statements) {
+			
 			ret = this.executeStatement(statement);
+			
 		}
 		
 		//局所変数をスタックから破棄する
@@ -184,8 +187,8 @@ public class InterpreterImplementation implements Interpreter {
 	@Override
 	public ExecuteStatementResult executeIfStatement(StatementNode statementNode) {
 		
-		ExecuteStatementResult executeStatementResult = new ExecuteStatementResult();
-		executeStatementResult.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
+		ExecuteStatementResult ret = new ExecuteStatementResult();
+		ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
 		IfNode ifNode = (IfNode) statementNode;
 		
 		//条件式を取り出し、実行する
@@ -195,24 +198,26 @@ public class InterpreterImplementation implements Interpreter {
 		//オペランドスタックから計算結果を取り出す
 		StackElement stackElement = this.operandStack.pop();
 		
-		Value Value = stackElement.getValue();
+		Value value = stackElement.getValue();
+		
+		//TODO
+		//計算結果が真偽値でなければ、例外を出す
 		
 		//trueならthenを実行する
-		if (Value.isBool()) {
+		if (value.isBool()) {
 			
-			this.executeStatement(ifNode.getThenStatement());
+			ret = this.executeStatement(ifNode.getThenStatement());
 			
 		//falseならelseを実行する
-		} else if (!Value.isBool()) {
+		} else if (!value.isBool()) {
 			
-			this.executeStatement(ifNode.getElseStatement());
+			ret = this.executeStatement(ifNode.getElseStatement());
 			
 		} else {
-			//TODO
-			//計算結果が真偽値でなければ、例外を出す
+			//ここに到達したら、例外を投げる
 		}
 		
-		return executeStatementResult;
+		return ret;
 	}
 
 	/**
@@ -222,10 +227,9 @@ public class InterpreterImplementation implements Interpreter {
 	public ExecuteStatementResult executeWhileStatement(
 			StatementNode statementNode) {
 		
-		//条件式を取り出し、実行する
+		ExecuteStatementResult ret = new ExecuteStatementResult();
+		ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
 		
-		ExecuteStatementResult executeStatementResult = new ExecuteStatementResult();
-		executeStatementResult.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
 		WhileNode whileNode = (WhileNode) statementNode;
 		
 		//条件式を取り出し、実行する
@@ -235,17 +239,37 @@ public class InterpreterImplementation implements Interpreter {
 		//オペランドスタックから計算結果を取り出す
 		StackElement stackElement = this.operandStack.pop();
 		
-		Value Value = stackElement.getValue();
+		Value value = stackElement.getValue();
 		
 		//trueの場合、文を実行する
-		if (Value.isBool()) {
-			this.executeStatement(whileNode.getBodyStatement());
+		//StatementResultFlagがNORMAL_STATEMENT_RESULTでない場合、ループの処理を終了する。
+		while (value.isBool() && ret.getStatementResultFlag() == StatementResultFlag.NORMAL_STATEMENT_RESULT) {
+			
+			//条件式を取り出し、実行する
+			conditionalExpression = whileNode.getConditionalExpression();
+			this.evaluateExpression(conditionalExpression);
+			
+			//オペランドスタックから計算結果を取り出す
+			stackElement = this.operandStack.pop();
+			
+			value = stackElement.getValue();
+			
+			//文を実行する
+			ret = this.executeStatement(whileNode.getBodyStatement());
+			
+			//break文を検知した場合、ループを終了させる
+			//ループの終了後、StatementResultFlagをNORMAL_STATEMENT_RESULTに戻す。
+			if (ret.getStatementResultFlag() == StatementResultFlag.BREAK_STATEMENT_RESULT) {
+				ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
+				break;
+			}
+			
+			if (ret.getStatementResultFlag() == StatementResultFlag.RETURN_STATEMENT_RESULT) {
+				break;
+			}
 		}
 		
-		//StatementResultFlagがBREAK_STATEMENT_RESULTになっている場合、ループの処理を終了する。
-		//ループの終了後、StatementResultFlagをNORMAL_STATEMENT_RESULTに戻す。
-		
-		return executeStatementResult;
+		return ret;
 	}
 
 	/**
@@ -255,20 +279,62 @@ public class InterpreterImplementation implements Interpreter {
 	public ExecuteStatementResult executeForStatement(
 			StatementNode statementNode) {
 		
+		ExecuteStatementResult ret = new ExecuteStatementResult();
+		ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
+		ForNode forNode = (ForNode) statementNode;
+		
 		//初期化式を実行
+		ExpressionNode initializeExpression = forNode.getInitializeExpression();
+		this.evaluateExpression(initializeExpression);
+		
+		//オペランドスタックから計算結果を破棄する
+		StackElement stackElement = this.operandStack.pop();
 		
 		//条件式を実行
+		ExpressionNode conditionalExpression = forNode.getConditionalExpression();
+		this.evaluateExpression(conditionalExpression);
+		
+		//オペランドスタックから計算結果を取り出す
+		stackElement = this.operandStack.pop();
+		
+		Value value = stackElement.getValue();
 		
 		//文を実行
-		
-		//後置き式を実行
-		
 		//条件式がtrueである限り、ループが継続する
+		while (value.isBool() && ret.getStatementResultFlag() == StatementResultFlag.NORMAL_STATEMENT_RESULT) {
+			
+			//条件式を取り出し、実行する
+			conditionalExpression = forNode.getConditionalExpression();
+			this.evaluateExpression(conditionalExpression);
+			
+			//オペランドスタックから計算結果を取り出す
+			stackElement = this.operandStack.pop();
+			
+			value = stackElement.getValue();
+			
+			//文を実行する
+			ret = this.executeStatement(forNode.getBodyStatement());
+			
+			//break文を検知した場合、ループを終了させる
+			//ループの終了後、StatementResultFlagをNORMAL_STATEMENT_RESULTに戻す。
+			if (ret.getStatementResultFlag() == StatementResultFlag.BREAK_STATEMENT_RESULT) {
+				ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
+				break;
+			}
+			
+			if (ret.getStatementResultFlag() == StatementResultFlag.RETURN_STATEMENT_RESULT) {
+				break;
+			}
+			
+			//後置き式を実行
+			ExpressionNode updateExpression = forNode.getUpdateExpression();
+			this.evaluateExpression(updateExpression);
+			
+			//オペランドスタックから計算結果を破棄する
+			stackElement = this.operandStack.pop();
+		}
 		
-		//StatementResultFlagがBREAK_STATEMENT_RESULTになっている場合、ループの処理を終了する。
-		//ループの終了後、StatementResultFlagをNORMAL_STATEMENT_RESULTに戻す。
-		
-		return null;
+		return ret;
 	}
 
 	/**
@@ -298,7 +364,7 @@ public class InterpreterImplementation implements Interpreter {
 		
 		//戻り値を計算する
 		
-		//戻り値をスタックに詰める
+		//戻り値をオペランドスタックに詰める
 		
 		return executeStatementResult;
 	}
@@ -333,8 +399,10 @@ public class InterpreterImplementation implements Interpreter {
 			StatementNode statementNode) {
 		
 		//何も実行しない
+		ExecuteStatementResult ret = new ExecuteStatementResult();
+		ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
 		
-		return null;
+		return ret;
 	}
 
 	@Override
@@ -1100,6 +1168,9 @@ public class InterpreterImplementation implements Interpreter {
 			case IDENTIFIER: //識別子
 				this.identifierExpression(expression);
 				break;
+			case ARRAY_SUBSCRIPT: //添字式
+				this.arraySubscriptExpression(expression);
+				break;
 			case ASSIGN: //"="
 				AssignNode assignNode = (AssignNode) expression;
 				this.assignExpression(assignNode.getLeftValue(), assignNode.getExpression());
@@ -1209,9 +1280,13 @@ public class InterpreterImplementation implements Interpreter {
 	 */
 	private void executeUserDefinedFunctionCall(IdentifierNode functionNode) {
 		
+		ExecuteStatementResult ret = new ExecuteStatementResult();
+		ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
+		
 		//複合文（関数本体）の実行
 		BlockNode block = (BlockNode) functionNode.getBlock();
-		this.executeBlockStatement(block);
+		
+		ret = this.executeBlockStatement(block);
 		
 		return;
 	}
