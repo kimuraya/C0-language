@@ -11,7 +11,7 @@ public class Identifier {
 	private String name;                     //識別子の名前
 	private IdentifierType identifierType;   //識別子の種類。変数か関数か
 	private boolean standardFunctionFlag;    //組み込み関数か否かを判別する為のフラグ変数。trueの場合、標準関数
-	private LeftValue leftValue;             //グローバル変数の値
+	private Value leftValue;             //グローバル変数の値
 	private List<Identifier> parameters;     //引数のリスト
 	private String standardFunctionName;     //標準関数に使用するクラス名を入れる
 	private IdentifierNode functionNode;     //構文木にある自分のノードへのリンク
@@ -34,10 +34,10 @@ public class Identifier {
 	public void setIdentifierType(IdentifierType identifierType) {
 		this.identifierType = identifierType;
 	}
-	public LeftValue getLeftValue() {
+	public Value getLeftValue() {
 		return leftValue;
 	}
-	public void setLeftValue(LeftValue leftValue) {
+	public void setLeftValue(Value leftValue) {
 		this.leftValue = leftValue;
 	}
 	public List<Identifier> getParameters() {

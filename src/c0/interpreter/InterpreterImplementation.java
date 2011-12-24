@@ -36,11 +36,13 @@ import c0.ast.UnaryMinusNode;
 import c0.util.DataType;
 import c0.util.ExecuteStatementResult;
 import c0.util.FramePointer;
+import c0.util.GlobalScope;
 import c0.util.Identifier;
 import c0.util.LocalVariable;
 import c0.util.NodeType;
 import c0.util.StackElement;
 import c0.util.StackElementType;
+import c0.util.SymbolTable;
 import c0.util.Value;
 
 /**
@@ -48,14 +50,24 @@ import c0.util.Value;
  */
 public class InterpreterImplementation implements Interpreter {
 	
+	private GlobalScope globalScope = null; //グローバル変数を管理する
 	private Stack<StackElement> callStack = null; //局所変数、戻り値、戻り先、フレームポインタを積む
 	private Stack<StackElement> operandStack = null; //式の計算に使用する
 	
 	public InterpreterImplementation(Stack<StackElement> callStack,
-			Stack<StackElement> operandStack) {
+			Stack<StackElement> operandStack, GlobalScope globalScope) {
 		super();
 		this.callStack = callStack;
 		this.operandStack = operandStack;
+		this.globalScope = globalScope;
+	}
+
+	public GlobalScope getGlobalScope() {
+		return globalScope;
+	}
+
+	public void setGlobalScope(GlobalScope globalScope) {
+		this.globalScope = globalScope;
 	}
 
 	public Stack<StackElement> getCallStack() {
@@ -363,23 +375,65 @@ public class InterpreterImplementation implements Interpreter {
 	 * 識別子
 	 */
 	@Override
-	public void identifierExpression(ExpressionNode identifier) {
+	public void identifierExpression(ExpressionNode expression) {
+		
+		//識別子を取り出す
+		IdentifierNode identifierNode = (IdentifierNode) expression;
+		Identifier search = identifierNode.getIdentifier(); //この識別子を探す
+		LocalVariable foundLocalVariable = null;
+		Identifier foundGlobalVariable = null;
+		boolean searchFlag = false; //識別子が見つかっかどうかを表す。trueなら見つかっている
 		
 		//TODO
 		//コールスタック（ローカル変数）から識別子を探す
 		//フレームポインタにぶつかるまでコールスタックを検索する
 		for (int i = this.callStack.size(); this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
 			
-			StackElement localVariable = this.callStack.get(i);
+			StackElement variableElement = this.callStack.get(i);
 			
-			//目的の識別子が見つかった場合、breakする
+			//目的の識別子が見つかった場合、その値を取り出す
+			LocalVariable localVariable = variableElement.getVariable();
+			String localVariableName = localVariable.getVariable().getName();
+			
+			if (localVariableName.equals(search.getName())) {
+				searchFlag = true;
+				foundLocalVariable = localVariable;
+				break;
+			}
 		}
 		
 		//グローバル変数（シンボルテーブル）から識別子を探す
+		if (!searchFlag) {
+			
+			SymbolTable globalSymbolTable = this.getGlobalScope().getGlobalSymbolTable();
+			
+			if (globalSymbolTable.searchSymbol(search.getName())) {
+				searchFlag = true;
+				foundGlobalVariable = globalSymbolTable.getSymbol(search.getName());
+			}
+		}
+		
 		
 		//識別子が存在すれば、値を取り出し、オペランドスタックに詰める
+		if (searchFlag) {
+			
+			Value value = null;
+			
+			//見つかった識別子から値を取り出す
+			if (foundLocalVariable != null) {
+				value = foundLocalVariable.getValue();
+			} else if (foundGlobalVariable != null) {
+				value = foundGlobalVariable.getLeftValue();
+			}
+			
+			//オペランドスタックに値を詰める
+			
+			
+		} else {
+			//識別子がローカル変数にも、グローバル変数にも存在しない場合、例外を投げる
+		}
 		
-		//識別子がローカル変数にも、グローバル変数にも存在しない場合、例外を投げる
+		return;
 	}
 	
 	/**
@@ -909,42 +963,6 @@ public class InterpreterImplementation implements Interpreter {
 	 */
 	@Override
 	public void exclamationExpression(ExpressionNode leftValue) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * "++" 前置増分
-	 */
-	@Override
-	public void preIncrementExpression(ExpressionNode leftValue) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * "--" 前置減分
-	 */
-	@Override
-	public void preDecrementExpression(ExpressionNode leftValue) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * "++" 後置増分
-	 */
-	@Override
-	public void postIncrementExpression(ExpressionNode leftValue) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * "--" 後置減分
-	 */
-	@Override
-	public void postDecrementExpression(ExpressionNode leftValue) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}

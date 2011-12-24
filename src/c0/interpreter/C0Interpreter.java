@@ -26,8 +26,8 @@ import c0.util.SymbolTable;
 public class C0Interpreter extends InterpreterImplementation {
 	
 	public C0Interpreter(Stack<StackElement> callStack,
-			Stack<StackElement> operandStack) {
-		super(callStack, operandStack);
+			Stack<StackElement> operandStack, GlobalScope globalScope) {
+		super(callStack, operandStack, globalScope);
 	}
 	
 	/**
@@ -72,8 +72,9 @@ public class C0Interpreter extends InterpreterImplementation {
 		//インタプリタのエントリーポイント
 		Stack<StackElement> callStack = new Stack<StackElement>();
 		Stack<StackElement> operandStack = new Stack<StackElement>();
+		GlobalScope globalScope = new GlobalScope();
 		
-		C0Interpreter interpreter = new C0Interpreter(callStack, operandStack);
+		C0Interpreter interpreter = new C0Interpreter(callStack, operandStack, globalScope);
 		interpreter.interpretation(fileName, fileReader); //実行
 	}
 	
@@ -102,7 +103,7 @@ public class C0Interpreter extends InterpreterImplementation {
 		}
 		
 		//シンボルテーブル
-		GlobalScope globalScope = new GlobalScope();
+		GlobalScope globalScope = this.getGlobalScope();
 		
 		//標準関数をシンボルテーブルに登録する
 		StandardFunction standardFunction = new StandardFunction();

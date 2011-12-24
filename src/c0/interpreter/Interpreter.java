@@ -42,14 +42,10 @@ public interface Interpreter {
 	//単項式
 	void unaryMinusExpression(ExpressionNode leftValue); //単項マイナス式
 	void exclamationExpression(ExpressionNode leftValue); //論理否定演算子
-	void preIncrementExpression(ExpressionNode leftValue); //前置増分式
-	void preDecrementExpression(ExpressionNode leftValue); //前置減分式
 	
 	//後置き式
 	void arraySubscriptExpression(ExpressionNode arraySubscriptExpression); //添字式
 	void executeFunctionCall(ExpressionNode callNode); //関数呼び出し（ネイティブ関数を含む）
-	void postIncrementExpression(ExpressionNode leftValue); //後置増分式
-	void postDecrementExpression(ExpressionNode leftValue); //後置減分式
 	
 	//式の実行
 	void evaluateExpression(ExpressionNode expression);
