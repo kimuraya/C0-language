@@ -33,6 +33,7 @@ import c0.ast.PreDecrementNode;
 import c0.ast.PreIncrementNode;
 import c0.ast.StatementNode;
 import c0.ast.UnaryMinusNode;
+import c0.ast.WhileNode;
 import c0.util.DataType;
 import c0.util.ExecuteStatementResult;
 import c0.util.FramePointer;
@@ -42,6 +43,7 @@ import c0.util.LocalVariable;
 import c0.util.NodeType;
 import c0.util.StackElement;
 import c0.util.StackElementType;
+import c0.util.StatementResultFlag;
 import c0.util.SymbolTable;
 import c0.util.Value;
 
@@ -182,15 +184,35 @@ public class InterpreterImplementation implements Interpreter {
 	@Override
 	public ExecuteStatementResult executeIfStatement(StatementNode statementNode) {
 		
+		ExecuteStatementResult executeStatementResult = new ExecuteStatementResult();
+		executeStatementResult.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
 		IfNode ifNode = (IfNode) statementNode;
 		
 		//条件式を取り出し、実行する
+		ExpressionNode conditionalExpression = ifNode.getConditionalExpression();
+		this.evaluateExpression(conditionalExpression);
+		
+		//オペランドスタックから計算結果を取り出す
+		StackElement stackElement = this.operandStack.pop();
+		
+		Value Value = stackElement.getValue();
 		
 		//trueならthenを実行する
-		
+		if (Value.isBool()) {
+			
+			this.executeStatement(ifNode.getThenStatement());
+			
 		//falseならelseを実行する
+		} else if (!Value.isBool()) {
+			
+			this.executeStatement(ifNode.getElseStatement());
+			
+		} else {
+			//TODO
+			//計算結果が真偽値でなければ、例外を出す
+		}
 		
-		return null;
+		return executeStatementResult;
 	}
 
 	/**
@@ -202,12 +224,28 @@ public class InterpreterImplementation implements Interpreter {
 		
 		//条件式を取り出し、実行する
 		
+		ExecuteStatementResult executeStatementResult = new ExecuteStatementResult();
+		executeStatementResult.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
+		WhileNode whileNode = (WhileNode) statementNode;
+		
+		//条件式を取り出し、実行する
+		ExpressionNode conditionalExpression = whileNode.getConditionalExpression();
+		this.evaluateExpression(conditionalExpression);
+		
+		//オペランドスタックから計算結果を取り出す
+		StackElement stackElement = this.operandStack.pop();
+		
+		Value Value = stackElement.getValue();
+		
 		//trueの場合、文を実行する
+		if (Value.isBool()) {
+			this.executeStatement(whileNode.getBodyStatement());
+		}
 		
 		//StatementResultFlagがBREAK_STATEMENT_RESULTになっている場合、ループの処理を終了する。
 		//ループの終了後、StatementResultFlagをNORMAL_STATEMENT_RESULTに戻す。
 		
-		return null;
+		return executeStatementResult;
 	}
 
 	/**
@@ -241,8 +279,10 @@ public class InterpreterImplementation implements Interpreter {
 			StatementNode statementNode) {
 		
 		//StatementResultFlagをBREAK_STATEMENT_RESULTにする
+		ExecuteStatementResult executeStatementResult = new ExecuteStatementResult();
+		executeStatementResult.setStatementResultFlag(StatementResultFlag.BREAK_STATEMENT_RESULT);
 		
-		return null;
+		return executeStatementResult;
 	}
 
 	/**
@@ -253,12 +293,14 @@ public class InterpreterImplementation implements Interpreter {
 			StatementNode statementNode) {
 		
 		//StatementResultFlagをRETURN_STATEMENT_RESULTにする
+		ExecuteStatementResult executeStatementResult = new ExecuteStatementResult();
+		executeStatementResult.setStatementResultFlag(StatementResultFlag.RETURN_STATEMENT_RESULT);
 		
 		//戻り値を計算する
 		
 		//戻り値をスタックに詰める
 		
-		return null;
+		return executeStatementResult;
 	}
 
 	/**
@@ -268,14 +310,19 @@ public class InterpreterImplementation implements Interpreter {
 	public ExecuteStatementResult executeExpressionStatement(
 			StatementNode statementNode) {
 		
+		ExecuteStatementResult executeStatementResult = new ExecuteStatementResult();
+		executeStatementResult.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
+		
 		//式を実行する
 		ExpressionStatementNode expressionStatementNode = (ExpressionStatementNode) statementNode;
 		this.evaluateExpression(expressionStatementNode.getExpression());
 		
-		//ExecuteStatementResultを作る
 		//スタックから値を取り出す
+		StackElement stackElement = this.operandStack.pop();
+		Value value = stackElement.getValue();
+		executeStatementResult.setValue(value);
 		
-		return null;
+		return executeStatementResult;
 	}
 
 	/**
@@ -417,17 +464,22 @@ public class InterpreterImplementation implements Interpreter {
 		//識別子が存在すれば、値を取り出し、オペランドスタックに詰める
 		if (searchFlag) {
 			
-			Value value = null;
+			Value resultValue = null;
 			
 			//見つかった識別子から値を取り出す
 			if (foundLocalVariable != null) {
-				value = foundLocalVariable.getValue();
+				resultValue = foundLocalVariable.getValue();
 			} else if (foundGlobalVariable != null) {
-				value = foundGlobalVariable.getLeftValue();
+				resultValue = foundGlobalVariable.getLeftValue();
 			}
 			
 			//オペランドスタックに値を詰める
+			StackElement resultElement = new StackElement();
+			resultElement.setStackElementType(StackElementType.VARIABLE);
+			resultElement.setValue(resultValue);
 			
+			//オペランドスタックに値を詰める
+			this.operandStack.push(resultElement);
 			
 		} else {
 			//識別子がローカル変数にも、グローバル変数にも存在しない場合、例外を投げる
@@ -468,7 +520,7 @@ public class InterpreterImplementation implements Interpreter {
 				if (leftValue.getDataType() == DataType.BOOLEAN) {
 					
 					//左がtrueだった場合のみ、右を評価する
-					if (leftValue.isBooleanLiteral()) {
+					if (leftValue.isBool()) {
 						
 						//右の式を実行
 						this.evaluateExpression(right);
@@ -478,7 +530,7 @@ public class InterpreterImplementation implements Interpreter {
 						if (rightValue.getDataType() == DataType.BOOLEAN) {
 							
 							//右もtrue？
-							if (rightValue.isBooleanLiteral()) {
+							if (rightValue.isBool()) {
 								result = true; //左右の結果、両方がtrue
 							}
 							
@@ -509,10 +561,10 @@ public class InterpreterImplementation implements Interpreter {
 				if (leftValue.getDataType() == DataType.BOOLEAN) {
 					
 					//左の式の結果を保存
-					result = leftValue.isBooleanLiteral();
+					result = leftValue.isBool();
 					
 					//左の結果がtrueではない場合のみ。右を実行
-					if (!leftValue.isBooleanLiteral()) {
+					if (!leftValue.isBool()) {
 						
 						//右の式を実行
 						this.evaluateExpression(right);
@@ -521,7 +573,7 @@ public class InterpreterImplementation implements Interpreter {
 						
 						//左の結果を代入
 						if (rightValue.getDataType() == DataType.BOOLEAN) {
-							result = rightValue.isBooleanLiteral();
+							result = rightValue.isBool();
 						} else {
 							//TODO 例外を投げる
 							//右の結果がbooleanではない
@@ -538,7 +590,7 @@ public class InterpreterImplementation implements Interpreter {
 		//実行結果をインタプリタで扱える形式にする
 		Value resultValue = new Value();
 		
-		resultValue.setBooleanLiteral(result);
+		resultValue.setBool(result);
 		resultValue.setDataType(DataType.BOOLEAN);
 		
 		StackElement resultElement = new StackElement();
@@ -639,7 +691,7 @@ public class InterpreterImplementation implements Interpreter {
 		//真偽値の式
 		} else if ((leftValue.getDataType() == DataType.BOOLEAN) && (rightValue.getDataType() == DataType.BOOLEAN)) {
 			
-			this.binaryOperatorExpression(leftValue.isBooleanLiteral(), rightValue.isBooleanLiteral(), expression.getNodeType());
+			this.binaryOperatorExpression(leftValue.isBool(), rightValue.isBool(), expression.getNodeType());
 			
 		} else {
 			//TODO データ型のチェックに引っかからなかった場合
@@ -723,7 +775,7 @@ public class InterpreterImplementation implements Interpreter {
 			resultValue.setInteger(resultInt);
 			resultValue.setDataType(DataType.INT);
 		} else if (operationResultBool) {
-			resultValue.setBooleanLiteral(resultBool);
+			resultValue.setBool(resultBool);
 			resultValue.setDataType(DataType.BOOLEAN);
 		}
 		
@@ -761,7 +813,7 @@ public class InterpreterImplementation implements Interpreter {
 		
 		//実行結果をインタプリタで扱える形式にする
 		Value resultValue = new Value();
-		resultValue.setBooleanLiteral(result);
+		resultValue.setBool(result);
 		resultValue.setDataType(DataType.BOOLEAN);
 		
 		StackElement resultElement = new StackElement();
@@ -826,7 +878,7 @@ public class InterpreterImplementation implements Interpreter {
 		//真偽値の式
 		} else if (leftValue.getDataType() == DataType.BOOLEAN) {
 			
-			this.unaryOperatorExpression(leftValue.isBooleanLiteral(), expression.getNodeType());
+			this.unaryOperatorExpression(leftValue.isBool(), expression.getNodeType());
 			
 		} else {
 			//TODO データ型のチェックに引っかからなかった場合
@@ -901,7 +953,7 @@ public class InterpreterImplementation implements Interpreter {
 		//実行結果をインタプリタで扱える形式にする
 		Value resultValue = new Value();
 		
-		resultValue.setBooleanLiteral(result);
+		resultValue.setBool(result);
 		resultValue.setDataType(DataType.BOOLEAN);
 		
 		StackElement resultElement = new StackElement();
@@ -919,16 +971,68 @@ public class InterpreterImplementation implements Interpreter {
 	@Override
 	public void assignExpression(ExpressionNode left, ExpressionNode right) {
 		
-		//式(right)を実行する
-		
-		//オペランドスタックから値を取り出す
+		//TODO
+		//左が左辺値でない場合、例外を出す
+		IdentifierNode identifierNode = (IdentifierNode) left;
+		Identifier search = identifierNode.getIdentifier(); //この識別子を探す
+		LocalVariable foundLocalVariable = null;
+		Identifier foundGlobalVariable = null;
+		boolean searchFlag = false; //識別子が見つかっかどうかを表す。trueなら見つかっている
 		
 		//コールスタックから代入先を探す（局所変数）
+		//TODO
+		//コールスタック（ローカル変数）から識別子を探す
+		//フレームポインタにぶつかるまでコールスタックを検索する
+		for (int i = this.callStack.size(); this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
+			
+			StackElement variableElement = this.callStack.get(i);
+			
+			//目的の識別子が見つかった場合、その値を取り出す
+			LocalVariable localVariable = variableElement.getVariable();
+			String localVariableName = localVariable.getVariable().getName();
+			
+			if (localVariableName.equals(search.getName())) {
+				searchFlag = true;
+				foundLocalVariable = localVariable;
+				break;
+			}
+		}
 		
 		//シンボルテーブルから代入先を探す（大域変数）
+		if (!searchFlag) {
+			
+			SymbolTable globalSymbolTable = this.getGlobalScope().getGlobalSymbolTable();
+			
+			if (globalSymbolTable.searchSymbol(search.getName())) {
+				searchFlag = true;
+				foundGlobalVariable = globalSymbolTable.getSymbol(search.getName());
+			}
+		}
+		
+		//式(right)を実行する
+		this.evaluateExpression(right);
+		
+		//オペランドスタックから右の値の計算結果を取り出す
+		StackElement stackLeft = this.operandStack.pop();
+		
+		Value rightValue = stackLeft.getValue();
 		
 		//代入を実行する
-
+		//識別子が存在すれば、値を取り出し、オペランドスタックに詰める
+		if (searchFlag) {
+			
+			//見つかった識別子に対し、代入を実行する
+			if (foundLocalVariable != null) {
+				foundLocalVariable.setValue(rightValue);
+			} else if (foundGlobalVariable != null) {
+				foundGlobalVariable.setLeftValue(rightValue);
+			}
+			
+		} else {
+			//識別子がローカル変数にも、グローバル変数にも存在しない場合、例外を投げる
+		}
+		
+		return;
 	}
 	
 	/**

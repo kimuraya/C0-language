@@ -9,7 +9,7 @@ public class Value {
 	private int integer; //整数
 	private int[] integerArray; //整数の配列
 	private String stringLiteral; //文字列定数
-	private boolean booleanLiteral; //真偽値のリテラル
+	private boolean bool; //真偽値のリテラル
 	private boolean[] booleanArray; //真偽値の配列
 	private StatementNode returnAddress; //戻り先
 	
@@ -38,11 +38,11 @@ public class Value {
 	public void setStringLiteral(String stringLiteral) {
 		this.stringLiteral = stringLiteral;
 	}
-	public boolean isBooleanLiteral() {
-		return booleanLiteral;
+	public boolean isBool() {
+		return bool;
 	}
-	public void setBooleanLiteral(boolean booleanLiteral) {
-		this.booleanLiteral = booleanLiteral;
+	public void setBool(boolean bool) {
+		this.bool = bool;
 	}
 	public boolean[] getBooleanArray() {
 		return booleanArray;
