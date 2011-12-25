@@ -1,5 +1,8 @@
 package c0.interpreter;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
@@ -1201,8 +1204,7 @@ public class InterpreterImplementation implements Interpreter {
 				this.unaryOperatorExpressionInit(expression);
 				break;
 			case CALL: //関数呼び出し
-				CallNode callNode = (CallNode) expression;
-				this.executeFunctionCall(callNode);
+				this.executeFunctionCall(expression);
 				break;
 		}
 	}
@@ -1211,19 +1213,35 @@ public class InterpreterImplementation implements Interpreter {
 	 * 関数呼び出し
 	 */
 	@Override
-	public void executeFunctionCall(ExpressionNode callNode) {
+	public void executeFunctionCall(ExpressionNode expression) {
+		
+		CallNode callNode = (CallNode) expression;
+		IdentifierNode functionNode = (IdentifierNode) callNode.getFunction();
+		Identifier function = null;
+		
+		//関数名を元にシンボルテーブルを検索する
+		SymbolTable globalSymbolTable = this.getGlobalScope().getGlobalSymbolTable();
+		
+		if (globalSymbolTable.searchSymbol(functionNode.getIdentifier().getName())) {
+			function = globalSymbolTable.getSymbol(functionNode.getIdentifier().getName());
+		} else {
+			//TODO
+			//指定した関数が存在しない場合、例外を投げる
+		}
 		
 		//呼び出そうとしている関数が標準関数か、ユーザー定義関数かチェックする
-		CallNode functionCall = (CallNode) callNode;
-		IdentifierNode functionNode = (IdentifierNode) functionCall.getFunction();
 		
 		//標準関数の呼び出し
-		if (functionNode.getIdentifier().isStandardFunctionFlag()) {
+		if (function.isStandardFunctionFlag()) {
 			
-			this.executeStandardFunctionCall(functionNode);
+			//引数を取り出す
+			List<ExpressionNode> arguments = callNode.getArguments();
+			functionNode = function.getFunctionNode(); //識別子から構文木上のリンクを取り出す
+			
+			this.executeStandardFunctionCall(functionNode, arguments);
 			
 		//ユーザー定義関数の呼び出し
-		} else if (!functionNode.getIdentifier().isStandardFunctionFlag()) {
+		} else if (!function.isStandardFunctionFlag()) {
 			
 			//コールスタックにフレームポインタを詰める
 			FramePointer framePointer = new FramePointer();
@@ -1234,7 +1252,7 @@ public class InterpreterImplementation implements Interpreter {
 			this.callStack.push(frameElement);
 			
 			//式を計算し、引数をスタックに積む
-			List<ExpressionNode> arguments = functionCall.getArguments();
+			List<ExpressionNode> arguments = callNode.getArguments();
 			
 			//引数の式を計算する
 			for (ExpressionNode argument : arguments) {
@@ -1258,6 +1276,8 @@ public class InterpreterImplementation implements Interpreter {
 				
 				this.callStack.push(variableElement);
 			}
+			
+			functionNode = function.getFunctionNode(); //識別子から構文木上のリンクを取り出す
 			
 			//ユーザー定義関数の呼び出し
 			this.executeUserDefinedFunctionCall(functionNode);
@@ -1295,7 +1315,50 @@ public class InterpreterImplementation implements Interpreter {
 	 * 標準関数の呼び出し
 	 * @param callNode
 	 */
-	private void executeStandardFunctionCall(IdentifierNode functionNode) {
+	private void executeStandardFunctionCall(IdentifierNode functionNode, List<ExpressionNode> arguments) {
+		
+		ExecuteStatementResult ret = new ExecuteStatementResult();
+		ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
+		
+		LinkedList<Value> valueList = new LinkedList<Value>();
+		String standardFunctionName = functionNode.getIdentifier().getStandardFunctionName(); //呼び出そうとしている関数名
+		StandardFunction standardFunction = new StandardFunction(); //標準関数
+		
+		//引数の式を計算する
+		for (ExpressionNode argument : arguments) {
+			
+			//式の実行
+			this.evaluateExpression(argument);
+			
+			//結果を変数として、コールスタックに詰める
+			StackElement result = this.operandStack.pop();
+			Value value = result.getValue();
+			
+			valueList.add(value);
+		}
+		
+		//関数名からstandardFunctionNameを取り出し、名前でメソッドを呼び出す
+		Class thisClass = standardFunction.getClass();
+		Method[] methods = thisClass.getMethods();
+		
+		for (Method method : methods) {
+			
+			//必要なメソッドの実行が終わったら、処理を終える
+			if (method.getName().equals(standardFunctionName)) {
+				try {
+					method.invoke(standardFunction, valueList);
+				} catch (IllegalArgumentException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
+			}
+		}
 		
 	}
 }

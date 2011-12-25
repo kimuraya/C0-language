@@ -91,10 +91,11 @@ public class AstVisitor implements Visitor {
 	}
 
 	@Override
-	//識別子をシンボルテーブルに登録する
-	//変数と関数で処理を分ける
+	/**
+	 * 識別子をシンボルテーブルに登録する
+	 * 変数と関数で処理を分ける
+	 */
 	public void visit(IdentifierNode identifierNode) {
-		//System.out.println(identifierNode.getIdentifier().getName());
 		
 		//関数を登録する場合
 		if ((identifierNode.getIdentifier().getIdentifierType() == IdentifierType.FUNCTION) && (identifierNode.getBlock() != null)) {

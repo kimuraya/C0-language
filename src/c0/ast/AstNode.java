@@ -4,7 +4,9 @@ import java.util.List;
 
 import c0.interpreter.Visitor;
 
-//抽象構文木のルート
+/**
+ * 抽象構文木のルート
+ */
 public class AstNode extends Node {
 	
 	private List<DeclareVariableNode> globalVariables; //外部変数のリスト

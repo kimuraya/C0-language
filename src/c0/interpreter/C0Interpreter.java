@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Stack;
 
 import c0.ast.AstNode;
+import c0.ast.ExpressionNode;
+import c0.ast.IdentifierNode;
 import c0.parser.C0Language;
 import c0.parser.ParseException;
 import c0.util.GlobalScope;
@@ -118,8 +120,6 @@ public class C0Interpreter extends InterpreterImplementation {
 		//シンボルテーブルの出力
 		this.outputSymbolTable(astVisitor);
 		
-		//インタプリタが構文木を入力として受け取り、プログラムを実行する
-		
 		//デバッグ
 		Identifier main = globalScope.getGlobalSymbolTable().getSymbol("main");
 		
@@ -127,6 +127,9 @@ public class C0Interpreter extends InterpreterImplementation {
 			System.out.println(main.getFunctionNode().getIdentifier().getName());
 			System.out.println(main.getFunctionNode().getIdentifier().getIdentifierType());
 		}
+		
+		//main関数の呼び出し
+		
 	}
 	
 	/**

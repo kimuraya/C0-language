@@ -1,6 +1,7 @@
 package c0.interpreter;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import c0.ast.ExpressionNode;
@@ -9,6 +10,7 @@ import c0.ast.LiteralNode;
 import c0.util.GlobalScope;
 import c0.util.Identifier;
 import c0.util.IdentifierType;
+import c0.util.Value;
 
 /**
  * 標準関数を管理するクラス
@@ -37,18 +39,38 @@ public class StandardFunction {
 	 * System.out.printf(String format, Object... args)のラッパー
 	 * 引数から値を取り出して、処理を実行させる
 	 */
-	public void printFunction(ExpressionNode function, List<ExpressionNode> parameters) {
+	public void printFunction(LinkedList<Value> valueList) {
 		
-		//インタプリタの引数から値を取り出す
-		LiteralNode formatValue = (LiteralNode)parameters.get(0);
+		//TODO
+		//データ型のチェックを入れる
 		
-		String format = formatValue.getLiteral().getStringLiteral();
+		//インタプリタの引数から値を取り出す。先頭の要素は削除する
+		String format = valueList.poll().getStringLiteral();
 		
-		Object[] args = null;
-		for (int i = 1; i < parameters.size(); i++) {
-			IdentifierNode arg = (IdentifierNode) parameters.get(i);
-			args[i] = arg.getIdentifier().getName();
+		ArrayList<Object> argList = new ArrayList<Object>();
+		for (Value value : valueList) {
+			
+			//TODO
+			switch (value.getDataType()) {
+				case INT:
+					argList.add(value.getInteger());
+					break;
+				case INT_ARRAY:
+					argList.add(value.getIntegerArray());
+					break;
+				case STRING:
+					argList.add(value.getStringLiteral());
+					break;
+				case BOOLEAN:
+					argList.add(value.isBool());
+					break;
+				case BOOLEAN_ARRAY:
+					argList.add(value.getBooleanArray());
+					break;
+			}
 		}
+		
+		Object[] args = argList.toArray();
 		
 		//ラップしているメソッドの実行
 		System.out.printf(format, args);
