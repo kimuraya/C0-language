@@ -2,12 +2,12 @@ int main () {
 	
 	int i;
 	i = 1 + 1;
-	print("%d", i);
+	print("%d%n", i);
 	
 	if (i > 1) {
-		print("true!");
+		print("true!%n");
 	} else {
-		print("false...");
+		print("false...%n");
 	}
 	
 }

@@ -936,6 +936,7 @@ public class C0Language implements C0LanguageConstants {
         ExpressionNode expressionNode = null;
         IdentifierNode identifierNode = null;
         Identifier identifier = null;
+        String str = null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case INTEGER:
       token = jj_consume_token(INTEGER);
@@ -943,7 +944,8 @@ public class C0Language implements C0LanguageConstants {
       break;
     case STRING:
       token = jj_consume_token(STRING);
-                                {if (true) return new LiteralNode(new Location(this.getFileName(), token), DataType.STRING, token.image);}
+                                str = token.image.substring(1, token.image.length() - 1);
+                                {if (true) return new LiteralNode(new Location(this.getFileName(), token), DataType.STRING, str);}
       break;
     case TRUE:
       token = jj_consume_token(TRUE);
@@ -1252,6 +1254,11 @@ public class C0Language implements C0LanguageConstants {
     return false;
   }
 
+  private boolean jj_3R_25() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
   private boolean jj_3R_57() {
     if (jj_scan_token(35)) return true;
     if (jj_3R_48()) return true;
@@ -1270,11 +1277,6 @@ public class C0Language implements C0LanguageConstants {
     return false;
   }
 
-  private boolean jj_3R_25() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    return false;
-  }
-
   private boolean jj_3R_55() {
     if (jj_scan_token(33)) return true;
     if (jj_3R_48()) return true;
@@ -1284,6 +1286,11 @@ public class C0Language implements C0LanguageConstants {
   private boolean jj_3R_54() {
     if (jj_scan_token(32)) return true;
     if (jj_3R_48()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_24() {
+    if (jj_scan_token(FALSE)) return true;
     return false;
   }
 
@@ -1302,11 +1309,6 @@ public class C0Language implements C0LanguageConstants {
     if (jj_scan_token(25)) return true;
     if (jj_3R_28()) return true;
     if (jj_scan_token(26)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_24() {
-    if (jj_scan_token(FALSE)) return true;
     return false;
   }
 

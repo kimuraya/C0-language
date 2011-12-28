@@ -571,6 +571,7 @@ ExpressionNode primaryExpression():
 	ExpressionNode expressionNode = null;
 	IdentifierNode identifierNode = null;
 	Identifier identifier = null;
+	String str = null;
 }
 {
 	token=<INTEGER> //10進定数
@@ -579,7 +580,8 @@ ExpressionNode primaryExpression():
 			}
 	| token=<STRING> //文字列定数
 			{
-				return new LiteralNode(new Location(this.getFileName(), token), DataType.STRING, token.image);
+				str = token.image.substring(1, token.image.length() - 1);
+				return new LiteralNode(new Location(this.getFileName(), token), DataType.STRING, str);
 			}
 	| token=<TRUE> //真偽値定数 : true
 			{
