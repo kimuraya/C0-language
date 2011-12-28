@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Stack;
 
 import c0.ast.AstNode;
+import c0.ast.CallNode;
 import c0.ast.ExpressionNode;
 import c0.ast.IdentifierNode;
 import c0.parser.C0Language;
@@ -99,7 +100,7 @@ public class C0Interpreter extends InterpreterImplementation {
 		try {			
 			program = parser.file();
 			int depth = 0;
-			program.dump(depth, true);
+			//program.dump(depth, true);
 		} catch (ParseException e1) {
 			e1.printStackTrace();
 		}
@@ -118,18 +119,23 @@ public class C0Interpreter extends InterpreterImplementation {
 		program.accept(astVisitor);
 		
 		//シンボルテーブルの出力
-		this.outputSymbolTable(astVisitor);
+		//this.outputSymbolTable(astVisitor);
+		
 		
 		//デバッグ
 		Identifier main = globalScope.getGlobalSymbolTable().getSymbol("main");
 		
+		/*
 		if (main.getFunctionNode() != null) {
 			System.out.println(main.getFunctionNode().getIdentifier().getName());
 			System.out.println(main.getFunctionNode().getIdentifier().getIdentifierType());
 		}
+		*/
 		
 		//main関数の呼び出し
-		
+		IdentifierNode mainFunction = main.getFunctionNode();
+		List<ExpressionNode> arguments = new LinkedList<ExpressionNode>();
+		this.executeFunctionCall(new CallNode(mainFunction, arguments));
 	}
 	
 	/**

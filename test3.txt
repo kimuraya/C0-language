@@ -1,0 +1,13 @@
+int main () {
+	
+	int i;
+	i = 1 + 1;
+	print("%d", i);
+	
+	if (i > 1) {
+		print("true!");
+	} else {
+		print("false...");
+	}
+	
+}

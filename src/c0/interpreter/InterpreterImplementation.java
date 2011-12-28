@@ -148,11 +148,14 @@ public class InterpreterImplementation implements Interpreter {
 		for (DeclareVariableNode declareVariableNode : localVariables) {
 			
 			//初期化式の実行
-			ExpressionNode expression = declareVariableNode.getExpression();
-			this.evaluateExpression(expression);
-			
-			StackElement result = this.operandStack.pop();
-			Value value = result.getValue();
+			Value value = new Value();
+			if (declareVariableNode.getExpression() != null) {
+				ExpressionNode expression = declareVariableNode.getExpression();
+				this.evaluateExpression(expression);
+				
+				StackElement result = this.operandStack.pop();
+				value = result.getValue();
+			}
 			
 			//計算結果をローカル変数にバインドする
 			LocalVariable variable = new LocalVariable();
@@ -177,8 +180,10 @@ public class InterpreterImplementation implements Interpreter {
 		}
 		
 		//局所変数をスタックから破棄する
-		for (int i = localVariables.size(); i >= 0; i--) {
-			this.callStack.pop();
+		if (!this.callStack.isEmpty()) {
+			for (int i = localVariables.size() - 1; i >= 0; i--) {
+				this.callStack.pop();
+			}
 		}
 		
 		return ret;
@@ -386,10 +391,12 @@ public class InterpreterImplementation implements Interpreter {
 		ExpressionStatementNode expressionStatementNode = (ExpressionStatementNode) statementNode;
 		this.evaluateExpression(expressionStatementNode.getExpression());
 		
-		//スタックから値を取り出す
-		StackElement stackElement = this.operandStack.pop();
-		Value value = stackElement.getValue();
-		executeStatementResult.setValue(value);
+		//スタックが空でなければ、値を取り出す
+		if (!this.operandStack.isEmpty()) {
+			StackElement stackElement = this.operandStack.pop();
+			Value value = stackElement.getValue();
+			executeStatementResult.setValue(value);
+		}
 		
 		return executeStatementResult;
 	}
@@ -505,7 +512,7 @@ public class InterpreterImplementation implements Interpreter {
 		//TODO
 		//コールスタック（ローカル変数）から識別子を探す
 		//フレームポインタにぶつかるまでコールスタックを検索する
-		for (int i = this.callStack.size(); this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
+		for (int i = this.callStack.size() - 1; this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
 			
 			StackElement variableElement = this.callStack.get(i);
 			
@@ -1054,7 +1061,7 @@ public class InterpreterImplementation implements Interpreter {
 		//TODO
 		//コールスタック（ローカル変数）から識別子を探す
 		//フレームポインタにぶつかるまでコールスタックを検索する
-		for (int i = this.callStack.size(); this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
+		for (int i = this.callStack.size() - 1; this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
 			
 			StackElement variableElement = this.callStack.get(i);
 			
@@ -1236,9 +1243,9 @@ public class InterpreterImplementation implements Interpreter {
 			
 			//引数を取り出す
 			List<ExpressionNode> arguments = callNode.getArguments();
-			functionNode = function.getFunctionNode(); //識別子から構文木上のリンクを取り出す
+			//functionNode = function.getFunctionNode(); //識別子から構文木上のリンクを取り出す
 			
-			this.executeStandardFunctionCall(functionNode, arguments);
+			this.executeStandardFunctionCall(function, arguments);
 			
 		//ユーザー定義関数の呼び出し
 		} else if (!function.isStandardFunctionFlag()) {
@@ -1283,8 +1290,10 @@ public class InterpreterImplementation implements Interpreter {
 			this.executeUserDefinedFunctionCall(functionNode);
 			
 			//フレームポインタと引数をコールスタックから除去
-			for (int i = arguments.size() + 1; i >= 0; i--) {
-				this.callStack.pop();
+			if (!this.callStack.isEmpty()) {
+				for (int i = arguments.size() - 1; i >= 0; i--) {
+					this.callStack.pop();
+				}
 			}
 			
 		} else {
@@ -1315,13 +1324,14 @@ public class InterpreterImplementation implements Interpreter {
 	 * 標準関数の呼び出し
 	 * @param callNode
 	 */
-	private void executeStandardFunctionCall(IdentifierNode functionNode, List<ExpressionNode> arguments) {
+	private void executeStandardFunctionCall(Identifier function, List<ExpressionNode> arguments) {
 		
 		ExecuteStatementResult ret = new ExecuteStatementResult();
 		ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
 		
 		LinkedList<Value> valueList = new LinkedList<Value>();
-		String standardFunctionName = functionNode.getIdentifier().getStandardFunctionName(); //呼び出そうとしている関数名
+		//String standardFunctionName = functionNode.getIdentifier().getStandardFunctionName(); //呼び出そうとしている関数名
+		String standardFunctionName = function.getStandardFunctionName();
 		StandardFunction standardFunction = new StandardFunction(); //標準関数
 		
 		//引数の式を計算する

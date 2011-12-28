@@ -106,8 +106,8 @@ public class AstVisitor implements Visitor {
 				//実際の登録処理
 				this.globalScope.getGlobalSymbolTable().addSymbol(identifierNode.getIdentifier());
 				
-				System.out.println("関数の出力");
-				System.out.println(identifierNode.getIdentifier().getName());
+				//System.out.println("関数の出力");
+				//System.out.println(identifierNode.getIdentifier().getName());
 			}
 			
 			//関数ごとにスコープを新規作成し、処理中の関数名を保存する
@@ -172,8 +172,8 @@ public class AstVisitor implements Visitor {
 				if (!this.globalScope.getGlobalSymbolTable().searchSymbol(identifierNode.getIdentifier().getName())
 						&& beingProcessedFunctionName == null) {
 					this.globalScope.getGlobalSymbolTable().addSymbol(identifierNode.getIdentifier());
-					System.out.println("グローバル変数の出力");
-					System.out.println(identifierNode.getIdentifier().getName());
+					//System.out.println("グローバル変数の出力");
+					//System.out.println(identifierNode.getIdentifier().getName());
 				} else {
 					//ここまで到達したら、局所変数にも大域変数にも登録されていない
 					for (LocalScope localScope : this.globalScope.getFunctionScopeList()) {
@@ -181,8 +181,8 @@ public class AstVisitor implements Visitor {
 						if (localScope.getFunctionName().equals(beingProcessedFunctionName)) {
 							LinkedList<SymbolTable> localSymbolTableList = localScope.getLocalSymbolTableList();
 							localSymbolTableList.getLast().addSymbol(identifierNode.getIdentifier());
-							System.out.println("ローカル変数の出力");
-							System.out.println(identifierNode.getIdentifier().getName());
+							//System.out.println("ローカル変数の出力");
+							//System.out.println(identifierNode.getIdentifier().getName());
 						}
 					}
 				}
