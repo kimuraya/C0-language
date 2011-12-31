@@ -23,6 +23,7 @@ import c0.ast.IfNode;
 import c0.ast.LessThanNode;
 import c0.ast.LessThanOrEqualNode;
 import c0.ast.LiteralNode;
+import c0.ast.Location;
 import c0.ast.LogicalAndNode;
 import c0.ast.LogicalOrNode;
 import c0.ast.MinusNode;
@@ -38,6 +39,7 @@ import c0.ast.PreIncrementNode;
 import c0.ast.StatementNode;
 import c0.ast.UnaryMinusNode;
 import c0.ast.WhileNode;
+import c0.parser.Token;
 import c0.util.DataType;
 import c0.util.ExecuteStatementResult;
 import c0.util.FramePointer;
@@ -103,31 +105,43 @@ public class InterpreterImplementation implements Interpreter {
 		
 		ExecuteStatementResult executeStatementResult = null;
 		
-		switch(statementNode.getNodeType()) {
-			case BLOCK_STATEMENT:
-				executeStatementResult = this.executeBlockStatement(statementNode);
-				break;
-			case IF_STATEMENT:
-				executeStatementResult = this.executeIfStatement(statementNode);
-				break;
-			case WHILE_STATEMENT:
-				executeStatementResult = this.executeWhileStatement(statementNode);
-				break;
-			case FOR_STATEMENT:
-				executeStatementResult = this.executeForStatement(statementNode);
-				break;
-			case BREAK_STATEMENT:
-				executeStatementResult = this.executeBreakStatement(statementNode);
-				break;
-			case RETURN_STATEMENT:
-				executeStatementResult = this.executeReturnStatement(statementNode);
-				break;
-			case EXPRESSION_STATEMENT:
-				executeStatementResult = this.executeExpressionStatement(statementNode);
-				break;
-			case EMPTY_STATEMENT:
-				executeStatementResult = this.executeEmptyStatement(statementNode);
-				break;
+		try {
+			
+			switch(statementNode.getNodeType()) {
+				
+				case BLOCK_STATEMENT:
+					executeStatementResult = this.executeBlockStatement(statementNode);
+					break;
+				case IF_STATEMENT:
+					executeStatementResult = this.executeIfStatement(statementNode);
+					break;
+				case WHILE_STATEMENT:
+					executeStatementResult = this.executeWhileStatement(statementNode);
+					break;
+				case FOR_STATEMENT:
+					executeStatementResult = this.executeForStatement(statementNode);
+					break;
+				case BREAK_STATEMENT:
+					executeStatementResult = this.executeBreakStatement(statementNode);
+					break;
+				case RETURN_STATEMENT:
+					executeStatementResult = this.executeReturnStatement(statementNode);
+					break;
+				case EXPRESSION_STATEMENT:
+					executeStatementResult = this.executeExpressionStatement(statementNode);
+					break;
+				case EMPTY_STATEMENT:
+					executeStatementResult = this.executeEmptyStatement(statementNode);
+					break;
+			}
+			
+		} catch(Exception e) {
+			
+			Location location = statementNode.location();
+			Token token = location.getToken();
+			System.out.println("問題のあった行:" + token.beginLine + "行," + token.beginColumn + "列," + token.endLine + "行," + token.endColumn + "列");
+			e.printStackTrace();
+			
 		}
 		
 		return executeStatementResult;
@@ -296,16 +310,21 @@ public class InterpreterImplementation implements Interpreter {
 		this.evaluateExpression(initializeExpression);
 		
 		//オペランドスタックから計算結果を破棄する
-		StackElement stackElement = this.operandStack.pop();
+		StackElement stackElement = null;
+		if (!this.operandStack.isEmpty()) {
+			stackElement = this.operandStack.pop();
+		}
 		
 		//条件式を実行
 		ExpressionNode conditionalExpression = forNode.getConditionalExpression();
 		this.evaluateExpression(conditionalExpression);
 		
 		//オペランドスタックから計算結果を取り出す
-		stackElement = this.operandStack.pop();
-		
-		Value value = stackElement.getValue();
+		Value value = new Value();
+		if (!this.operandStack.isEmpty()) {
+			stackElement = this.operandStack.pop();
+			value = stackElement.getValue();
+		}
 		
 		//文を実行
 		//条件式がtrueである限り、ループが継続する
@@ -316,9 +335,10 @@ public class InterpreterImplementation implements Interpreter {
 			this.evaluateExpression(conditionalExpression);
 			
 			//オペランドスタックから計算結果を取り出す
-			stackElement = this.operandStack.pop();
-			
-			value = stackElement.getValue();
+			if (!this.operandStack.isEmpty()) {
+				stackElement = this.operandStack.pop();
+				value = stackElement.getValue();
+			}
 			
 			//文を実行する
 			ret = this.executeStatement(forNode.getBodyStatement());
@@ -339,7 +359,9 @@ public class InterpreterImplementation implements Interpreter {
 			this.evaluateExpression(updateExpression);
 			
 			//オペランドスタックから計算結果を破棄する
-			stackElement = this.operandStack.pop();
+			if (!this.operandStack.isEmpty()) {
+				stackElement = this.operandStack.pop();
+			}
 		}
 		
 		return ret;
@@ -939,10 +961,10 @@ public class InterpreterImplementation implements Interpreter {
 				break;
 		}
 		
-		//左右の値の式を実行する
+		//左辺値の式を実行する
 		this.evaluateExpression(left);
 		
-		//オペランドスタックから左右の値の計算結果を取り出す
+		//オペランドスタックから左辺値の計算結果を取り出す
 		StackElement stackLeft = this.operandStack.pop();
 		
 		Value leftValue = stackLeft.getValue();
@@ -951,7 +973,7 @@ public class InterpreterImplementation implements Interpreter {
 		//整数の式
 		if (leftValue.getDataType() == DataType.INT) {
 			
-			this.unaryOperatorExpression(leftValue.getInteger(), expression.getNodeType());
+			this.unaryOperatorExpression(expression, leftValue.getInteger(), expression.getNodeType());
 			
 		//真偽値の式
 		} else if (leftValue.getDataType() == DataType.BOOLEAN) {
@@ -972,10 +994,10 @@ public class InterpreterImplementation implements Interpreter {
 	 * @param left
 	 * @param expressionType
 	 */
-	public void unaryOperatorExpression(int left, NodeType expressionType) {
+	public void unaryOperatorExpression(ExpressionNode expression, int left, NodeType expressionType) {
 		
 		//式を実行する
-		int result = 0;
+		int result = 0; //実行結果
 		
 		//ノードの種類によって、処理を分ける
 		switch(expressionType) {
@@ -983,16 +1005,20 @@ public class InterpreterImplementation implements Interpreter {
 				result = -left;
 				break;
 			case PRE_INCREMENT: //"++" 前置増分
-				result = left++; //TODO 再検討
+				result = ++left;
+				this.leftValueUpdate(expression, left);
 				break;
 			case PRE_DECREMENT: //"--" 前置減分
-				result = left--; //TODO 再検討
+				result = --left;
+				this.leftValueUpdate(expression, left);
 				break;
 			case POST_INCREMENT: //"++" 後置増分
-				result = ++left; //TODO 再検討
+				result = left++;
+				this.leftValueUpdate(expression, left);
 				break;
 			case POST_DECREMENT: //"--" 後置減分
-				result = --left; //TODO 再検討
+				result = left--;
+				this.leftValueUpdate(expression, left);
 				break;
 		}
 		
@@ -1007,6 +1033,102 @@ public class InterpreterImplementation implements Interpreter {
 		
 		//オペランドスタックに値を詰める
 		this.operandStack.push(resultElement);
+		
+		return;
+	}
+	
+	/**
+	 * 左辺値の更新
+	 */
+	public void leftValueUpdate(ExpressionNode expression, int leftValue) {
+		
+		ExpressionNode left = null;
+		
+		//ノードの種類によって、処理を分ける
+		switch(expression.getNodeType()) {
+			case EXCLAMATION: //"!"
+				ExclamationNode exclamationNode = (ExclamationNode) expression;
+				left = exclamationNode.getLeftValue();
+				break;
+			case UNARY_MINUS: //"-" 単項マイナス式
+				UnaryMinusNode unaryMinusNode = (UnaryMinusNode) expression;
+				left = unaryMinusNode.getLeftValue();
+				break;
+			case PRE_INCREMENT: //"++" 前置増分
+				PreIncrementNode preIncrementNode = (PreIncrementNode) expression;
+				left = preIncrementNode.getLeftValue();
+				break;
+			case PRE_DECREMENT: //"--" 前置減分
+				PreDecrementNode preDecrementNode = (PreDecrementNode) expression;
+				left = preDecrementNode.getLeftValue();
+				break;
+			case POST_INCREMENT: //"++" 後置増分
+				PostIncrementNode postIncrementNode = (PostIncrementNode) expression;
+				left = postIncrementNode.getLeftValue();
+				break;
+			case POST_DECREMENT: //"--" 後置減分
+				PostDecrementNode postDecrementNode = (PostDecrementNode) expression;
+				left = postDecrementNode.getLeftValue();
+				break;
+		}
+		
+		//TODO
+		//左が左辺値でない場合、例外を出す
+		IdentifierNode identifierNode = (IdentifierNode) left;
+		Identifier search = identifierNode.getIdentifier(); //この識別子を探す
+		LocalVariable foundLocalVariable = null;
+		Identifier foundGlobalVariable = null;
+		boolean searchFlag = false; //識別子が見つかっかどうかを表す。trueなら見つかっている
+		
+		//コールスタックから代入先を探す（局所変数）
+		//TODO
+		//コールスタック（ローカル変数）から識別子を探す
+		//フレームポインタにぶつかるまでコールスタックを検索する
+		for (int i = this.callStack.size() - 1; this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
+			
+			StackElement variableElement = this.callStack.get(i);
+			
+			//目的の識別子が見つかった場合、その値を取り出す
+			LocalVariable localVariable = variableElement.getVariable();
+			String localVariableName = localVariable.getVariable().getName();
+			
+			if (localVariableName.equals(search.getName())) {
+				searchFlag = true;
+				foundLocalVariable = localVariable;
+				break;
+			}
+		}
+		
+		//シンボルテーブルから代入先を探す（大域変数）
+		if (!searchFlag) {
+			
+			SymbolTable globalSymbolTable = this.getGlobalScope().getGlobalSymbolTable();
+			
+			if (globalSymbolTable.searchSymbol(search.getName())) {
+				searchFlag = true;
+				foundGlobalVariable = globalSymbolTable.getSymbol(search.getName());
+			}
+		}
+		
+		//更新する値を作る
+		Value value = new Value();
+		value.setInteger(leftValue);
+		value.setDataType(DataType.INT);
+		
+		//左辺値を更新する
+		//識別子が存在すれば、値を取り出し、オペランドスタックに詰める
+		if (searchFlag) {
+			
+			//見つかった識別子に対し、代入を実行する
+			if (foundLocalVariable != null) {
+				foundLocalVariable.setValue(value);
+			} else if (foundGlobalVariable != null) {
+				foundGlobalVariable.setLeftValue(value);
+			}
+			
+		} else {
+			//識別子がローカル変数にも、グローバル変数にも存在しない場合、例外を投げる
+		}
 		
 		return;
 	}
@@ -1047,7 +1169,11 @@ public class InterpreterImplementation implements Interpreter {
 	 * "="
 	 */
 	@Override
-	public void assignExpression(ExpressionNode left, ExpressionNode right) {
+	public void assignExpression(ExpressionNode expression) {
+		
+		AssignNode assignNode = (AssignNode) expression;
+		ExpressionNode left = assignNode.getLeftValue(); //左辺値
+		ExpressionNode right = assignNode.getExpression(); //代入される式
 		
 		//TODO
 		//左が左辺値でない場合、例外を出す
@@ -1112,42 +1238,6 @@ public class InterpreterImplementation implements Interpreter {
 		
 		return;
 	}
-	
-	/**
-	 * "&&"
-	 */
-	@Override
-	public void logicalAndExpression(ExpressionNode left, ExpressionNode right) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * "||"
-	 */
-	@Override
-	public void logicalOrExpression(ExpressionNode left, ExpressionNode right) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * "-" 単項マイナス式
-	 */
-	@Override
-	public void unaryMinusExpression(ExpressionNode leftValue) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	/**
-	 * "!"
-	 */
-	@Override
-	public void exclamationExpression(ExpressionNode leftValue) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
 
 	/**
 	 * 添字式
@@ -1182,8 +1272,7 @@ public class InterpreterImplementation implements Interpreter {
 				this.arraySubscriptExpression(expression);
 				break;
 			case ASSIGN: //"="
-				AssignNode assignNode = (AssignNode) expression;
-				this.assignExpression(assignNode.getLeftValue(), assignNode.getExpression());
+				this.assignExpression(expression);
 				break;
 			case LOGICAL_AND: //"&&"
 			case LOGICAL_OR: //"||"
@@ -1243,8 +1332,6 @@ public class InterpreterImplementation implements Interpreter {
 			
 			//引数を取り出す
 			List<ExpressionNode> arguments = callNode.getArguments();
-			//functionNode = function.getFunctionNode(); //識別子から構文木上のリンクを取り出す
-			
 			this.executeStandardFunctionCall(function, arguments);
 			
 		//ユーザー定義関数の呼び出し

@@ -1,13 +1,58 @@
 int main () {
 	
 	int i;
+	int j;
+	int k;
+	int l;
+	int m;
+	int o;
+	
 	i = 1 + 1;
+	j = 0;
+	k = 0;
+	l = 0;
+	m = 0;
+	o = 0;
+	
 	print("%d%n", i);
 	
-	if (i > 1) {
+	if (i > 10) {
 		print("true!%n");
 	} else {
 		print("false...%n");
 	}
 	
+	for (i = 0; i < 4; i++) {
+		print("for stmt...%n");
+	}
+	
+	while (true) {
+		break;
+	}
+	
+	print("break%n");
+	
+	i = 0;
+	while (i < 2) {
+		i++;
+		print("while stmt...%n");
+	} 
+	
+	//インクリメント演算子、デクリメント演算子のテスト
+	o = ++j;
+	print("o = %d%n", o);
+	
+	o = --k;
+	print("o = %d%n", o);
+	
+	o = l++;
+	print("o = %d%n", o);
+	
+	o = m--;
+	print("o = %d%n", o);
+	
+	print("j = %d%n", j);
+	print("k = %d%n", k);
+	print("l = %d%n", l);
+	print("m = %d%n", m);
 }
