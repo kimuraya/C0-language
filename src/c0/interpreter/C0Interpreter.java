@@ -100,7 +100,7 @@ public class C0Interpreter extends InterpreterImplementation {
 		try {			
 			program = parser.file();
 			int depth = 0;
-			//program.dump(depth, true);
+			program.dump(depth, true);
 		} catch (ParseException e1) {
 			e1.printStackTrace();
 		}

@@ -309,8 +309,10 @@ public class AstVisitor implements Visitor {
 		callNode.getFunction().accept(this);
 		List<ExpressionNode> parameters = callNode.getArguments();
 		
-		for (ExpressionNode parameter : parameters) {
-			parameter.accept(this);
+		if (parameters != null) {
+			for (ExpressionNode parameter : parameters) {
+				parameter.accept(this);
+			}
 		}
 	}
 	
@@ -388,7 +390,9 @@ public class AstVisitor implements Visitor {
 
 	@Override
 	public void visit(ReturnNode returnNode) {
-		returnNode.getExpression().accept(this);
+		if (returnNode.getExpression() != null) {
+			returnNode.getExpression().accept(this);
+		}
 	}
 
 	@Override

@@ -55,4 +55,18 @@ int main () {
 	print("k = %d%n", k);
 	print("l = %d%n", l);
 	print("m = %d%n", m);
+	
+	//関数呼び出しのテスト
+	i = add(j, k);
+	print("i = %d%n", i);
+	
+	i = add(10, 12);
+	print("i = %d%n", i);
+	
+	return;
+}
+
+int add(int i, int j) {
+	i = i + j;
+	return i;
 }

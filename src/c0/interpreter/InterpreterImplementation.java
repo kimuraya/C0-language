@@ -2,6 +2,7 @@ package c0.interpreter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -36,6 +37,7 @@ import c0.ast.PostDecrementNode;
 import c0.ast.PostIncrementNode;
 import c0.ast.PreDecrementNode;
 import c0.ast.PreIncrementNode;
+import c0.ast.ReturnNode;
 import c0.ast.StatementNode;
 import c0.ast.UnaryMinusNode;
 import c0.ast.WhileNode;
@@ -393,6 +395,22 @@ public class InterpreterImplementation implements Interpreter {
 		executeStatementResult.setStatementResultFlag(StatementResultFlag.RETURN_STATEMENT_RESULT);
 		
 		//戻り値を計算する
+		ReturnNode returnNode = (ReturnNode) statementNode;
+		
+		if (returnNode.getExpression() != null) {
+			ExpressionNode expression = returnNode.getExpression();
+			this.evaluateExpression(expression);
+		}
+		
+		//オペランドスタックから計算結果を取り出す
+		/*
+		StackElement stackElement = null;
+		Value value = new Value();
+		if (!this.operandStack.isEmpty()) {
+			stackElement = this.operandStack.pop();
+			value = stackElement.getValue();
+		}
+		*/
 		
 		//戻り値をオペランドスタックに詰める
 		
@@ -689,7 +707,6 @@ public class InterpreterImplementation implements Interpreter {
 		
 		//実行結果をインタプリタで扱える形式にする
 		Value resultValue = new Value();
-		
 		resultValue.setBool(result);
 		resultValue.setDataType(DataType.BOOLEAN);
 		
@@ -799,7 +816,7 @@ public class InterpreterImplementation implements Interpreter {
 			
 		}
 		
-		
+		return;
 	}
 	
 	/**
@@ -1325,7 +1342,15 @@ public class InterpreterImplementation implements Interpreter {
 			//指定した関数が存在しない場合、例外を投げる
 		}
 		
+		//関数呼び出しに引数が存在する場合のみ、引数を取り出す
+		List<ParameterNode> parameters = null;
+		if (function.getFunctionNode() != null && function.getFunctionNode().getParameters() != null) {
+			parameters = function.getFunctionNode().getParameters();
+		}
+		
+		//TODO 引数の数が合わない場合、例外を出す
 		//呼び出そうとしている関数が標準関数か、ユーザー定義関数かチェックする
+		//関数呼び出しと関数の引数の数が異なる場合、例外を投げるようにする
 		
 		//標準関数の呼び出し
 		if (function.isStandardFunctionFlag()) {
@@ -1337,38 +1362,54 @@ public class InterpreterImplementation implements Interpreter {
 		//ユーザー定義関数の呼び出し
 		} else if (!function.isStandardFunctionFlag()) {
 			
+			//式を計算し、引数をスタックに積む
+			List<ExpressionNode> arguments = callNode.getArguments();
+			List<StackElement> variableElements = new ArrayList<StackElement>();
+			
+			//引数がある場合のみ、処理を行う
+			if (parameters != null) {
+				
+				//引数の式を計算する
+				for (int i = 0; i < arguments.size(); i++) {
+					
+					ExpressionNode argument = arguments.get(i);
+					ParameterNode parameter = parameters.get(i);
+					
+					//式の実行
+					this.evaluateExpression(argument);
+					
+					//結果を変数として、コールスタックに詰める
+					StackElement result = this.operandStack.pop();
+					Value value = result.getValue();
+					
+					//計算結果を引数（ローカル変数）にバインドする
+					LocalVariable variable = new LocalVariable();
+					variable.setVariable(parameter.getIdentifier().getIdentifier()); //識別子をローカル変数にセットする
+					variable.setValue(value); //値をセットする
+					
+					//引数を作る
+					StackElement variableElement = new StackElement();
+					variableElement.setStackElementType(StackElementType.VARIABLE);
+					variableElement.setVariable(variable);
+					
+					//引数をリストに追加
+					variableElements.add(variableElement);
+				}
+			}
+			
 			//コールスタックにフレームポインタを詰める
 			FramePointer framePointer = new FramePointer();
 			StackElement frameElement = new StackElement();
 			frameElement.setStackElementType(StackElementType.FRAME_POINTER);
 			frameElement.setFramePointer(framePointer);
-			
 			this.callStack.push(frameElement);
 			
-			//式を計算し、引数をスタックに積む
-			List<ExpressionNode> arguments = callNode.getArguments();
-			
-			//引数の式を計算する
-			for (ExpressionNode argument : arguments) {
-				
-				//式の実行
-				this.evaluateExpression(argument);
-				
-				//結果を変数として、コールスタックに詰める
-				StackElement result = this.operandStack.pop();
-				Value value = result.getValue();
-				
-				//計算結果を引数（ローカル変数）にバインドする
-				LocalVariable variable = new LocalVariable();
-				variable.setVariable(functionNode.getIdentifier()); //識別子をセットする
-				variable.setValue(value); //値をセットする
-				
-				//コールスタックに引数を詰める
-				StackElement variableElement = new StackElement();
-				variableElement.setStackElementType(StackElementType.VARIABLE);
-				variableElement.setVariable(variable);
-				
-				this.callStack.push(variableElement);
+			//フレームポインタをコールスタックに詰めた後、引数を詰める。
+			//フレームポインタを先に詰めると、引数の計算が出来ない
+			if (parameters != null) {
+				for (StackElement variableElement : variableElements) {
+					this.callStack.push(variableElement);
+				}
 			}
 			
 			functionNode = function.getFunctionNode(); //識別子から構文木上のリンクを取り出す
@@ -1378,9 +1419,15 @@ public class InterpreterImplementation implements Interpreter {
 			
 			//フレームポインタと引数をコールスタックから除去
 			if (!this.callStack.isEmpty()) {
-				for (int i = arguments.size() - 1; i >= 0; i--) {
-					this.callStack.pop();
+				
+				if (arguments != null) {
+					for (int i = arguments.size(); i >= 0; i--) {
+						this.callStack.pop();
+					}
+				} else if (arguments == null) {
+					this.callStack.pop(); //フレームポインタのみ除去する
 				}
+				
 			}
 			
 		} else {
