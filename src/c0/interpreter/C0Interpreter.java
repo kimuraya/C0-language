@@ -12,15 +12,19 @@ import java.util.Stack;
 
 import c0.ast.AstNode;
 import c0.ast.CallNode;
+import c0.ast.DeclareVariableNode;
 import c0.ast.ExpressionNode;
 import c0.ast.IdentifierNode;
 import c0.parser.C0Language;
 import c0.parser.ParseException;
 import c0.util.GlobalScope;
 import c0.util.Identifier;
+import c0.util.IdentifierType;
 import c0.util.LocalScope;
 import c0.util.StackElement;
+import c0.util.StackElementType;
 import c0.util.SymbolTable;
+import c0.util.Value;
 
 /**
  * ASTのノードを入力として受け取り、関数を実行する。
@@ -119,7 +123,7 @@ public class C0Interpreter extends InterpreterImplementation {
 		program.accept(astVisitor);
 		
 		//シンボルテーブルの出力
-		//this.outputSymbolTable(astVisitor);
+		this.outputSymbolTable(astVisitor);
 		
 		
 		//デバッグ
@@ -131,6 +135,48 @@ public class C0Interpreter extends InterpreterImplementation {
 			System.out.println(main.getFunctionNode().getIdentifier().getIdentifierType());
 		}
 		*/
+		
+		//グローバル変数の初期化
+		List<DeclareVariableNode> getGlobalVariables = program.getGlobalVariables();
+		
+		for (DeclareVariableNode globalVariable : getGlobalVariables) {
+			
+			IdentifierNode identifierNode = globalVariable.getIdentifier();
+			Identifier search = identifierNode.getIdentifier(); //この識別子を探す
+			boolean searchFlag = false; //識別子が見つかったかどうかを表す。trueなら見つかっている
+			Identifier foundGlobalVariable = null;
+			
+			Value value = new Value();
+			if (globalVariable.getExpression() != null) {
+				
+				//初期化式の実行
+				ExpressionNode expression = globalVariable.getExpression();
+				this.evaluateExpression(expression);
+				StackElement result = this.operandStack.pop();
+				value = result.getValue();
+				
+				SymbolTable globalSymbolTable = this.getGlobalScope().getGlobalSymbolTable();
+				
+				if (globalSymbolTable.searchSymbol(search.getName())) {
+					searchFlag = true;
+					foundGlobalVariable = globalSymbolTable.getSymbol(search.getName());
+				}
+				
+				//計算結果をグローバル変数に代入する
+				if (searchFlag) {
+					
+					//見つかった識別子に対し、代入を実行する
+					if (foundGlobalVariable != null) {
+						foundGlobalVariable.setLeftValue(value);
+					}
+					
+				} else {
+					//識別子がグローバル変数に存在しない場合、例外を投げる
+				}
+			}
+		}
+		
+		//main関数の引数の処理
 		
 		//main関数の呼び出し
 		IdentifierNode mainFunction = main.getFunctionNode();

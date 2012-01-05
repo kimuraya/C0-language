@@ -62,7 +62,7 @@ public class InterpreterImplementation implements Interpreter {
 	
 	private GlobalScope globalScope = null; //グローバル変数を管理する
 	private Stack<StackElement> callStack = null; //局所変数、戻り値、戻り先、フレームポインタを積む
-	private Stack<StackElement> operandStack = null; //式の計算に使用する
+	protected Stack<StackElement> operandStack = null; //式の計算に使用する
 	
 	public InterpreterImplementation(Stack<StackElement> callStack,
 			Stack<StackElement> operandStack, GlobalScope globalScope) {
