@@ -21,6 +21,22 @@ public class DataTypeNode extends ExpressionNode {
 		return null;
 	}
 
+	public DataType getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(DataType dataType) {
+		this.dataType = dataType;
+	}
+
+	public ExpressionNode getElementNumber() {
+		return elementNumber;
+	}
+
+	public void setElementNumber(ExpressionNode elementNumber) {
+		this.elementNumber = elementNumber;
+	}
+
 	@Override
 	public void dump(int depth, boolean indentFlag) {
 		

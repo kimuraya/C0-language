@@ -7,9 +7,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import c0.ast.ArraySubscriptExpressionNode;
 import c0.ast.AssignNode;
 import c0.ast.BlockNode;
 import c0.ast.CallNode;
+import c0.ast.DataTypeNode;
 import c0.ast.DeclareVariableNode;
 import c0.ast.DivNode;
 import c0.ast.EquivalenceNode;
@@ -163,14 +165,55 @@ public class InterpreterImplementation implements Interpreter {
 		List<DeclareVariableNode> localVariables = block.getLocalVariables();
 		for (DeclareVariableNode declareVariableNode : localVariables) {
 			
+			//データ型
+			DataTypeNode localVariableDataTypeNode = declareVariableNode.getDataType();
+			DataType localVariableDataType = localVariableDataTypeNode.getDataType();
+			
 			//初期化式の実行
 			Value value = new Value();
-			if (declareVariableNode.getExpression() != null) {
+			
+			//配列以外の変数の初期化
+			if (declareVariableNode.getExpression() != null
+					&& (localVariableDataType != DataType.INT_ARRAY || localVariableDataType != DataType.BOOLEAN_ARRAY)) {
 				ExpressionNode expression = declareVariableNode.getExpression();
 				this.evaluateExpression(expression);
 				
 				StackElement result = this.operandStack.pop();
 				value = result.getValue();
+				
+			//配列の初期化
+			//配列の初期化式は認めない。要素数のない配列は作れない
+			} else if (declareVariableNode.getExpression() == null && localVariableDataTypeNode.getElementNumber() != null &&
+					(localVariableDataType == DataType.INT_ARRAY || localVariableDataType == DataType.BOOLEAN_ARRAY)) {
+				
+				//要素数の計算
+				//TODO 結果が整数でなければ、例外を投げる
+				Value elementNumberValue = new Value();
+				ExpressionNode elementNumberExpression = localVariableDataTypeNode.getElementNumber();
+				this.evaluateExpression(elementNumberExpression);
+				StackElement result = this.operandStack.pop();
+				elementNumberValue = result.getValue();
+				
+				//配列の生成
+				int elementNumber = elementNumberValue.getInteger();
+				
+				int intArray[];
+				boolean  boolArray[];
+				if (localVariableDataType == DataType.INT_ARRAY && elementNumber > 0) {
+					
+					intArray = new int[elementNumber];
+					value.setDataType(DataType.INT_ARRAY);
+					value.setIntegerArray(intArray);
+					
+				} else if (localVariableDataType == DataType.BOOLEAN_ARRAY && elementNumber > 0) {
+					
+					boolArray = new boolean[elementNumber];
+					value.setDataType(DataType.BOOLEAN_ARRAY);
+					value.setBooleanArray(boolArray);
+					
+				} else if (elementNumber <= 0) {
+					//TODO 配列の要素数が0か、0より小さい場合は例外を投げる
+				}
 			}
 			
 			//計算結果をローカル変数にバインドする
@@ -1260,8 +1303,9 @@ public class InterpreterImplementation implements Interpreter {
 	 * 添字式
 	 */
 	@Override
-	public void arraySubscriptExpression(ExpressionNode arraySubscriptExpression) {
-		// TODO 自動生成されたメソッド・スタブ
+	public void arraySubscriptExpression(ExpressionNode expression) {
+		
+		ArraySubscriptExpressionNode ArraySubscriptExpressionNode = (ArraySubscriptExpressionNode) expression;
 
 	}
 

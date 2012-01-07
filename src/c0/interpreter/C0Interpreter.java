@@ -12,11 +12,13 @@ import java.util.Stack;
 
 import c0.ast.AstNode;
 import c0.ast.CallNode;
+import c0.ast.DataTypeNode;
 import c0.ast.DeclareVariableNode;
 import c0.ast.ExpressionNode;
 import c0.ast.IdentifierNode;
 import c0.parser.C0Language;
 import c0.parser.ParseException;
+import c0.util.DataType;
 import c0.util.GlobalScope;
 import c0.util.Identifier;
 import c0.util.IdentifierType;
@@ -145,9 +147,13 @@ public class C0Interpreter extends InterpreterImplementation {
 			Identifier search = identifierNode.getIdentifier(); //この識別子を探す
 			boolean searchFlag = false; //識別子が見つかったかどうかを表す。trueなら見つかっている
 			Identifier foundGlobalVariable = null;
+			DataTypeNode globalVariableDataTypeNode = globalVariable.getDataType();
+			DataType globalVariableDataType = globalVariableDataTypeNode.getDataType();
 			
 			Value value = new Value();
-			if (globalVariable.getExpression() != null) {
+			
+			//配列以外の変数の初期化
+			if (globalVariable.getExpression() != null && (globalVariableDataType != DataType.INT_ARRAY || globalVariableDataType != DataType.BOOLEAN_ARRAY)) {
 				
 				//初期化式の実行
 				ExpressionNode expression = globalVariable.getExpression();
@@ -155,24 +161,59 @@ public class C0Interpreter extends InterpreterImplementation {
 				StackElement result = this.operandStack.pop();
 				value = result.getValue();
 				
-				SymbolTable globalSymbolTable = this.getGlobalScope().getGlobalSymbolTable();
+			//配列の初期化
+			//配列の初期化式は認めない。要素数のない配列は作れない
+			} else if (globalVariable.getExpression() == null && globalVariableDataTypeNode.getElementNumber() != null &&
+					(globalVariableDataType == DataType.INT_ARRAY || globalVariableDataType == DataType.BOOLEAN_ARRAY)) {
 				
-				if (globalSymbolTable.searchSymbol(search.getName())) {
-					searchFlag = true;
-					foundGlobalVariable = globalSymbolTable.getSymbol(search.getName());
+				//要素数の計算
+				//TODO 結果が整数でなければ、例外を投げる
+				Value elementNumberValue = new Value();
+				ExpressionNode elementNumberExpression = globalVariableDataTypeNode.getElementNumber();
+				this.evaluateExpression(elementNumberExpression);
+				StackElement result = this.operandStack.pop();
+				elementNumberValue = result.getValue();
+				
+				//配列の生成
+				int elementNumber = elementNumberValue.getInteger();
+				
+				int intArray[];
+				boolean  boolArray[];
+				if (globalVariableDataType == DataType.INT_ARRAY && elementNumber > 0) {
+					
+					intArray = new int[elementNumber];
+					value.setDataType(DataType.INT_ARRAY);
+					value.setIntegerArray(intArray);
+					
+				} else if (globalVariableDataType == DataType.BOOLEAN_ARRAY && elementNumber > 0) {
+					
+					boolArray = new boolean[elementNumber];
+					value.setDataType(DataType.BOOLEAN_ARRAY);
+					value.setBooleanArray(boolArray);
+					
+				} else if (elementNumber <= 0) {
+					//TODO 配列の要素数が0か、0より小さい場合は例外を投げる
+				}
+			}
+			
+			//シンボルテーブルの検索
+			SymbolTable globalSymbolTable = this.getGlobalScope().getGlobalSymbolTable();
+			
+			if (globalSymbolTable.searchSymbol(search.getName())) {
+				searchFlag = true;
+				foundGlobalVariable = globalSymbolTable.getSymbol(search.getName());
+			}
+			
+			//計算結果をグローバル変数に代入する
+			if (searchFlag) {
+				
+				//見つかった識別子に対し、代入を実行する
+				if (foundGlobalVariable != null) {
+					foundGlobalVariable.setLeftValue(value);
 				}
 				
-				//計算結果をグローバル変数に代入する
-				if (searchFlag) {
-					
-					//見つかった識別子に対し、代入を実行する
-					if (foundGlobalVariable != null) {
-						foundGlobalVariable.setLeftValue(value);
-					}
-					
-				} else {
-					//識別子がグローバル変数に存在しない場合、例外を投げる
-				}
+			} else {
+				//識別子がグローバル変数に存在しない場合、例外を投げる
 			}
 		}
 		
