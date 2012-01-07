@@ -1285,11 +1285,28 @@ public class InterpreterImplementation implements Interpreter {
 		//識別子が存在すれば、値を取り出し、オペランドスタックに詰める
 		if (searchFlag) {
 			
+			Value localVal = foundLocalVariable.getValue();
+			Value globalVal = foundGlobalVariable.getLeftValue();
+			
 			//見つかった識別子に対し、代入を実行する
 			if (foundLocalVariable != null) {
+				
 				foundLocalVariable.setValue(rightValue);
+				
 			} else if (foundGlobalVariable != null) {
+				
 				foundGlobalVariable.setLeftValue(rightValue);
+				
+			} else if (foundLocalVariable != null && localVal.getDataType() == DataType.INT_ARRAY) {
+				
+				int[] array = localVal.getIntegerArray();
+				
+			} else if (foundGlobalVariable != null && globalVal.getDataType() == DataType.INT_ARRAY) {
+				
+			} else if (foundLocalVariable != null && localVal.getDataType() == DataType.BOOLEAN_ARRAY) {
+				
+			} else if (foundGlobalVariable != null && globalVal.getDataType() == DataType.BOOLEAN_ARRAY) {
+				
 			}
 			
 		} else {
@@ -1306,7 +1323,149 @@ public class InterpreterImplementation implements Interpreter {
 	public void arraySubscriptExpression(ExpressionNode expression) {
 		
 		ArraySubscriptExpressionNode ArraySubscriptExpressionNode = (ArraySubscriptExpressionNode) expression;
-
+		
+		//添字を計算する
+		//TODO　添字が整数でなかった場合、例外を投げる
+		Value value = new Value();
+		ExpressionNode indexExpression = ArraySubscriptExpressionNode.getIndex();
+		this.evaluateExpression(indexExpression);
+		StackElement resultElement = this.operandStack.pop();
+		value = resultElement.getValue();
+		int index = value.getInteger();
+		
+		//配列を取り出す
+		//グローバル変数とローカル変数で処理を分ける
+		IdentifierNode arrayNode = ArraySubscriptExpressionNode.getArray();
+		Identifier arrayIdentifier = arrayNode.getIdentifier();
+		Value arrayValue = null;
+		DataType arrayDataType = null;
+		
+		SymbolTable globalSymbolTable = this.getGlobalScope().getGlobalSymbolTable();
+		
+		//ローカル変数にある場合
+		if (this.serachCallStack(arrayIdentifier.getName())) {
+			
+			LocalVariable localVariable = this.getLocalVariable(arrayIdentifier.getName());
+			arrayValue = localVariable.getValue();
+			arrayDataType = arrayValue.getDataType();
+			
+		//グローバル変数にある場合
+		} else if (globalSymbolTable.searchSymbol(arrayIdentifier.getName())) {
+			
+			Identifier globalVariable = globalSymbolTable.getSymbol(arrayIdentifier.getName());
+			arrayValue = globalVariable.getLeftValue();
+			arrayDataType = arrayValue.getDataType();
+			
+		//TODO 識別子が見つからない場合、例外を投げる
+		} else {
+			
+		}
+		
+		//添字と配列のサイズをチェックする
+		//TODO 添字式の識別子が配列でなかった場合、例外を投げる
+		
+		Value arrayIndexValue = null;
+		if (index >= 0 && (arrayDataType == DataType.INT_ARRAY || arrayDataType == DataType.BOOLEAN_ARRAY)) {
+			
+			//添字が配列の範囲内なら配列から値を取り出し、オペランドスタックに積む
+			if (arrayDataType == DataType.INT_ARRAY ) {
+				
+				int[] array = arrayValue.getIntegerArray();
+				
+				if (index < array.length - 1) {
+					int val = array[index];
+					arrayIndexValue = new Value();
+					arrayIndexValue.setDataType(DataType.INT);
+					arrayIndexValue.setInteger(val);
+				} else {
+					//TODO 範囲外の要素を参照しようとした。例外を投げる
+				}
+				
+			} else if (arrayDataType == DataType.BOOLEAN_ARRAY) {
+				
+				boolean[] array = arrayValue.getBooleanArray();
+				
+				if (index < array.length - 1) {
+					boolean val = array[index];
+					arrayIndexValue = new Value();
+					arrayIndexValue.setDataType(DataType.BOOLEAN);
+					arrayIndexValue.setBool(val);
+				} else {
+					//TODO 範囲外の要素を参照しようとした。例外を投げる
+				}
+				
+			}
+			
+			//スタックの要素の作製
+			StackElement stackElement = new StackElement();
+			stackElement.setStackElementType(StackElementType.LITERAL);
+			stackElement.setValue(arrayIndexValue);
+			
+			//オペランドスタックに値を詰める
+			this.operandStack.add(stackElement);
+		}
+		
+		return;
+	}
+	
+	/**
+	 * 識別子がローカル変数として存在するかチェック
+	 * @param name
+	 * @return
+	 */
+	private boolean serachCallStack(String name) {
+		
+		boolean ret = false; //識別子が見つかっかどうかを表す。trueなら見つかっている
+		
+		//コールスタック（ローカル変数）から識別子を探す
+		//フレームポインタにぶつかるまでコールスタックを検索する
+		for (int i = this.callStack.size() - 1; this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
+			
+			StackElement variableElement = this.callStack.get(i);
+			
+			LocalVariable localVariable = variableElement.getVariable();
+			String localVariableName = localVariable.getVariable().getName();
+			
+			if (localVariableName.equals(name)) {
+				ret = true;
+				break;
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * コールスタックからローカル変数を取り出す
+	 * @param name
+	 * @return
+	 */
+	private LocalVariable getLocalVariable(String name) {
+		
+		//識別子を取り出す
+		LocalVariable ret = null;
+		Identifier foundGlobalVariable = null;
+		boolean searchFlag = false; //識別子が見つかっかどうかを表す。trueなら見つかっている
+		
+		//TODO
+		//コールスタック（ローカル変数）から識別子を探す
+		//フレームポインタにぶつかるまでコールスタックを検索する
+		for (int i = this.callStack.size() - 1; this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
+			
+			StackElement variableElement = this.callStack.get(i);
+			
+			//目的の識別子が見つかった場合、その値を取り出す
+			LocalVariable localVariable = variableElement.getVariable();
+			String localVariableName = localVariable.getVariable().getName();
+			
+			if (localVariableName.equals(name)) {
+				searchFlag = true;
+				ret = localVariable;
+				break;
+			}
+		}
+		
+		return ret;
 	}
 
 	/**
