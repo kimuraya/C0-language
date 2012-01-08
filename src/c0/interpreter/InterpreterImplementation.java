@@ -1343,7 +1343,7 @@ public class InterpreterImplementation implements Interpreter {
 		SymbolTable globalSymbolTable = this.getGlobalScope().getGlobalSymbolTable();
 		
 		//ローカル変数にある場合
-		if (this.serachCallStack(arrayIdentifier.getName())) {
+		if (this.searchLocalVariable(arrayIdentifier.getName())) {
 			
 			LocalVariable localVariable = this.getLocalVariable(arrayIdentifier.getName());
 			arrayValue = localVariable.getValue();
@@ -1413,7 +1413,7 @@ public class InterpreterImplementation implements Interpreter {
 	 * @param name
 	 * @return
 	 */
-	private boolean serachCallStack(String name) {
+	private boolean searchLocalVariable(String name) {
 		
 		boolean ret = false; //識別子が見つかっかどうかを表す。trueなら見つかっている
 		
