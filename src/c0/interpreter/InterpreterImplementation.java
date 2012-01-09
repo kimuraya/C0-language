@@ -236,6 +236,11 @@ public class InterpreterImplementation implements Interpreter {
 			
 			ret = this.executeStatement(statement);
 			
+			//TODO break文を使えるようにするための応急処置
+			//TODO break文をループ内とswich文以外の場所で書けないようにする
+			if (ret.getStatementResultFlag() != StatementResultFlag.NORMAL_STATEMENT_RESULT) {
+				break;
+			}
 		}
 		
 		//局所変数をスタックから破棄する
