@@ -1237,8 +1237,23 @@ public class InterpreterImplementation implements Interpreter {
 		
 		//TODO
 		//左が左辺値でない場合、例外を出す
-		IdentifierNode identifierNode = (IdentifierNode) left;
-		Identifier search = identifierNode.getIdentifier(); //この識別子を探す
+		Identifier search = null;//この識別子を探す
+		ArraySubscriptExpressionNode arraySubscriptExpressionNode = null;
+		if (left instanceof IdentifierNode) {
+			
+			IdentifierNode identifierNode = (IdentifierNode) left;
+			search = identifierNode.getIdentifier();
+			
+		} else if (left instanceof ArraySubscriptExpressionNode) {
+			
+			arraySubscriptExpressionNode= (ArraySubscriptExpressionNode) left;
+			IdentifierNode identifierNode = arraySubscriptExpressionNode.getArray();
+			search = identifierNode.getIdentifier();
+			
+		} else {
+			//TODO 左辺値が識別子でも添字式でもない場合、例外を投げる
+		}
+		
 		LocalVariable foundLocalVariable = null;
 		Identifier foundGlobalVariable = null;
 		boolean searchFlag = false; //識別子が見つかっかどうかを表す。trueなら見つかっている
@@ -1285,27 +1300,97 @@ public class InterpreterImplementation implements Interpreter {
 		//識別子が存在すれば、値を取り出し、オペランドスタックに詰める
 		if (searchFlag) {
 			
-			Value localVal = foundLocalVariable.getValue();
-			Value globalVal = foundGlobalVariable.getLeftValue();
+			Value localVal = null;
+			Value globalVal = null;
+			if (foundLocalVariable != null) {
+				localVal = foundLocalVariable.getValue();
+			} else if (foundGlobalVariable != null) {
+				globalVal = foundGlobalVariable.getLeftValue();
+			}
 			
 			//見つかった識別子に対し、代入を実行する
-			if (foundLocalVariable != null) {
-				
-				foundLocalVariable.setValue(rightValue);
-				
-			} else if (foundGlobalVariable != null) {
-				
-				foundGlobalVariable.setLeftValue(rightValue);
-				
-			} else if (foundLocalVariable != null && localVal.getDataType() == DataType.INT_ARRAY) {
+			
+			//ローカル変数の整数配列に対する代入
+			if (foundLocalVariable != null && localVal.getDataType() == DataType.INT_ARRAY) {
 				
 				int[] array = localVal.getIntegerArray();
 				
+				//添字を計算する
+				Value value = this.getIndexValue(arraySubscriptExpressionNode);
+				int index = value.getInteger();
+				
+				if (rightValue.getDataType() == DataType.INT) {
+					array[index] = rightValue.getInteger();
+				} else {
+					//右辺値が整数でなかった場合、例外を投げる
+				}
+				
+				//代入を行った配列をローカル変数にセット
+				localVal.setIntegerArray(array);
+			
+			//グローバル変数の整数配列に対する代入
 			} else if (foundGlobalVariable != null && globalVal.getDataType() == DataType.INT_ARRAY) {
 				
+				int[] array = globalVal.getIntegerArray();
+				
+				//添字を計算する
+				Value value = this.getIndexValue(arraySubscriptExpressionNode);
+				int index = value.getInteger();
+				
+				if (rightValue.getDataType() == DataType.INT) {
+					array[index] = rightValue.getInteger();
+				} else {
+					//右辺値が整数でなかった場合、例外を投げる
+				}
+				
+				//代入を行った配列をグローバル変数にセット
+				globalVal.setIntegerArray(array);
+				
+			//ローカル変数の真偽値配列に対する代入
 			} else if (foundLocalVariable != null && localVal.getDataType() == DataType.BOOLEAN_ARRAY) {
 				
+				boolean[] array = localVal.getBooleanArray();
+				
+				//添字を計算する
+				Value value = this.getIndexValue(arraySubscriptExpressionNode);
+				int index = value.getInteger();
+				
+				if (rightValue.getDataType() == DataType.BOOLEAN) {
+					array[index] = rightValue.isBool();
+				} else {
+					//右辺値が整数でなかった場合、例外を投げる
+				}
+				
+				//代入を行った配列をローカル変数にセット
+				localVal.setBooleanArray(array);
+				
+			//グローバル変数の真偽値配列に対する代入
 			} else if (foundGlobalVariable != null && globalVal.getDataType() == DataType.BOOLEAN_ARRAY) {
+				
+				boolean[] array = globalVal.getBooleanArray();
+				
+				//添字を計算する
+				Value value = this.getIndexValue(arraySubscriptExpressionNode);
+				int index = value.getInteger();
+				
+				if (rightValue.getDataType() == DataType.BOOLEAN) {
+					array[index] = rightValue.isBool();
+				} else {
+					//右辺値が整数でなかった場合、例外を投げる
+				}
+				
+				//代入を行った配列をローカル変数にセット
+				globalVal.setBooleanArray(array);
+				
+			//ローカル変数への代入
+			} else if (foundLocalVariable != null) {
+				
+				foundLocalVariable.setValue(rightValue);
+			
+			//グローバル変数への代入
+			} else if (foundGlobalVariable != null) {
+				
+				foundGlobalVariable.setLeftValue(rightValue);
 				
 			}
 			
@@ -1314,6 +1399,22 @@ public class InterpreterImplementation implements Interpreter {
 		}
 		
 		return;
+	}
+	
+	/**
+	 * 添字式の添字を取り出す
+	 * @param arraySubscriptExpressionNode
+	 * @return
+	 */
+	private Value getIndexValue(ArraySubscriptExpressionNode arraySubscriptExpressionNode) {
+		
+		Value ret = new Value();
+		ExpressionNode indexExpression = arraySubscriptExpressionNode.getIndex();
+		this.evaluateExpression(indexExpression);
+		StackElement resultElement = this.operandStack.pop();
+		ret = resultElement.getValue();
+		
+		return ret;
 	}
 
 	/**

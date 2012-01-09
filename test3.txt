@@ -8,6 +8,8 @@ int main () {
 	int l;
 	int m;
 	int o;
+	int[10] p;
+	boolean[20] q;
 	
 	i = 1 + 1;
 	j = 0;
@@ -64,6 +66,12 @@ int main () {
 	
 	i = add(10, 12);
 	print("i = %d%n", i);
+	
+	p[1] = 10;
+	print("p[1] = %d%n", p[1]);
+	
+	q[10] = true;
+	print("q[10] = %b%n", q[10]);
 	
 	return;
 }
