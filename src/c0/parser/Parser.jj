@@ -343,7 +343,11 @@ StatementNode whileStatement():
 	StatementNode body = null;
 }
 {
-	token=<WHILE> "(" conditional=expression() ")" body=statement() { return new WhileNode(new Location(this.getFileName(), token), conditional, body); }
+	token=<WHILE> "(" conditional=expression() ")" body=statement()
+	{
+		body.setLoopFlag(true);
+		return new WhileNode(new Location(this.getFileName(), token), conditional, body);
+	}
 }
 
 //for文 :=
@@ -359,7 +363,9 @@ StatementNode forStatement():
 }
 {
 	token=<FOR> "(" [initialize=expression()] ";" [conditional=expression()] ";" [update=expression()] ")" body=statement()
-	{ return new ForNode(new Location(this.getFileName(), token), initialize, conditional, update, body); }
+	{
+		body.setLoopFlag(true);
+		return new ForNode(new Location(this.getFileName(), token), initialize, conditional, update, body);	}
 }
 
 //break文 :=

@@ -238,7 +238,7 @@ public class InterpreterImplementation implements Interpreter {
 			
 			//TODO break文を使えるようにするための応急処置
 			//TODO break文をループ内とswich文以外の場所で書けないようにする
-			if (ret.getStatementResultFlag() != StatementResultFlag.NORMAL_STATEMENT_RESULT) {
+			if (ret.getStatementResultFlag() == StatementResultFlag.RETURN_STATEMENT_RESULT) {
 				break;
 			}
 		}
@@ -327,11 +327,12 @@ public class InterpreterImplementation implements Interpreter {
 			value = stackElement.getValue();
 			
 			//文を実行する
+			boolean loopFlag = whileNode.getBodyStatement().isLoopFlag();
 			ret = this.executeStatement(whileNode.getBodyStatement());
 			
 			//break文を検知した場合、ループを終了させる
 			//ループの終了後、StatementResultFlagをNORMAL_STATEMENT_RESULTに戻す。
-			if (ret.getStatementResultFlag() == StatementResultFlag.BREAK_STATEMENT_RESULT) {
+			if ((ret.getStatementResultFlag() == StatementResultFlag.BREAK_STATEMENT_RESULT) && loopFlag) {
 				ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
 				break;
 			}
@@ -391,11 +392,12 @@ public class InterpreterImplementation implements Interpreter {
 			}
 			
 			//文を実行する
+			boolean loopFlag = forNode.getBodyStatement().isLoopFlag();
 			ret = this.executeStatement(forNode.getBodyStatement());
 			
 			//break文を検知した場合、ループを終了させる
 			//ループの終了後、StatementResultFlagをNORMAL_STATEMENT_RESULTに戻す。
-			if (ret.getStatementResultFlag() == StatementResultFlag.BREAK_STATEMENT_RESULT) {
+			if ((ret.getStatementResultFlag() == StatementResultFlag.BREAK_STATEMENT_RESULT) && loopFlag) {
 				ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
 				break;
 			}
