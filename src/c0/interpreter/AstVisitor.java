@@ -365,7 +365,9 @@ public class AstVisitor implements Visitor {
 	public void visit(IfNode ifNode) {
 		ifNode.getConditionalExpression().accept(this);
 		ifNode.getThenStatement().accept(this);
-		ifNode.getElseStatement().accept(this);
+		if (ifNode.getElseStatement() != null) {
+			ifNode.getElseStatement().accept(this);
+		}
 	}
 
 	@Override

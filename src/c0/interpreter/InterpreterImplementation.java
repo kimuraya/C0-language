@@ -234,12 +234,15 @@ public class InterpreterImplementation implements Interpreter {
 		List<StatementNode> statements = block.getStatements();
 		for (StatementNode statement : statements) {
 			
+			boolean loopFlag = statement.isLoopFlag();
 			ret = this.executeStatement(statement);
 			
 			//TODO break文を使えるようにするための応急処置
 			//TODO break文をループ内とswich文以外の場所で書けないようにする
 			if (ret.getStatementResultFlag() == StatementResultFlag.RETURN_STATEMENT_RESULT) {
 				break;
+			} else if (ret.getStatementResultFlag() == StatementResultFlag.BREAK_STATEMENT_RESULT && !loopFlag) {
+				//TODO ループでない箇所でbreak文を実行した場合、例外を投げる
 			}
 		}
 		
@@ -328,7 +331,11 @@ public class InterpreterImplementation implements Interpreter {
 			
 			//文を実行する
 			boolean loopFlag = whileNode.getBodyStatement().isLoopFlag();
-			ret = this.executeStatement(whileNode.getBodyStatement());
+			if (value.isBool()) {
+				ret = this.executeStatement(whileNode.getBodyStatement());
+			} else if (!value.isBool()) {
+				break;
+			}
 			
 			//break文を検知した場合、ループを終了させる
 			//ループの終了後、StatementResultFlagをNORMAL_STATEMENT_RESULTに戻す。
@@ -393,7 +400,11 @@ public class InterpreterImplementation implements Interpreter {
 			
 			//文を実行する
 			boolean loopFlag = forNode.getBodyStatement().isLoopFlag();
-			ret = this.executeStatement(forNode.getBodyStatement());
+			if (value.isBool()) {
+				ret = this.executeStatement(forNode.getBodyStatement());
+			} else if (!value.isBool()) {
+				break;
+			}
 			
 			//break文を検知した場合、ループを終了させる
 			//ループの終了後、StatementResultFlagをNORMAL_STATEMENT_RESULTに戻す。
