@@ -127,10 +127,6 @@ public class C0Interpreter extends InterpreterImplementation {
 		//シンボルテーブルの出力
 		this.outputSymbolTable(astVisitor);
 		
-		
-		//デバッグ
-		Identifier main = globalScope.getGlobalSymbolTable().getSymbol("main");
-		
 		/*
 		if (main.getFunctionNode() != null) {
 			System.out.println(main.getFunctionNode().getIdentifier().getName());
@@ -220,6 +216,7 @@ public class C0Interpreter extends InterpreterImplementation {
 		//main関数の引数の処理
 		
 		//main関数の呼び出し
+		Identifier main = globalScope.getGlobalSymbolTable().getSymbol("main");
 		IdentifierNode mainFunction = main.getFunctionNode();
 		List<ExpressionNode> arguments = new LinkedList<ExpressionNode>();
 		this.executeFunctionCall(new CallNode(mainFunction, arguments));

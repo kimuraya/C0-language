@@ -284,7 +284,7 @@ public class InterpreterImplementation implements Interpreter {
 			ret = this.executeStatement(ifNode.getThenStatement());
 			
 		//falseならelseを実行する
-		} else if (!value.isBool()) {
+		} else if (!value.isBool() && ifNode.getElseStatement() != null) {
 			
 			ret = this.executeStatement(ifNode.getElseStatement());
 			
@@ -454,6 +454,10 @@ public class InterpreterImplementation implements Interpreter {
 		//StatementResultFlagをRETURN_STATEMENT_RESULTにする
 		ExecuteStatementResult executeStatementResult = new ExecuteStatementResult();
 		executeStatementResult.setStatementResultFlag(StatementResultFlag.RETURN_STATEMENT_RESULT);
+		
+		//TODO 関数の戻り値のデータ型をチェックする処理を入れる。
+		//TODO 戻り値のデータ型と計算結果のデータ型が合わない場合、
+		//TODO 戻り値がvoidなのに、戻り値を戻そうとしている場合、例外を投げる
 		
 		//戻り値を計算する
 		ReturnNode returnNode = (ReturnNode) statementNode;
@@ -1699,8 +1703,6 @@ public class InterpreterImplementation implements Interpreter {
 					
 					//式の実行
 					this.evaluateExpression(argument);
-					
-					//結果を変数として、コールスタックに詰める
 					StackElement result = this.operandStack.pop();
 					Value value = result.getValue();
 					
