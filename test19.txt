@@ -1,0 +1,20 @@
+//複合文
+int a = 200;
+
+int main() {
+	
+	int i = 0;
+	print("%d%n", i);
+	print("%d%n", a);
+	
+	//複合文の中で、複合文を書ける
+	{
+		int i = 100;
+		int a = 2000;
+		print("%d%n", i); //複合文の中で宣言した変数が優先的に読まれる
+		print("%d%n", a);
+	}
+	
+	print("%d%n", i);
+	print("%d%n", a);
+}
