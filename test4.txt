@@ -1,0 +1,7 @@
+//真偽値定数
+
+int main() {
+	print(true);
+	print("%n");
+	print(false);
+}

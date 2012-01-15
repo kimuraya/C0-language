@@ -21,10 +21,12 @@ public class LiteralNode extends ExpressionNode {
 				this.literal.setDataType(dataType);
 				this.literal.setInteger(Integer.parseInt(image, 10));
 				this.nodeType = NodeType.INT_LITERAL;
+				break;
 			case STRING:
 				this.literal.setDataType(dataType);
 				this.literal.setStringLiteral(image);
 				this.nodeType = NodeType.STRING_LITERAL;
+				break;
 			case BOOLEAN:
 				//trueの場合
 				if (image.equals("true")) {
@@ -36,6 +38,7 @@ public class LiteralNode extends ExpressionNode {
 					this.literal.setBool(false);
 				}
 				this.nodeType = NodeType.BOOLEAN_LITERAL;
+				break;
 		}
 	}
 

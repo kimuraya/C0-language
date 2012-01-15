@@ -1,0 +1,38 @@
+//条件積演算子, 条件和演算子
+
+int main() {
+	
+	boolean bool;
+	
+	bool = true && true;
+	print(bool);
+	print("%n");
+	
+	bool = true && false;
+	print(bool);
+	print("%n");
+	
+	bool = false && true;
+	print(bool);
+	print("%n");
+	
+	bool = false && false;
+	print(bool);
+	print("%n");
+	
+	bool = true || true;
+	print(bool);
+	print("%n");
+	
+	bool = true || false;
+	print(bool);
+	print("%n");
+	
+	bool = false || true;
+	print(bool);
+	print("%n");
+	
+	bool = false || false;
+	print(bool);
+	print("%n");
+}

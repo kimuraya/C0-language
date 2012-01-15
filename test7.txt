@@ -1,0 +1,14 @@
+//同等演算子, 不等演算子
+
+int main() {
+	boolean bool = false;
+	
+	bool = 1 == 1;
+	print(bool);
+	print("%n");
+	
+	bool = 1 != 1;
+	print(bool);
+	print("%n");
+}
+

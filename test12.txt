@@ -1,0 +1,20 @@
+//関数呼び出し
+
+int main() {
+	
+	int i = 0;
+	
+	user_print(); //戻り値のない関数
+	i = add(100, 1000); //戻り値のある関数
+	print(i); //標準関数print
+	
+}
+
+void user_print() {
+	print("user_print%n");
+}
+
+int add(int i, int j) {
+	return i + j;
+}
+

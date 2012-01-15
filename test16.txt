@@ -1,0 +1,27 @@
+//break文
+
+int main() {
+	
+	int i = 0;
+	
+	while (i < 3) {
+		print("while body%n");
+		i++;
+		break;
+	}
+	
+	for(i = 0; i < 3; i++) {
+		print("for body%n");
+		break;
+	}
+	
+	i = 0;
+	while (i < 20) {
+		print("while body2%n");
+		i++;
+		if (true) {
+			break;
+		}
+	}
+	print("%d%n", i);
+}

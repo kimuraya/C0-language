@@ -1495,7 +1495,7 @@ public class InterpreterImplementation implements Interpreter {
 				
 				int[] array = arrayValue.getIntegerArray();
 				
-				if (index < array.length - 1) {
+				if (index < array.length) {
 					int val = array[index];
 					arrayIndexValue = new Value();
 					arrayIndexValue.setDataType(DataType.INT);
@@ -1508,7 +1508,7 @@ public class InterpreterImplementation implements Interpreter {
 				
 				boolean[] array = arrayValue.getBooleanArray();
 				
-				if (index < array.length - 1) {
+				if (index < array.length) {
 					boolean val = array[index];
 					arrayIndexValue = new Value();
 					arrayIndexValue.setDataType(DataType.BOOLEAN);

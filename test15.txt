@@ -1,0 +1,12 @@
+//for文
+
+int main() {
+	
+	int i = 0;
+	
+	//C0言語では、for文の初期化式で変数を宣言できない
+	for (i = 0; i < 3; i++) {
+		print("for body%n");
+	}
+	
+}

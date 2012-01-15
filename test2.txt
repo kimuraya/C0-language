@@ -1,22 +1,5 @@
-int a = 0;
-int b = 1;
-int c = 2;
+//10進定数の表示
 
 int main() {
-	int i = 1;
-	int j = 2;
-	
-	a = add(i, j);
-	{
-		int i;
-		i = a;
-	}
-	
-	return a;
-}
-
-int add(int i, int j) {
-	int b;
-	b = i + j;
-	return b;
+	print(100);
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import c0.ast.ExpressionNode;
 import c0.ast.IdentifierNode;
 import c0.ast.LiteralNode;
+import c0.util.DataType;
 import c0.util.GlobalScope;
 import c0.util.Identifier;
 import c0.util.IdentifierType;
@@ -45,7 +46,18 @@ public class StandardFunction {
 		//データ型のチェックを入れる
 		
 		//インタプリタの引数から値を取り出す。先頭の要素は削除する
-		String format = valueList.poll().getStringLiteral();
+		String format = null;
+		if (valueList.peekFirst().getDataType() == DataType.STRING) {
+			format = valueList.poll().getStringLiteral();
+		} else if (valueList.peekFirst().getDataType() == DataType.INT)  {
+			format = String.valueOf(valueList.poll().getInteger());
+		} else if (valueList.peekFirst().getDataType() == DataType.INT_ARRAY)  {
+			format = String.valueOf(valueList.poll().getIntegerArray());
+		} else if (valueList.peekFirst().getDataType() == DataType.BOOLEAN)  {
+			format = String.valueOf(valueList.poll().isBool());
+		} else if (valueList.peekFirst().getDataType() == DataType.BOOLEAN_ARRAY)  {
+			format = String.valueOf(valueList.poll().getBooleanArray());
+		}
 		
 		ArrayList<Object> argList = new ArrayList<Object>();
 		for (Value value : valueList) {

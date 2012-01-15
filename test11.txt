@@ -1,0 +1,17 @@
+//添字式
+
+int main() {
+	
+	int[10] array; //C0言語の配列の宣言。データ型の後ろに配列のサイズを書く
+	int i = 0;
+	
+	for (i = 0; i < 10; i++) {
+		array[i] = i;
+	}
+	
+	print("配列の要素の出力%n");
+	for (i = 0; i < 10; i++) {
+		print("array[%d", i);
+		print("] = %d%n", array[i]);
+	}
+}

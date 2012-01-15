@@ -1,0 +1,31 @@
+//return文
+
+int main() {
+	
+	int i = 0;
+	boolean bool = false;
+	
+	//戻り値のない関数
+	user_func();
+	
+	//戻り値を返す関数
+	i = add(100, 1000);
+	print("%d%n", i);
+	
+	//戻り値として、boolean型も認めている
+	bool = bool_func();
+	print("%b%n", bool);
+	
+}
+
+void user_func() {
+	return;
+}
+
+int add(int i, int j) {
+	return i + j; //式の計算結果を呼び出し元へ戻す
+}
+
+boolean bool_func() {
+	return true; //boolean型も戻り値として、認めている
+}

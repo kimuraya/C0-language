@@ -1,0 +1,9 @@
+//論理否定演算子
+
+int main() {
+	
+	print(!true);
+	print("%n");
+	print(!false);
+	
+}

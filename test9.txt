@@ -1,0 +1,30 @@
+//単項マイナス式, 前置増分, 前置減分, 後置増分, 後置減分
+
+int main() {
+	
+	int i = 10;
+	
+	//単項マイナス式
+	print("単項マイナス式%n");
+	print("i = %d%n%n", -i);
+	
+	//前置増分
+	print("前置増分%n");
+	print("i = %d%n", ++i);
+	print("i = %d%n%n", i);
+	
+	//前置減分
+	print("前置減分%n");
+	print("i = %d%n", --i);
+	print("i = %d%n%n", i);
+	
+	//後置増分
+	print("後置増分%n");
+	print("i = %d%n", i++);
+	print("i = %d%n%n", i);
+	
+	//後置減分
+	print("後置減分%n");
+	print("i = %d%n", i--);
+	print("i = %d%n%n", i);
+}

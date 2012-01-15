@@ -1,0 +1,20 @@
+//if文
+
+int main() {
+	
+	int i = 1;
+	
+	//条件式がtrueの場合、ifに付いている文を実行する
+	//条件式はboolean型を返す式でなければならない
+	if (i < 10) {
+		print("i < 10%n");
+	} else if (i > 10) {
+		print("i < 10%n");
+	} else {
+		print("else");
+	}
+	
+	//ifに付く文は複合文でなくても良い
+	if (i == 1) print("i = 1");
+	
+}

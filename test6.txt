@@ -1,0 +1,21 @@
+//関係演算子
+
+int main() {
+	boolean bool = false;
+	
+	bool = 1 < 3;
+	print(bool);
+	print("%n");
+	
+	bool = 1 > 3;
+	print(bool);
+	print("%n");
+	
+	bool = 5 >= 1;
+	print(bool);
+	print("%n");
+	
+	bool = 5 <= 1;
+	print(bool);
+	print("%n");
+}

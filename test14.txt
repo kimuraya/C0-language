@@ -1,0 +1,11 @@
+//while文
+
+int main() {
+	
+	int i = 0;
+	
+	while(i < 3) {
+		print("while body%n");
+		i++;
+	}
+}
