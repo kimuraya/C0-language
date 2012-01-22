@@ -6,14 +6,14 @@ int a = 20;
 boolean bool = true;
 
 int main() {
-	
+
 	//複合文の先頭で、ローカル変数を宣言できます
 	int i = 5;
-	
+
 	i = i + 10;
-	
+
 	//標準関数printを使って、変数や定数を表示できます
-	print("%d%n", i);
+	print("i = %d%n", i);
 	print("%d%n", a);
 	print("%b%n", bool);
 }
