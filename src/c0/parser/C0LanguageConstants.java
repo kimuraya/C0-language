@@ -77,6 +77,7 @@ public interface C0LanguageConstants {
     "\";\"",
     "\"[\"",
     "\"]\"",
+    "\"[]\"",
     "\"{\"",
     "\"}\"",
     "\"||\"",

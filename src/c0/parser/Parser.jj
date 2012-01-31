@@ -215,10 +215,20 @@ DataTypeNode type():
 	{
 		return new DataTypeNode(DataType.INT_ARRAY, elementNumber); //整数の配列
 	}
+    | LOOKAHEAD(<INT> "[]")
+	<INT> "[]"
+	{
+		return new DataTypeNode(DataType.INT_ARRAY, null); //整数の配列の参照変数
+	} 
 	| LOOKAHEAD(<BOOLEAN> "[")
 	<BOOLEAN> "[" elementNumber=expression() "]"
 	{
 		return new DataTypeNode(DataType.BOOLEAN_ARRAY, elementNumber); //真偽値の配列
+	}
+	| LOOKAHEAD(<BOOLEAN> "[]")
+	<BOOLEAN> "[]"
+	{
+		return new DataTypeNode(DataType.BOOLEAN_ARRAY, null); //真偽値の配列の参照変数
 	}
 	| <INT>
 	{
