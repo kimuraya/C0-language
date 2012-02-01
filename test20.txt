@@ -1,0 +1,59 @@
+//不完全配列型
+
+int main() {
+	
+	int[] array; //不完全配列型を宣言できる
+	int[3] array2;
+	int[] array3;
+	int i = 0;
+	
+	print("不完全配列型のテスト%n");
+	
+	for (i = 0; i < 3; i++) {
+		array2[i] = i;
+	}
+	
+	//不完全配列型に配列の参照を代入
+	array = array2; //配列変数の識別子は配列の参照を返す
+	
+	//代入後は配列型変数として、値にアクセスできる
+	for (i = 0; i < 3; i++) {
+		print("%d%n", array[i]);
+	}
+	print("%n");
+	
+	//関数の引数、戻り値として、配列型を利用できる
+	array3 = func(array2);
+	
+	for (i = 0; i < 3; i++) {
+		print("%d%n", array3[i]);
+	}
+	print("%n");
+	
+	//関数内で配列の値を変更する
+	func2(array2);
+	
+	//関数内での変更が反映されている
+	for (i = 0; i < 3; i++) {
+		print("%d%n", array2[i]);
+	}
+}
+
+//関数の引数、戻り値として、配列型を利用できる
+//引数で配列を受け取る場合、不完全配列型を使用する
+int[] func(int[] a) {
+	
+	int i = 0;
+	
+	for (i = 0; i < 3; i++) {
+		print("%d%n", a[i]);
+	}
+	print("%n");
+	
+	return a;
+}
+
+//関数内で配列の値を変更する
+int[] func2(int[] a) {
+	a[0] = 100;
+}

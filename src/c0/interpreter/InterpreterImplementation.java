@@ -1268,15 +1268,16 @@ public class InterpreterImplementation implements Interpreter {
 		//左が左辺値でない場合、例外を出す
 		Identifier search = null;//この識別子を探す
 		ArraySubscriptExpressionNode arraySubscriptExpressionNode = null;
+		IdentifierNode identifierNode = null;
 		if (left instanceof IdentifierNode) {
 
-			IdentifierNode identifierNode = (IdentifierNode) left;
+			identifierNode = (IdentifierNode) left;
 			search = identifierNode.getIdentifier();
 
 		} else if (left instanceof ArraySubscriptExpressionNode) {
 
-			arraySubscriptExpressionNode= (ArraySubscriptExpressionNode) left;
-			IdentifierNode identifierNode = arraySubscriptExpressionNode.getArray();
+			arraySubscriptExpressionNode = (ArraySubscriptExpressionNode) left;
+			identifierNode = arraySubscriptExpressionNode.getArray();
 			search = identifierNode.getIdentifier();
 
 		} else {
@@ -1410,7 +1411,7 @@ public class InterpreterImplementation implements Interpreter {
 
 				//代入を行った配列をローカル変数にセット
 				globalVal.setBooleanArray(array);
-
+				
 			//ローカル変数への代入
 			} else if (foundLocalVariable != null) {
 
