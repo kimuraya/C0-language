@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Stack;
 
 import c0.ast.ArraySubscriptExpressionNode;
@@ -65,6 +66,7 @@ public class InterpreterImplementation implements Interpreter {
 	private GlobalScope globalScope = null; //グローバル変数を管理する
 	private Stack<StackElement> callStack = null; //局所変数、戻り値、戻り先、フレームポインタを積む
 	protected Stack<StackElement> operandStack = null; //式の計算に使用する
+	protected Properties properties = null; //エラーメッセージ
 	
 	public InterpreterImplementation(Stack<StackElement> callStack,
 			Stack<StackElement> operandStack, GlobalScope globalScope) {
@@ -265,9 +267,10 @@ public class InterpreterImplementation implements Interpreter {
 
 	/**
 	 * if文
+	 * @throws Exception 
 	 */
 	@Override
-	public ExecuteStatementResult executeIfStatement(StatementNode statementNode) {
+	public ExecuteStatementResult executeIfStatement(StatementNode statementNode) throws Exception {
 
 		ExecuteStatementResult ret = new ExecuteStatementResult();
 		ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
@@ -284,7 +287,12 @@ public class InterpreterImplementation implements Interpreter {
 
 		//TODO
 		//計算結果が真偽値でなければ、例外を出す
-
+		if(value.getDataType() != DataType.BOOLEAN) {
+			//ここに到達したら、例外を投げる
+			String errorMessage = this.properties.getProperty("ifError");
+			throw new Exception(errorMessage);
+		}
+		
 		//trueならthenを実行する
 		if (value.isBool()) {
 
@@ -295,8 +303,6 @@ public class InterpreterImplementation implements Interpreter {
 
 			ret = this.executeStatement(ifNode.getElseStatement());
 
-		} else {
-			//ここに到達したら、例外を投げる
 		}
 
 		return ret;

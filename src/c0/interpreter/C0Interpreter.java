@@ -1,13 +1,17 @@
 package c0.interpreter;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Stack;
 
 import c0.ast.AstNode;
@@ -93,6 +97,26 @@ public class C0Interpreter extends InterpreterImplementation {
 	 * @param fileReader
 	 */
 	private void interpretation(String fileName, FileReader fileReader) {
+		
+		//プロパティファイルの読み込み
+		this.properties = new Properties();
+		InputStreamReader inputStreamReader = null;
+		try {
+			inputStreamReader = new InputStreamReader(new FileInputStream("error.properties"), "UTF-8");
+			this.properties.load(inputStreamReader);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			
+			try {
+				if (inputStreamReader != null) {
+					inputStreamReader.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
 		
 		AstNode program = null; //構文木
 		

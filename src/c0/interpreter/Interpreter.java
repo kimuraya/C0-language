@@ -11,7 +11,7 @@ public interface Interpreter {
 	//文の処理
 	ExecuteStatementResult executeStatement(StatementNode statementNode); //文の実行
 	ExecuteStatementResult executeBlockStatement(StatementNode statementNode); //複合文
-	ExecuteStatementResult executeIfStatement(StatementNode statementNode); //if文
+	ExecuteStatementResult executeIfStatement(StatementNode statementNode) throws Exception; //if文
 	ExecuteStatementResult executeWhileStatement(StatementNode statementNode); //while文
 	ExecuteStatementResult executeForStatement(StatementNode statementNode); //for文
 	ExecuteStatementResult executeBreakStatement(StatementNode statementNode); //break文
