@@ -270,7 +270,7 @@ public class InterpreterImplementation implements Interpreter {
 	 * @throws Exception 
 	 */
 	@Override
-	public ExecuteStatementResult executeIfStatement(StatementNode statementNode) throws Exception {
+	public ExecuteStatementResult executeIfStatement(StatementNode statementNode) throws InterpreterRuntimeException {
 
 		ExecuteStatementResult ret = new ExecuteStatementResult();
 		ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
@@ -289,8 +289,8 @@ public class InterpreterImplementation implements Interpreter {
 		//計算結果が真偽値でなければ、例外を出す
 		if(value.getDataType() != DataType.BOOLEAN) {
 			//ここに到達したら、例外を投げる
-			String errorMessage = this.properties.getProperty("ifError");
-			throw new Exception(errorMessage);
+			String errorMessage = this.properties.getProperty("error.ConditionalExpressionError");
+			throw new InterpreterRuntimeException(errorMessage);
 		}
 		
 		//trueならthenを実行する
