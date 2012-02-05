@@ -105,60 +105,51 @@ public class InterpreterImplementation implements Interpreter {
 	 * StatementResultFlagがBREAK_STATEMENT_RESULTになっている場合、ループの処理を終了する。
 	 * ループの終了後、StatementResultFlagをNORMAL_STATEMENT_RESULTに戻す。
 	 * StatementResultFlagがRETURN_STATEMENT_RESULTになっている場合、文の処理を行わない。
+	 * @throws InterpreterRuntimeException 
 	 */
 	@Override
-	public ExecuteStatementResult executeStatement(StatementNode statementNode) {
-
+	public ExecuteStatementResult executeStatement(StatementNode statementNode) throws InterpreterRuntimeException {
+		
 		ExecuteStatementResult executeStatementResult = null;
-
-		try {
-
-			switch(statementNode.getNodeType()) {
-
-				case BLOCK_STATEMENT:
-					executeStatementResult = this.executeBlockStatement(statementNode);
-					break;
-				case IF_STATEMENT:
-					executeStatementResult = this.executeIfStatement(statementNode);
-					break;
-				case WHILE_STATEMENT:
-					executeStatementResult = this.executeWhileStatement(statementNode);
-					break;
-				case FOR_STATEMENT:
-					executeStatementResult = this.executeForStatement(statementNode);
-					break;
-				case BREAK_STATEMENT:
-					executeStatementResult = this.executeBreakStatement(statementNode);
-					break;
-				case RETURN_STATEMENT:
-					executeStatementResult = this.executeReturnStatement(statementNode);
-					break;
-				case EXPRESSION_STATEMENT:
-					executeStatementResult = this.executeExpressionStatement(statementNode);
-					break;
-				case EMPTY_STATEMENT:
-					executeStatementResult = this.executeEmptyStatement(statementNode);
-					break;
-			}
-
-		} catch(Exception e) {
-
-			Location location = statementNode.location();
-			Token token = location.getToken();
-			System.out.println("問題のあった行:" + token.beginLine + "行," + token.beginColumn + "列," + token.endLine + "行," + token.endColumn + "列");
-			e.printStackTrace();
-
+		
+		switch(statementNode.getNodeType()) {
+			
+			case BLOCK_STATEMENT:
+				executeStatementResult = this.executeBlockStatement(statementNode);
+				break;
+			case IF_STATEMENT:
+				executeStatementResult = this.executeIfStatement(statementNode);
+				break;
+			case WHILE_STATEMENT:
+				executeStatementResult = this.executeWhileStatement(statementNode);
+				break;
+			case FOR_STATEMENT:
+				executeStatementResult = this.executeForStatement(statementNode);
+				break;
+			case BREAK_STATEMENT:
+				executeStatementResult = this.executeBreakStatement(statementNode);
+				break;
+			case RETURN_STATEMENT:
+				executeStatementResult = this.executeReturnStatement(statementNode);
+				break;
+			case EXPRESSION_STATEMENT:
+				executeStatementResult = this.executeExpressionStatement(statementNode);
+				break;
+			case EMPTY_STATEMENT:
+				executeStatementResult = this.executeEmptyStatement(statementNode);
+				break;
 		}
-
+		
 		return executeStatementResult;
 	}
 
 	/**
 	 * 複合文
+	 * @throws InterpreterRuntimeException 
 	 */
 	@Override
 	public ExecuteStatementResult executeBlockStatement(
-			StatementNode statementNode) {
+			StatementNode statementNode) throws InterpreterRuntimeException {
 
 		BlockNode block = (BlockNode) statementNode;
 		ExecuteStatementResult ret = null;
@@ -189,13 +180,18 @@ public class InterpreterImplementation implements Interpreter {
 					(localVariableDataType == DataType.INT_ARRAY || localVariableDataType == DataType.BOOLEAN_ARRAY)) {
 
 				//要素数の計算
-				//TODO 結果が整数でなければ、例外を投げる
 				Value elementNumberValue = new Value();
 				ExpressionNode elementNumberExpression = localVariableDataTypeNode.getElementNumber();
 				this.evaluateExpression(elementNumberExpression);
 				StackElement result = this.operandStack.pop();
 				elementNumberValue = result.getValue();
-
+				
+				//結果が整数でなければ、例外を投げる
+				if (elementNumberValue.getDataType() != DataType.INT) {
+					String errorMessage = this.properties.getProperty("error.IsNotAnIntegerNumberOfElements");
+					throw new InterpreterRuntimeException(errorMessage, statementNode);
+				}
+				
 				//配列の生成
 				int elementNumber = elementNumberValue.getInteger();
 
@@ -212,9 +208,11 @@ public class InterpreterImplementation implements Interpreter {
 					boolArray = new boolean[elementNumber];
 					value.setDataType(DataType.BOOLEAN_ARRAY);
 					value.setBooleanArray(boolArray);
-
+					
+				//配列の要素数が0か、0より小さい場合は例外を投げる
 				} else if (elementNumber <= 0) {
-					//TODO 配列の要素数が0か、0より小さい場合は例外を投げる
+					String errorMessage = this.properties.getProperty("error.LessThanOrEqualToZeroTheNumberOfElements");
+					throw new InterpreterRuntimeException(errorMessage, statementNode);
 				}
 			}
 
@@ -240,7 +238,7 @@ public class InterpreterImplementation implements Interpreter {
 			ret = this.executeStatement(statement);
 
 			//TODO break文を使えるようにするための応急処置
-			//TODO break文をループ内とswich文以外の場所で書けないようにする
+			//TODO break文をループ内とswitch文以外の場所で書けないようにする
 
 			//return文を実行したら、処理を終える
 			if (ret.getStatementResultFlag() == StatementResultFlag.RETURN_STATEMENT_RESULT) {
@@ -285,12 +283,10 @@ public class InterpreterImplementation implements Interpreter {
 
 		Value value = stackElement.getValue();
 
-		//TODO
 		//計算結果が真偽値でなければ、例外を出す
 		if(value.getDataType() != DataType.BOOLEAN) {
-			//ここに到達したら、例外を投げる
 			String errorMessage = this.properties.getProperty("error.ConditionalExpressionError");
-			throw new InterpreterRuntimeException(errorMessage);
+			throw new InterpreterRuntimeException(errorMessage, statementNode);
 		}
 		
 		//trueならthenを実行する
@@ -310,10 +306,11 @@ public class InterpreterImplementation implements Interpreter {
 
 	/**
 	 * while文
+	 * @throws InterpreterRuntimeException 
 	 */
 	@Override
 	public ExecuteStatementResult executeWhileStatement(
-			StatementNode statementNode) {
+			StatementNode statementNode) throws InterpreterRuntimeException {
 
 		ExecuteStatementResult ret = new ExecuteStatementResult();
 		ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
@@ -328,6 +325,12 @@ public class InterpreterImplementation implements Interpreter {
 		StackElement stackElement = this.operandStack.pop();
 
 		Value value = stackElement.getValue();
+		
+		//計算結果が真偽値でなければ、例外を出す
+		if(value.getDataType() != DataType.BOOLEAN) {
+			String errorMessage = this.properties.getProperty("error.ConditionalExpressionError");
+			throw new InterpreterRuntimeException(errorMessage, statementNode);
+		}
 
 		//trueの場合、文を実行する
 		//StatementResultFlagがNORMAL_STATEMENT_RESULTでない場合、ループの処理を終了する。
@@ -367,10 +370,11 @@ public class InterpreterImplementation implements Interpreter {
 
 	/**
 	 * for文
+	 * @throws InterpreterRuntimeException 
 	 */
 	@Override
 	public ExecuteStatementResult executeForStatement(
-			StatementNode statementNode) {
+			StatementNode statementNode) throws InterpreterRuntimeException {
 
 		ExecuteStatementResult ret = new ExecuteStatementResult();
 		ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
@@ -389,12 +393,18 @@ public class InterpreterImplementation implements Interpreter {
 		//条件式を実行
 		ExpressionNode conditionalExpression = forNode.getConditionalExpression();
 		this.evaluateExpression(conditionalExpression);
-
+		
 		//オペランドスタックから計算結果を取り出す
 		Value value = new Value();
 		if (!this.operandStack.isEmpty()) {
 			stackElement = this.operandStack.pop();
 			value = stackElement.getValue();
+		}
+		
+		//計算結果が真偽値でなければ、例外を出す
+		if(value.getDataType() != DataType.BOOLEAN) {
+			String errorMessage = this.properties.getProperty("error.ConditionalExpressionError");
+			throw new InterpreterRuntimeException(errorMessage, statementNode);
 		}
 
 		//文を実行
@@ -459,10 +469,11 @@ public class InterpreterImplementation implements Interpreter {
 
 	/**
 	 * return文
+	 * @throws InterpreterRuntimeException 
 	 */
 	@Override
 	public ExecuteStatementResult executeReturnStatement(
-			StatementNode statementNode) {
+			StatementNode statementNode) throws InterpreterRuntimeException {
 
 		//StatementResultFlagをRETURN_STATEMENT_RESULTにする
 		ExecuteStatementResult executeStatementResult = new ExecuteStatementResult();
@@ -497,25 +508,32 @@ public class InterpreterImplementation implements Interpreter {
 
 	/**
 	 * 式文
+	 * @throws InterpreterRuntimeException 
 	 */
 	@Override
 	public ExecuteStatementResult executeExpressionStatement(
-			StatementNode statementNode) {
+			StatementNode statementNode) throws InterpreterRuntimeException {
+		
+		ExecuteStatementResult executeStatementResult = null;
+		try {
+			executeStatementResult = new ExecuteStatementResult();
+			executeStatementResult.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
 
-		ExecuteStatementResult executeStatementResult = new ExecuteStatementResult();
-		executeStatementResult.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
+			//式を実行する
+			ExpressionStatementNode expressionStatementNode = (ExpressionStatementNode) statementNode;
+			this.evaluateExpression(expressionStatementNode.getExpression());
 
-		//式を実行する
-		ExpressionStatementNode expressionStatementNode = (ExpressionStatementNode) statementNode;
-		this.evaluateExpression(expressionStatementNode.getExpression());
-
-		//スタックが空でなければ、値を取り出す
-		if (!this.operandStack.isEmpty()) {
-			StackElement stackElement = this.operandStack.pop();
-			Value value = stackElement.getValue();
-			executeStatementResult.setValue(value);
+			//スタックが空でなければ、値を取り出す
+			if (!this.operandStack.isEmpty()) {
+				StackElement stackElement = this.operandStack.pop();
+				Value value = stackElement.getValue();
+				executeStatementResult.setValue(value);
+			}
+		} catch (InterpreterRuntimeException e) {
+			e.setStatementNode(statementNode); //例外が起こった文を保存する
+			throw e;
 		}
-
+		
 		return executeStatementResult;
 	}
 
@@ -537,17 +555,6 @@ public class InterpreterImplementation implements Interpreter {
 	public ExecuteStatementResult executeParameter(StatementNode statementNode) {
 
 		//引数の値を返す
-
-		return null;
-	}
-
-	@Override
-	public ExecuteStatementResult executeDeclareVariable(
-			StatementNode statementNode) {
-
-		//変数宣言
-
-		//初期化式がある場合、代入を行う
 
 		return null;
 	}
@@ -616,18 +623,18 @@ public class InterpreterImplementation implements Interpreter {
 
 	/**
 	 * 識別子
+	 * @throws InterpreterRuntimeException 
 	 */
 	@Override
-	public void identifierExpression(ExpressionNode expression) {
-
+	public void identifierExpression(ExpressionNode expression) throws InterpreterRuntimeException {
+		
 		//識別子を取り出す
 		IdentifierNode identifierNode = (IdentifierNode) expression;
 		Identifier search = identifierNode.getIdentifier(); //この識別子を探す
 		LocalVariable foundLocalVariable = null;
 		Identifier foundGlobalVariable = null;
 		boolean searchFlag = false; //識別子が見つかっかどうかを表す。trueなら見つかっている
-
-		//TODO
+		
 		//コールスタック（ローカル変数）から識別子を探す
 		//フレームポインタにぶつかるまでコールスタックを検索する
 		for (int i = this.callStack.size() - 1; this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
@@ -679,6 +686,8 @@ public class InterpreterImplementation implements Interpreter {
 
 		} else {
 			//識別子がローカル変数にも、グローバル変数にも存在しない場合、例外を投げる
+			String errorMessage = this.properties.getProperty("error.IdentifierDoesNotExist");
+			throw new InterpreterRuntimeException(errorMessage);
 		}
 
 		return;
@@ -687,8 +696,9 @@ public class InterpreterImplementation implements Interpreter {
 	/**
 	 * 論理AND, 論理ORの処理
 	 * @param expression
+	 * @throws InterpreterRuntimeException 
 	 */
-	public void logicalOperatorExpression(ExpressionNode expression) {
+	public void logicalOperatorExpression(ExpressionNode expression) throws InterpreterRuntimeException {
 
 		ExpressionNode left = null;
 		ExpressionNode right = null;
@@ -731,13 +741,16 @@ public class InterpreterImplementation implements Interpreter {
 							}
 
 						} else {
-							//TODO 例外を投げる
 							//右の結果がbooleanではない
+							String errorMessage = this.properties.getProperty("error.TheRightExpressionOfLogicalANDIsNotABooleanValue");
+							throw new InterpreterRuntimeException(errorMessage);
 						}
-					} else {
-						//TODO 例外を投げる
-						//左の結果がbooleanではない
 					}
+					
+				} else {
+					//左の結果がbooleanではない
+					String errorMessage = this.properties.getProperty("error.TheLeftExpressionOfLogicalANDIsNotABooleanValue");
+					throw new InterpreterRuntimeException(errorMessage);
 				}
 
 				break;
@@ -771,13 +784,15 @@ public class InterpreterImplementation implements Interpreter {
 						if (rightValue.getDataType() == DataType.BOOLEAN) {
 							result = rightValue.isBool();
 						} else {
-							//TODO 例外を投げる
 							//右の結果がbooleanではない
+							String errorMessage = this.properties.getProperty("error.TheRightExpressionOfLogicalORIsNotABooleanValue");
+							throw new InterpreterRuntimeException(errorMessage);
 						}
 					}
 				} else {
-					//TODO 例外を投げる
 					//左の結果がbooleanではない
+					String errorMessage = this.properties.getProperty("error.TheLeftExpressionOfLogicalORIsNotABooleanValue");
+					throw new InterpreterRuntimeException(errorMessage);
 				}
 
 				break;
@@ -800,8 +815,9 @@ public class InterpreterImplementation implements Interpreter {
 	/**
 	 * 二項演算子の前処理。データ型のチェック
 	 * @param expression
+	 * @throws InterpreterRuntimeException 
 	 */
-	public void binaryOperatorExpressionInit(ExpressionNode expression) {
+	public void binaryOperatorExpressionInit(ExpressionNode expression) throws InterpreterRuntimeException {
 
 		ExpressionNode left = null;
 		ExpressionNode right = null;
@@ -877,7 +893,8 @@ public class InterpreterImplementation implements Interpreter {
 		Value leftValue = stackLeft.getValue();
 		Value rightValue = stackRight.getValue();
 
-		//TODO データ型のチェック
+		//データ型のチェック
+		
 		//整数の式
 		if ((leftValue.getDataType() == DataType.INT) && (rightValue.getDataType() == DataType.INT)) {
 
@@ -889,9 +906,9 @@ public class InterpreterImplementation implements Interpreter {
 			this.binaryOperatorExpression(leftValue.isBool(), rightValue.isBool(), expression.getNodeType());
 
 		} else {
-			//TODO データ型のチェックに引っかからなかった場合
-			//TODO エラーが起こった行数を保存して、例外を投げる
-
+			//データ型のチェックに引っかからなかった場合
+			String errorMessage = this.properties.getProperty("error.AnAttemptWasMadeToPerformAnOperationThatIsNotDefined");
+			throw new InterpreterRuntimeException(errorMessage);
 		}
 
 		return;
@@ -1023,9 +1040,10 @@ public class InterpreterImplementation implements Interpreter {
 	/**
 	 * 単項演算子
 	 * @param expression
+	 * @throws InterpreterRuntimeException 
 	 */
-	public void unaryOperatorExpressionInit(ExpressionNode expression) {
-		//TODO
+	public void unaryOperatorExpressionInit(ExpressionNode expression) throws InterpreterRuntimeException {
+		
 		ExpressionNode left = null;
 
 		//ノードの種類によって、処理を分ける
@@ -1064,7 +1082,7 @@ public class InterpreterImplementation implements Interpreter {
 
 		Value leftValue = stackLeft.getValue();
 
-		//TODO データ型のチェック
+		//データ型のチェック
 		//整数の式
 		if (leftValue.getDataType() == DataType.INT) {
 
@@ -1076,9 +1094,12 @@ public class InterpreterImplementation implements Interpreter {
 			this.unaryOperatorExpression(leftValue.isBool(), expression.getNodeType());
 
 		} else {
-			//TODO データ型のチェックに引っかからなかった場合
-			//TODO エラーが起こった行数を保存して、例外を投げる
-
+			
+			//TODO 再検討
+			
+			//データ型のチェックに引っかからなかった場合
+			String errorMessage = this.properties.getProperty("error.AnAttemptWasMadeToPerformAnOperationThatIsNotDefined");
+			throw new InterpreterRuntimeException(errorMessage);
 		}
 
 		return;
@@ -1176,7 +1197,6 @@ public class InterpreterImplementation implements Interpreter {
 		boolean searchFlag = false; //識別子が見つかっかどうかを表す。trueなら見つかっている
 
 		//コールスタックから代入先を探す（局所変数）
-		//TODO
 		//コールスタック（ローカル変数）から識別子を探す
 		//フレームポインタにぶつかるまでコールスタックを検索する
 		for (int i = this.callStack.size() - 1; this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
@@ -1222,6 +1242,7 @@ public class InterpreterImplementation implements Interpreter {
 			}
 
 		} else {
+			//TODO
 			//識別子がローカル変数にも、グローバル変数にも存在しない場合、例外を投げる
 		}
 
@@ -1261,20 +1282,21 @@ public class InterpreterImplementation implements Interpreter {
 	}
 
 	/**
-	 * "="
+	 * 代入式
+	 * @throws InterpreterRuntimeException 
 	 */
 	@Override
-	public void assignExpression(ExpressionNode expression) {
+	public void assignExpression(ExpressionNode expression) throws InterpreterRuntimeException {
 
 		AssignNode assignNode = (AssignNode) expression;
 		ExpressionNode left = assignNode.getLeftValue(); //左辺値
 		ExpressionNode right = assignNode.getExpression(); //代入される式
-
-		//TODO
-		//左が左辺値でない場合、例外を出す
+		
 		Identifier search = null;//この識別子を探す
 		ArraySubscriptExpressionNode arraySubscriptExpressionNode = null;
 		IdentifierNode identifierNode = null;
+		Value value = null;
+		int index = 0; //添字
 		if (left instanceof IdentifierNode) {
 
 			identifierNode = (IdentifierNode) left;
@@ -1285,9 +1307,28 @@ public class InterpreterImplementation implements Interpreter {
 			arraySubscriptExpressionNode = (ArraySubscriptExpressionNode) left;
 			identifierNode = arraySubscriptExpressionNode.getArray();
 			search = identifierNode.getIdentifier();
+			
+			//添字を計算する
+			value = this.getIndexValue(arraySubscriptExpressionNode);
+			
+			//添字が整数でなかった場合
+			if (value.getDataType() != DataType.INT) {
+				String errorMessage = this.properties.getProperty("error.IsNotAnIntegerNumberOfElements");
+				throw new InterpreterRuntimeException(errorMessage);
+			}
+			
+			index = value.getInteger();
+			
+			//添字が0より小さいかどうかチェック
+			if (index < 0) {
+				String errorMessage = this.properties.getProperty("error.NumberOfElementsIsLessThanZero");
+				throw new InterpreterRuntimeException(errorMessage);
+			}
 
 		} else {
-			//TODO 左辺値が識別子でも添字式でもない場合、例外を投げる
+			//左の式が識別子でも添字式でもない場合、例外を投げる
+			String errorMessage = this.properties.getProperty("error.TheLeftExpressionIsNotAnLvalue");
+			throw new InterpreterRuntimeException(errorMessage);
 		}
 
 		LocalVariable foundLocalVariable = null;
@@ -1295,7 +1336,6 @@ public class InterpreterImplementation implements Interpreter {
 		boolean searchFlag = false; //識別子が見つかっかどうかを表す。trueなら見つかっている
 
 		//コールスタックから代入先を探す（局所変数）
-		//TODO
 		//コールスタック（ローカル変数）から識別子を探す
 		//フレームポインタにぶつかるまでコールスタックを検索する
 		for (int i = this.callStack.size() - 1; this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
@@ -1350,15 +1390,21 @@ public class InterpreterImplementation implements Interpreter {
 			if (foundLocalVariable != null && localVal.getDataType() == DataType.INT_ARRAY) {
 
 				int[] array = localVal.getIntegerArray();
-
-				//添字を計算する
-				Value value = this.getIndexValue(arraySubscriptExpressionNode);
-				int index = value.getInteger();
-
+				
 				if (rightValue.getDataType() == DataType.INT) {
-					array[index] = rightValue.getInteger();
+					
+					if (index < array.length) {
+						array[index] = rightValue.getInteger();
+					} else {
+						//範囲外の要素を参照しようとした
+						String errorMessage = this.properties.getProperty("error.IsGreaterThanTheBoundsOfTheArrayElement");
+						throw new InterpreterRuntimeException(errorMessage);
+					}
+					
 				} else {
 					//右辺値が整数でなかった場合、例外を投げる
+					String errorMessage = this.properties.getProperty("error.TheDataTypeOfTheValueToAssignToTheRight-handSideIsDifferent");
+					throw new InterpreterRuntimeException(errorMessage);
 				}
 
 				//代入を行った配列をローカル変数にセット
@@ -1366,17 +1412,23 @@ public class InterpreterImplementation implements Interpreter {
 
 			//グローバル変数の整数配列に対する代入
 			} else if (foundGlobalVariable != null && globalVal.getDataType() == DataType.INT_ARRAY) {
-
+				
 				int[] array = globalVal.getIntegerArray();
-
-				//添字を計算する
-				Value value = this.getIndexValue(arraySubscriptExpressionNode);
-				int index = value.getInteger();
-
+				
 				if (rightValue.getDataType() == DataType.INT) {
-					array[index] = rightValue.getInteger();
+					
+					if (index < array.length) {
+						array[index] = rightValue.getInteger();
+					} else {
+						//範囲外の要素を参照しようとした
+						String errorMessage = this.properties.getProperty("error.IsGreaterThanTheBoundsOfTheArrayElement");
+						throw new InterpreterRuntimeException(errorMessage);
+					}
+					
 				} else {
 					//右辺値が整数でなかった場合、例外を投げる
+					String errorMessage = this.properties.getProperty("error.TheDataTypeOfTheValueToAssignToTheRight-handSideIsDifferent");
+					throw new InterpreterRuntimeException(errorMessage);
 				}
 
 				//代入を行った配列をグローバル変数にセット
@@ -1386,15 +1438,21 @@ public class InterpreterImplementation implements Interpreter {
 			} else if (foundLocalVariable != null && localVal.getDataType() == DataType.BOOLEAN_ARRAY) {
 
 				boolean[] array = localVal.getBooleanArray();
-
-				//添字を計算する
-				Value value = this.getIndexValue(arraySubscriptExpressionNode);
-				int index = value.getInteger();
-
+				
 				if (rightValue.getDataType() == DataType.BOOLEAN) {
-					array[index] = rightValue.isBool();
+					
+					if (index < array.length) {
+						array[index] = rightValue.isBool();
+					} else {
+						//範囲外の要素を参照しようとした
+						String errorMessage = this.properties.getProperty("error.IsGreaterThanTheBoundsOfTheArrayElement");
+						throw new InterpreterRuntimeException(errorMessage);
+					}
+					
 				} else {
-					//右辺値が整数でなかった場合、例外を投げる
+					//右辺値が真偽値でなかった場合、例外を投げる
+					String errorMessage = this.properties.getProperty("error.TheDataTypeOfTheValueToAssignToTheRight-handSideIsDifferent");
+					throw new InterpreterRuntimeException(errorMessage);
 				}
 
 				//代入を行った配列をローカル変数にセット
@@ -1404,15 +1462,21 @@ public class InterpreterImplementation implements Interpreter {
 			} else if (foundGlobalVariable != null && globalVal.getDataType() == DataType.BOOLEAN_ARRAY) {
 
 				boolean[] array = globalVal.getBooleanArray();
-
-				//添字を計算する
-				Value value = this.getIndexValue(arraySubscriptExpressionNode);
-				int index = value.getInteger();
-
+				
 				if (rightValue.getDataType() == DataType.BOOLEAN) {
-					array[index] = rightValue.isBool();
+					
+					if (index < array.length) {
+						array[index] = rightValue.isBool();
+					} else {
+						//範囲外の要素を参照しようとした
+						String errorMessage = this.properties.getProperty("error.IsGreaterThanTheBoundsOfTheArrayElement");
+						throw new InterpreterRuntimeException(errorMessage);
+					}
+					
 				} else {
-					//右辺値が整数でなかった場合、例外を投げる
+					//右辺値が真偽値でなかった場合、例外を投げる
+					String errorMessage = this.properties.getProperty("error.TheDataTypeOfTheValueToAssignToTheRight-handSideIsDifferent");
+					throw new InterpreterRuntimeException(errorMessage);
 				}
 
 				//代入を行った配列をローカル変数にセット
@@ -1432,6 +1496,8 @@ public class InterpreterImplementation implements Interpreter {
 
 		} else {
 			//識別子がローカル変数にも、グローバル変数にも存在しない場合、例外を投げる
+			String errorMessage = this.properties.getProperty("error.IdentifierDoesNotExist");
+			throw new InterpreterRuntimeException(errorMessage);
 		}
 
 		return;
@@ -1441,35 +1507,51 @@ public class InterpreterImplementation implements Interpreter {
 	 * 添字式の添字を取り出す
 	 * @param arraySubscriptExpressionNode
 	 * @return
+	 * @throws InterpreterRuntimeException 
 	 */
-	private Value getIndexValue(ArraySubscriptExpressionNode arraySubscriptExpressionNode) {
+	private Value getIndexValue(ArraySubscriptExpressionNode arraySubscriptExpressionNode) throws InterpreterRuntimeException {
 
 		Value ret = new Value();
 		ExpressionNode indexExpression = arraySubscriptExpressionNode.getIndex();
 		this.evaluateExpression(indexExpression);
 		StackElement resultElement = this.operandStack.pop();
 		ret = resultElement.getValue();
-
+		
+		//TODO　添字が存在しない場合、例外を投げる
+		
 		return ret;
 	}
 
 	/**
 	 * 添字式
+	 * @throws InterpreterRuntimeException 
 	 */
 	@Override
-	public void arraySubscriptExpression(ExpressionNode expression) {
+	public void arraySubscriptExpression(ExpressionNode expression) throws InterpreterRuntimeException {
 
 		ArraySubscriptExpressionNode ArraySubscriptExpressionNode = (ArraySubscriptExpressionNode) expression;
 
 		//添字を計算する
-		//TODO　添字が整数でなかった場合、例外を投げる
 		Value value = new Value();
 		ExpressionNode indexExpression = ArraySubscriptExpressionNode.getIndex();
 		this.evaluateExpression(indexExpression);
 		StackElement resultElement = this.operandStack.pop();
 		value = resultElement.getValue();
+		
+		//添字が整数でなかった場合
+		if (value.getDataType() != DataType.INT) {
+			String errorMessage = this.properties.getProperty("error.IsNotAnIntegerNumberOfElements");
+			throw new InterpreterRuntimeException(errorMessage);
+		}
+		
 		int index = value.getInteger();
-
+		
+		//添字が0より小さいかどうかチェック
+		if (index < 0) {
+			String errorMessage = this.properties.getProperty("error.NumberOfElementsIsLessThanZero");
+			throw new InterpreterRuntimeException(errorMessage);
+		}
+		
 		//配列を取り出す
 		//グローバル変数とローカル変数で処理を分ける
 		IdentifierNode arrayNode = ArraySubscriptExpressionNode.getArray();
@@ -1493,16 +1575,18 @@ public class InterpreterImplementation implements Interpreter {
 			arrayValue = globalVariable.getLeftValue();
 			arrayDataType = arrayValue.getDataType();
 
-		//TODO 識別子が見つからない場合、例外を投げる
+		//識別子が見つからない場合、例外を投げる
 		} else {
-
+			//識別子がローカル変数にも、グローバル変数にも存在しない場合、例外を投げる
+			String errorMessage = this.properties.getProperty("error.IdentifierDoesNotExist");
+			throw new InterpreterRuntimeException(errorMessage);
 		}
 
 		//添字と配列のサイズをチェックする
 		//TODO 添字式の識別子が配列でなかった場合、例外を投げる
-
+		
 		Value arrayIndexValue = null;
-		if (index >= 0 && (arrayDataType == DataType.INT_ARRAY || arrayDataType == DataType.BOOLEAN_ARRAY)) {
+		if (arrayDataType == DataType.INT_ARRAY || arrayDataType == DataType.BOOLEAN_ARRAY) {
 
 			//添字が配列の範囲内なら配列から値を取り出し、オペランドスタックに積む
 			if (arrayDataType == DataType.INT_ARRAY ) {
@@ -1515,7 +1599,9 @@ public class InterpreterImplementation implements Interpreter {
 					arrayIndexValue.setDataType(DataType.INT);
 					arrayIndexValue.setInteger(val);
 				} else {
-					//TODO 範囲外の要素を参照しようとした。例外を投げる
+					//範囲外の要素を参照しようとした
+					String errorMessage = this.properties.getProperty("error.IsGreaterThanTheBoundsOfTheArrayElement");
+					throw new InterpreterRuntimeException(errorMessage);
 				}
 
 			} else if (arrayDataType == DataType.BOOLEAN_ARRAY) {
@@ -1528,9 +1614,15 @@ public class InterpreterImplementation implements Interpreter {
 					arrayIndexValue.setDataType(DataType.BOOLEAN);
 					arrayIndexValue.setBool(val);
 				} else {
-					//TODO 範囲外の要素を参照しようとした。例外を投げる
+					//範囲外の要素を参照しようとした
+					String errorMessage = this.properties.getProperty("error.IsGreaterThanTheBoundsOfTheArrayElement");
+					throw new InterpreterRuntimeException(errorMessage);
 				}
 
+			} else {
+				//配列のデータ型が整数でも真偽値でもない
+				String errorMessage = this.properties.getProperty("error.AnAttemptWasMadeToPerformAnOperationThatIsNotDefined");
+				throw new InterpreterRuntimeException(errorMessage);
 			}
 
 			//スタックの要素の作製
@@ -1601,15 +1693,18 @@ public class InterpreterImplementation implements Interpreter {
 				break;
 			}
 		}
+		
+		//TODO 識別子が見つからない場合、例外を投げる
 
 		return ret;
 	}
 
 	/**
 	 * 式の実行
+	 * @throws InterpreterRuntimeException 
 	 */
 	@Override
-	public void evaluateExpression(ExpressionNode expression) {
+	public void evaluateExpression(ExpressionNode expression) throws InterpreterRuntimeException {
 
 		switch(expression.getNodeType()) {
 
@@ -1664,9 +1759,10 @@ public class InterpreterImplementation implements Interpreter {
 
 	/**
 	 * 関数呼び出し
+	 * @throws InterpreterRuntimeException 
 	 */
 	@Override
-	public void executeFunctionCall(ExpressionNode expression) {
+	public void executeFunctionCall(ExpressionNode expression) throws InterpreterRuntimeException {
 
 		CallNode callNode = (CallNode) expression;
 		IdentifierNode functionNode = (IdentifierNode) callNode.getFunction();
@@ -1678,8 +1774,9 @@ public class InterpreterImplementation implements Interpreter {
 		if (globalSymbolTable.searchSymbol(functionNode.getIdentifier().getName())) {
 			function = globalSymbolTable.getSymbol(functionNode.getIdentifier().getName());
 		} else {
-			//TODO
 			//指定した関数が存在しない場合、例外を投げる
+			String errorMessage = this.properties.getProperty("error.IdentifierDoesNotExist");
+			throw new InterpreterRuntimeException(errorMessage);
 		}
 
 		//関数呼び出しに引数が存在する場合のみ、引数を取り出す
@@ -1778,8 +1875,9 @@ public class InterpreterImplementation implements Interpreter {
 	/**
 	 * ユーザー定義関数の呼び出し
 	 * @param callNode
+	 * @throws InterpreterRuntimeException 
 	 */
-	private void executeUserDefinedFunctionCall(IdentifierNode functionNode) {
+	private void executeUserDefinedFunctionCall(IdentifierNode functionNode) throws InterpreterRuntimeException {
 
 		ExecuteStatementResult ret = new ExecuteStatementResult();
 		ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
@@ -1795,8 +1893,9 @@ public class InterpreterImplementation implements Interpreter {
 	/**
 	 * 標準関数の呼び出し
 	 * @param callNode
+	 * @throws InterpreterRuntimeException 
 	 */
-	private void executeStandardFunctionCall(Identifier function, List<ExpressionNode> arguments) {
+	private void executeStandardFunctionCall(Identifier function, List<ExpressionNode> arguments) throws InterpreterRuntimeException {
 
 		ExecuteStatementResult ret = new ExecuteStatementResult();
 		ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);

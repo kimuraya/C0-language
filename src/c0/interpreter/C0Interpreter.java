@@ -20,8 +20,11 @@ import c0.ast.DataTypeNode;
 import c0.ast.DeclareVariableNode;
 import c0.ast.ExpressionNode;
 import c0.ast.IdentifierNode;
+import c0.ast.Location;
+import c0.ast.StatementNode;
 import c0.parser.C0Language;
 import c0.parser.ParseException;
+import c0.parser.Token;
 import c0.util.DataType;
 import c0.util.GlobalScope;
 import c0.util.Identifier;
@@ -177,7 +180,12 @@ public class C0Interpreter extends InterpreterImplementation {
 				
 				//初期化式の実行
 				ExpressionNode expression = globalVariable.getExpression();
-				this.evaluateExpression(expression);
+				try {
+					this.evaluateExpression(expression);
+				} catch (InterpreterRuntimeException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
 				StackElement result = this.operandStack.pop();
 				value = result.getValue();
 				
@@ -190,7 +198,12 @@ public class C0Interpreter extends InterpreterImplementation {
 				//TODO 結果が整数でなければ、例外を投げる
 				Value elementNumberValue = new Value();
 				ExpressionNode elementNumberExpression = globalVariableDataTypeNode.getElementNumber();
-				this.evaluateExpression(elementNumberExpression);
+				try {
+					this.evaluateExpression(elementNumberExpression);
+				} catch (InterpreterRuntimeException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
 				StackElement result = this.operandStack.pop();
 				elementNumberValue = result.getValue();
 				
@@ -243,7 +256,17 @@ public class C0Interpreter extends InterpreterImplementation {
 		Identifier main = globalScope.getGlobalSymbolTable().getSymbol("main");
 		IdentifierNode mainFunction = main.getFunctionNode();
 		List<ExpressionNode> arguments = new LinkedList<ExpressionNode>();
-		this.executeFunctionCall(new CallNode(mainFunction, arguments));
+		try {
+			this.executeFunctionCall(new CallNode(mainFunction, arguments));
+		} catch (InterpreterRuntimeException e) {
+			// TODO 自動生成された catch ブロック
+			System.out.println("/******************エラーメッセージ******************/");
+			StatementNode statementNode = e.getStatementNode();
+			Location location = statementNode.location();
+			Token token = location.getToken();
+			System.out.println("問題のあった行:" + token.beginLine + "行," + token.beginColumn + "列," + token.endLine + "行," + token.endColumn + "列");
+			e.printStackTrace();
+		}
 	}
 	
 	/**
