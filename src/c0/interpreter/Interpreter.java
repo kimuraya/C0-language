@@ -39,7 +39,7 @@ public interface Interpreter {
 	
 	//単項式
 	void unaryOperatorExpressionInit(ExpressionNode expression) throws InterpreterRuntimeException; //単項演算子の前処理
-	void unaryOperatorExpression(ExpressionNode expression, int left, NodeType expressionType); //単項マイナス式, 前置増分, 前置減分, 後置増分, 後置減分
+	void unaryOperatorExpression(ExpressionNode expression, int left, NodeType expressionType) throws InterpreterRuntimeException; //単項マイナス式, 前置増分, 前置減分, 後置増分, 後置減分
 	public void unaryOperatorExpression(boolean left, NodeType expressionType); //論理否定演算子
 	
 	//後置き式

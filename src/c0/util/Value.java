@@ -2,7 +2,9 @@ package c0.util;
 
 import c0.ast.StatementNode;
 
-//値を管理するクラス
+/**
+ * 値を管理するクラス
+ */
 public class Value {
 	
 	private DataType dataType; //変数のデータ型

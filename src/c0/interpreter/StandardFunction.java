@@ -15,7 +15,6 @@ import c0.util.Value;
 
 /**
  * 標準関数を管理するクラス
- * 
  */
 public class StandardFunction {
 	

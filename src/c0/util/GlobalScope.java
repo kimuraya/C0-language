@@ -2,7 +2,9 @@ package c0.util;
 
 import java.util.LinkedList;
 
-//大域変数と関数名のスコープを管理する
+/**
+ * 大域変数と関数名のスコープを管理する
+ */
 public class GlobalScope {
 	
 	//大域変数のシンボルテーブル

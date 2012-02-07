@@ -2,6 +2,9 @@ package c0.util;
 
 import java.util.LinkedList;
 
+/**
+ * C0言語インタプリタのシンボルテーブル
+ */
 public class SymbolTable {
 	
 	//シンボルテーブル
@@ -10,7 +13,11 @@ public class SymbolTable {
 	//上位のシンボルテーブルへのリンク
 	private SymbolTable prev = null;
 	
-	//識別子がシンボルテーブルに登録済みかをチェックする
+	/**
+	 * 識別子がシンボルテーブルに登録済みかをチェックする
+	 * @param Symbol
+	 * @return
+	 */
 	public boolean searchSymbol(Identifier Symbol) {
 		
 		//指定された要素が存在する場合
@@ -22,7 +29,11 @@ public class SymbolTable {
 		}
 	}
 	
-	//識別子がシンボルテーブルに登録済みかをチェックする
+	/**
+	 * 識別子がシンボルテーブルに登録済みかをチェックする
+	 * @param name
+	 * @return
+	 */
 	public boolean searchSymbol(String name) {
 		
 		//名前の検索
@@ -38,12 +49,19 @@ public class SymbolTable {
 		return false;
 	}
 	
-	//識別子をシンボルテーブルに追加する
+	/**
+	 * 識別子をシンボルテーブルに追加する
+	 * @param Symbol
+	 */
 	public void addSymbol(Identifier Symbol) {
 		this.symbolTable.add(Symbol);
 	}
 	
-	//名前でシンボルテーブルを検索し、シンボルを取得する
+	/**
+	 * 名前でシンボルテーブルを検索し、シンボルを取得する
+	 * @param name
+	 * @return
+	 */
 	public Identifier getSymbol(String name) {
 		
 		//名前の検索
@@ -59,7 +77,11 @@ public class SymbolTable {
 		return null;
 	}
 	
-	//同名の識別子を更新する
+	/**
+	 * 同名の識別子を更新する
+	 * @param Symbol
+	 * @return
+	 */
 	public boolean updateSymbol(Identifier Symbol) {
 		
 		int cnt = 0;

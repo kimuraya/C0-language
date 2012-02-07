@@ -1,5 +1,8 @@
 package c0.util;
 
+/**
+ * インタプリタで使われるスタックの要素
+ */
 public class StackElement {
 	
 	private StackElementType stackElementType = null; //スタックに積む際の要素の種類

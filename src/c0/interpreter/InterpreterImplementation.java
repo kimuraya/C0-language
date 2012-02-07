@@ -1094,9 +1094,6 @@ public class InterpreterImplementation implements Interpreter {
 			this.unaryOperatorExpression(leftValue.isBool(), expression.getNodeType());
 
 		} else {
-			
-			//TODO 再検討
-			
 			//データ型のチェックに引っかからなかった場合
 			String errorMessage = this.properties.getProperty("error.AnAttemptWasMadeToPerformAnOperationThatIsNotDefined");
 			throw new InterpreterRuntimeException(errorMessage);
@@ -1109,8 +1106,9 @@ public class InterpreterImplementation implements Interpreter {
 	 * 単項演算子の式
 	 * @param left
 	 * @param expressionType
+	 * @throws InterpreterRuntimeException 
 	 */
-	public void unaryOperatorExpression(ExpressionNode expression, int left, NodeType expressionType) {
+	public void unaryOperatorExpression(ExpressionNode expression, int left, NodeType expressionType) throws InterpreterRuntimeException {
 
 		//式を実行する
 		int result = 0; //実行結果
@@ -1155,21 +1153,14 @@ public class InterpreterImplementation implements Interpreter {
 
 	/**
 	 * 左辺値の更新
+	 * @throws InterpreterRuntimeException 
 	 */
-	public void leftValueUpdate(ExpressionNode expression, int leftValue) {
+	public void leftValueUpdate(ExpressionNode expression, int leftValue) throws InterpreterRuntimeException {
 
 		ExpressionNode left = null;
 
 		//ノードの種類によって、処理を分ける
 		switch(expression.getNodeType()) {
-			case EXCLAMATION: //"!"
-				ExclamationNode exclamationNode = (ExclamationNode) expression;
-				left = exclamationNode.getLeftValue();
-				break;
-			case UNARY_MINUS: //"-" 単項マイナス式
-				UnaryMinusNode unaryMinusNode = (UnaryMinusNode) expression;
-				left = unaryMinusNode.getLeftValue();
-				break;
 			case PRE_INCREMENT: //"++" 前置増分
 				PreIncrementNode preIncrementNode = (PreIncrementNode) expression;
 				left = preIncrementNode.getLeftValue();
@@ -1188,10 +1179,15 @@ public class InterpreterImplementation implements Interpreter {
 				break;
 		}
 
-		//TODO
 		//左が左辺値でない場合、例外を出す
-		IdentifierNode identifierNode = (IdentifierNode) left;
-		Identifier search = identifierNode.getIdentifier(); //この識別子を探す
+		Identifier search;
+		try {
+			IdentifierNode identifierNode = (IdentifierNode) left;
+			search = identifierNode.getIdentifier();
+		} catch (java.lang.ClassCastException e) {
+			String errorMessage = this.properties.getProperty("error.IncrementAndTheDecrementOperatorIsNecessaryToUseTheIdentifier");
+			throw new InterpreterRuntimeException(errorMessage);
+		}
 		LocalVariable foundLocalVariable = null;
 		Identifier foundGlobalVariable = null;
 		boolean searchFlag = false; //識別子が見つかっかどうかを表す。trueなら見つかっている
@@ -1242,8 +1238,9 @@ public class InterpreterImplementation implements Interpreter {
 			}
 
 		} else {
-			//TODO
 			//識別子がローカル変数にも、グローバル変数にも存在しない場合、例外を投げる
+			String errorMessage = this.properties.getProperty("error.IdentifierDoesNotExist");
+			throw new InterpreterRuntimeException(errorMessage);
 		}
 
 		return;
@@ -1511,13 +1508,18 @@ public class InterpreterImplementation implements Interpreter {
 	 */
 	private Value getIndexValue(ArraySubscriptExpressionNode arraySubscriptExpressionNode) throws InterpreterRuntimeException {
 
-		Value ret = new Value();
+		Value ret = null;
 		ExpressionNode indexExpression = arraySubscriptExpressionNode.getIndex();
 		this.evaluateExpression(indexExpression);
 		StackElement resultElement = this.operandStack.pop();
 		ret = resultElement.getValue();
 		
-		//TODO　添字が存在しない場合、例外を投げる
+		//添字が存在しない場合、例外を投げる
+		if (ret == null) {
+			String errorMessage = this.properties.getProperty("error.IndexDoesNotExist");
+			throw new InterpreterRuntimeException(errorMessage);
+		}
+		
 		
 		return ret;
 	}
@@ -1583,7 +1585,6 @@ public class InterpreterImplementation implements Interpreter {
 		}
 
 		//添字と配列のサイズをチェックする
-		//TODO 添字式の識別子が配列でなかった場合、例外を投げる
 		
 		Value arrayIndexValue = null;
 		if (arrayDataType == DataType.INT_ARRAY || arrayDataType == DataType.BOOLEAN_ARRAY) {
@@ -1632,6 +1633,10 @@ public class InterpreterImplementation implements Interpreter {
 
 			//オペランドスタックに値を詰める
 			this.operandStack.add(stackElement);
+		} else {
+			//添字式の識別子が配列でなかった場合、例外を投げる
+			String errorMessage = this.properties.getProperty("error.IdentifierIsNotAnArray");
+			throw new InterpreterRuntimeException(errorMessage);
 		}
 
 		return;
@@ -1673,10 +1678,7 @@ public class InterpreterImplementation implements Interpreter {
 
 		//識別子を取り出す
 		LocalVariable ret = null;
-		Identifier foundGlobalVariable = null;
-		boolean searchFlag = false; //識別子が見つかっかどうかを表す。trueなら見つかっている
-
-		//TODO
+		
 		//コールスタック（ローカル変数）から識別子を探す
 		//フレームポインタにぶつかるまでコールスタックを検索する
 		for (int i = this.callStack.size() - 1; this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
@@ -1688,14 +1690,11 @@ public class InterpreterImplementation implements Interpreter {
 			String localVariableName = localVariable.getVariable().getName();
 
 			if (localVariableName.equals(name)) {
-				searchFlag = true;
 				ret = localVariable;
 				break;
 			}
 		}
 		
-		//TODO 識別子が見つからない場合、例外を投げる
-
 		return ret;
 	}
 

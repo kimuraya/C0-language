@@ -6,6 +6,9 @@ import c0.ast.BlockNode;
 import c0.ast.ExpressionNode;
 import c0.ast.IdentifierNode;
 
+/**
+ * 識別子の情報を管理する
+ */
 public class Identifier {
 	
 	private String name;                     //識別子の名前
