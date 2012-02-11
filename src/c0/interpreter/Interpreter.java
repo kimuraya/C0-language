@@ -30,7 +30,7 @@ public interface Interpreter {
 	
 	//二項演算子
 	void binaryOperatorExpressionInit(ExpressionNode expression) throws InterpreterRuntimeException; //二項演算子の前処理
-	void binaryOperatorExpression(int left, int right, NodeType expressionType); //整数の加算式, 減算式, 乗算, 除算式, 剰余式, 小なり比較演算子, 以下比較演算子, 大なり比較演算子, 以上比較演算子
+	void binaryOperatorExpression(int left, int right, NodeType expressionType) throws InterpreterRuntimeException; //整数の加算式, 減算式, 乗算, 除算式, 剰余式, 小なり比較演算子, 以下比較演算子, 大なり比較演算子, 以上比較演算子
 	void binaryOperatorExpression(boolean left, boolean right, NodeType expressionType); //同等演算子, 不等演算子
 	void assignExpression(ExpressionNode expression) throws InterpreterRuntimeException; //代入式
 	

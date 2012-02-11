@@ -50,6 +50,7 @@ import c0.util.ExecuteStatementResult;
 import c0.util.FramePointer;
 import c0.util.GlobalScope;
 import c0.util.Identifier;
+import c0.util.IdentifierType;
 import c0.util.LocalVariable;
 import c0.util.NodeType;
 import c0.util.StackElement;
@@ -721,6 +722,12 @@ public class InterpreterImplementation implements Interpreter {
 				this.evaluateExpression(left);
 				stackLeft = this.operandStack.pop();
 				leftValue = stackLeft.getValue();
+				
+				//左から値を取り出せない場合
+				if (leftValue == null) {
+					String errorMessage = this.properties.getProperty("error.TheValueOfTheExpressionCanNotBeEjected");
+					throw new InterpreterRuntimeException(errorMessage);
+				}
 
 				//データ型のチェック
 				if (leftValue.getDataType() == DataType.BOOLEAN) {
@@ -732,7 +739,13 @@ public class InterpreterImplementation implements Interpreter {
 						this.evaluateExpression(right);
 						stackRight = this.operandStack.pop();
 						rightValue = stackRight.getValue();
-
+						
+						//右から値を取り出せない場合
+						if (rightValue == null) {
+							String errorMessage = this.properties.getProperty("error.TheValueOfTheExpressionCanNotBeEjected");
+							throw new InterpreterRuntimeException(errorMessage);
+						}
+						
 						if (rightValue.getDataType() == DataType.BOOLEAN) {
 
 							//右もtrue？
@@ -765,7 +778,13 @@ public class InterpreterImplementation implements Interpreter {
 				this.evaluateExpression(left);
 				stackLeft = this.operandStack.pop();
 				leftValue = stackLeft.getValue();
-
+				
+				//左から値を取り出せない場合
+				if (leftValue == null) {
+					String errorMessage = this.properties.getProperty("error.TheValueOfTheExpressionCanNotBeEjected");
+					throw new InterpreterRuntimeException(errorMessage);
+				}
+				
 				//データ型のチェック
 				if (leftValue.getDataType() == DataType.BOOLEAN) {
 
@@ -779,7 +798,13 @@ public class InterpreterImplementation implements Interpreter {
 						this.evaluateExpression(right);
 						stackRight = this.operandStack.pop();
 						rightValue = stackRight.getValue();
-
+						
+						//右から値を取り出せない場合
+						if (rightValue == null) {
+							String errorMessage = this.properties.getProperty("error.TheValueOfTheExpressionCanNotBeEjected");
+							throw new InterpreterRuntimeException(errorMessage);
+						}
+						
 						//左の結果を代入
 						if (rightValue.getDataType() == DataType.BOOLEAN) {
 							result = rightValue.isBool();
@@ -892,6 +917,12 @@ public class InterpreterImplementation implements Interpreter {
 
 		Value leftValue = stackLeft.getValue();
 		Value rightValue = stackRight.getValue();
+		
+		//左右の式から値を取り出せない場合
+		if (leftValue == null || rightValue == null) {
+			String errorMessage = this.properties.getProperty("error.AnAttemptWasMadeToPerformAnOperationThatIsNotDefined");
+			throw new InterpreterRuntimeException(errorMessage);
+		}
 
 		//データ型のチェック
 		
@@ -922,8 +953,9 @@ public class InterpreterImplementation implements Interpreter {
 	 * @param left
 	 * @param right
 	 * @param expressionType
+	 * @throws InterpreterRuntimeException 
 	 */
-	public void binaryOperatorExpression(int left, int right, NodeType expressionType) {
+	public void binaryOperatorExpression(int left, int right, NodeType expressionType) throws InterpreterRuntimeException {
 
 		//式を実行する
 		int resultInt = 0;
@@ -947,6 +979,13 @@ public class InterpreterImplementation implements Interpreter {
 				operationResultInt = true;
 				break;
 			case DIV: //"/"
+				
+				//0の除算を検知した場合
+				if (right == 0) {
+					String errorMessage = this.properties.getProperty("error.DivisionByZero");
+					throw new InterpreterRuntimeException(errorMessage);
+				}
+				
 				resultInt = left / right;
 				operationResultInt = true;
 				break;
@@ -1081,6 +1120,12 @@ public class InterpreterImplementation implements Interpreter {
 		StackElement stackLeft = this.operandStack.pop();
 
 		Value leftValue = stackLeft.getValue();
+		
+		//左辺値から値を取り出せない場合
+		if (leftValue == null) {
+			String errorMessage = this.properties.getProperty("error.CanNotEjectTheValueFromTheLeftValue");
+			throw new InterpreterRuntimeException(errorMessage);
+		}
 
 		//データ型のチェック
 		//整数の式
@@ -1775,6 +1820,12 @@ public class InterpreterImplementation implements Interpreter {
 		} else {
 			//指定した関数が存在しない場合、例外を投げる
 			String errorMessage = this.properties.getProperty("error.IdentifierDoesNotExist");
+			throw new InterpreterRuntimeException(errorMessage);
+		}
+		
+		//見つかった識別子が関数であるかどうかチェック
+		if (function.getIdentifierType() != IdentifierType.FUNCTION) {
+			String errorMessage = this.properties.getProperty("error.UsingTheIdentifierThatIsNotAFunction");
 			throw new InterpreterRuntimeException(errorMessage);
 		}
 
