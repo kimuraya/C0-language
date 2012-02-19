@@ -3,7 +3,10 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//"--" 前置減分
+/**
+ * 前置減分
+ * "--"
+ */
 public class PreDecrementNode extends ExpressionNode {
 	
 	private ExpressionNode leftValue; //左辺値

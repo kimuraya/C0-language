@@ -1,5 +1,8 @@
 package c0.ast;
 
+/**
+ * 文
+ */
 abstract public class StatementNode extends Node {
 	
 	boolean loopFlag; //trueの場合、for, while文の本体

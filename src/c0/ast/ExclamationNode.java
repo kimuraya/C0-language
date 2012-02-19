@@ -3,7 +3,10 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//"!"
+/**
+ * 論理否定演算子
+ * "!"
+ */
 public class ExclamationNode extends ExpressionNode {
 	
 	private ExpressionNode leftValue;

@@ -3,9 +3,11 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.DataType;
 
-//変数宣言
-//データ型 単純宣言子 ['=' 式] ';'
-//|データ型 配列宣言子 ';'
+/**
+ * 変数宣言
+ * データ型 単純宣言子 ['=' 式] ';'
+ * データ型 配列宣言子 ';'
+ */
 public class DeclareVariableNode extends StatementNode {
 	
 	private DataTypeNode dataType; //データ型

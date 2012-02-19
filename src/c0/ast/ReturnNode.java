@@ -3,7 +3,9 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//return文
+/**
+ * return文
+ */
 public class ReturnNode extends StatementNode {
 	
 	private ExpressionNode expression; //式

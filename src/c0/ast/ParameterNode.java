@@ -2,8 +2,10 @@ package c0.ast;
 
 import c0.interpreter.Visitor;
 
-//引数 :=
-//データ型 識別子
+/**
+ * 引数
+ * データ型 識別子
+ */
 public class ParameterNode extends StatementNode {
 	
 	private DataTypeNode dataType; //データ型

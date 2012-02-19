@@ -3,7 +3,10 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//"<="
+/**
+ * 以下比較演算子
+ * "<="
+ */
 public class LessThanOrEqualNode extends ExpressionNode {
 	
 	private ExpressionNode left;

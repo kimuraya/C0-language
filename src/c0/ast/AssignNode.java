@@ -3,7 +3,9 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//"="
+/**
+ * 代入式
+ */
 public class AssignNode extends ExpressionNode {
 
 	private ExpressionNode leftValue; //左辺値

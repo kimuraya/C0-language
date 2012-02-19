@@ -5,7 +5,9 @@ import java.util.List;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//関数呼び出し（ネイティブ関数を含む）
+/**
+ * 関数呼び出し
+ */
 public class CallNode extends ExpressionNode {
 	
 	private ExpressionNode function;

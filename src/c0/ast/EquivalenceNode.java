@@ -3,7 +3,10 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//"=="
+/**
+ * 同等演算子
+ * "=="
+ */
 public class EquivalenceNode extends ExpressionNode {
 	
 	private ExpressionNode left;

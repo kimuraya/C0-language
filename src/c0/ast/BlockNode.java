@@ -5,7 +5,9 @@ import java.util.List;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//複合文
+/**
+ * 複合文
+ */
 public class BlockNode extends StatementNode {
 	
 	private List<DeclareVariableNode> localVariables; //局所変数

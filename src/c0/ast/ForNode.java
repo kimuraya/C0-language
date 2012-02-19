@@ -3,7 +3,9 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//for文
+/**
+ * for文
+ */
 public class ForNode extends StatementNode {
 	
 	private ExpressionNode initializeExpression; //初期化

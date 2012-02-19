@@ -3,7 +3,10 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//"-"
+/**
+ * 減算式
+ * "-"
+ */
 public class MinusNode extends ExpressionNode {
 	
 	private ExpressionNode left;

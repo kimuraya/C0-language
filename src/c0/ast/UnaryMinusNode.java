@@ -3,7 +3,10 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//"-" 単項マイナス式
+/**
+ *　単項マイナス式
+ * "-"
+ */
 public class UnaryMinusNode extends ExpressionNode {
 	
 	private ExpressionNode leftValue;

@@ -3,7 +3,9 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//空文
+/**
+ * 空文
+ */
 public class EmptyStatementNode extends StatementNode {
 	
 	public EmptyStatementNode(Location loc) {

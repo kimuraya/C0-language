@@ -3,7 +3,10 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//"&&"
+/**
+ * 条件積演算子
+ * "&&"
+ */
 public class LogicalAndNode extends ExpressionNode {
 	
 	private ExpressionNode left;

@@ -3,7 +3,9 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//if-else文
+/**
+ * if-else文
+ */
 public class IfNode extends StatementNode {
 	
 	private ExpressionNode conditionalExpression; //条件式

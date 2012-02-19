@@ -3,7 +3,10 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//"%"
+/**
+ * 剰余式
+ * "%"
+ */
 public class ModNode extends ExpressionNode {
 	
 	private ExpressionNode left;

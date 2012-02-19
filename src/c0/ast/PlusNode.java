@@ -3,7 +3,10 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//"+"
+/**
+ * 加算式
+ * "+"
+ */
 public class PlusNode extends ExpressionNode {
 	
 	private ExpressionNode left;

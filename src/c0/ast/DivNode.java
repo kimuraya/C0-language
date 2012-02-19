@@ -3,7 +3,10 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//"/"
+/**
+ * 除算式
+ * "/"
+ */
 public class DivNode extends ExpressionNode {
 	
 	private ExpressionNode left;

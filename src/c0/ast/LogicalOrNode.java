@@ -3,7 +3,10 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//"||"
+/**
+ * 条件和演算子
+ * "||"
+ */
 public class LogicalOrNode extends ExpressionNode {
 	
 	private ExpressionNode left;

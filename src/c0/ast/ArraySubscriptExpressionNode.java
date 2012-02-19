@@ -3,7 +3,9 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//添字式
+/**
+ * 添字式
+ */
 public class ArraySubscriptExpressionNode extends ExpressionNode {
 	
 	private IdentifierNode array;

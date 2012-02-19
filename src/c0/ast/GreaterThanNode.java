@@ -3,7 +3,10 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//">"
+/**
+ * 大なり比較演算子
+ * ">"
+ */
 public class GreaterThanNode extends ExpressionNode {
 	
 	private ExpressionNode left;

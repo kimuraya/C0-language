@@ -3,7 +3,9 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//while文
+/**
+ * while文
+ */
 public class WhileNode extends StatementNode {
 	
 	private ExpressionNode conditionalExpression; //条件式

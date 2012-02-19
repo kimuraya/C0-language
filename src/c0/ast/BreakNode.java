@@ -3,7 +3,9 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//break文
+/**
+ * break文
+ */
 public class BreakNode extends StatementNode {
 	
 	public BreakNode(Location loc) {

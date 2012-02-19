@@ -3,7 +3,10 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//"++" 後置増分
+/**
+ * 後置増分
+ * "++"
+ */
 public class PostIncrementNode extends ExpressionNode {
 	
 	private ExpressionNode leftValue; //左辺値

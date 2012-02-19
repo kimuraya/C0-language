@@ -3,7 +3,10 @@ package c0.ast;
 import c0.interpreter.Visitor;
 import c0.util.NodeType;
 
-//"!="
+/**
+ * 不等演算子
+ * "!="
+ */
 public class NotEquivalenceNode extends ExpressionNode {
 	
 	private ExpressionNode left;

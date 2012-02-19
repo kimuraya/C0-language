@@ -47,6 +47,9 @@ import c0.util.SymbolTable;
 
 public class SemanticAnalyzer implements Visitor {
 
+	/**
+	 * 抽象構文木のルート
+	 */
 	@Override
 	public void visit(AstNode astNode) {
 		
@@ -63,6 +66,9 @@ public class SemanticAnalyzer implements Visitor {
 		}
 	}
 
+	/**
+	 * 式
+	 */
 	@Override
 	public void visit(ExpressionNode expressionNode) {
 		expressionNode.accept(this);
@@ -73,10 +79,10 @@ public class SemanticAnalyzer implements Visitor {
 		
 	}
 
-	@Override
 	/**
-	 * 識別子を走査する
+	 * 識別子
 	 */
+	@Override
 	public void visit(IdentifierNode identifierNode) {
 		
 		//関数である場合、複合文を走査する
@@ -85,120 +91,202 @@ public class SemanticAnalyzer implements Visitor {
 		
 	}
 
+	/**
+	 * 代入式
+	 */
 	@Override
 	public void visit(AssignNode assignNode) {
 		assignNode.getLeftValue().accept(this);
 		assignNode.getExpression().accept(this);
 	}
 
+	/**
+	 * 同等演算子
+	 * "=="
+	 */
 	@Override
 	public void visit(EquivalenceNode equivalenceNode) {
 		equivalenceNode.getLeft().accept(this);
 		equivalenceNode.getRight().accept(this);
 	}
 
+	/**
+	 * 不等演算子
+	 * "!="
+	 */
 	@Override
 	public void visit(NotEquivalenceNode notEquivalenceNode) {
 		notEquivalenceNode.getLeft().accept(this);
 		notEquivalenceNode.getRight().accept(this);
 	}
 
+	/**
+	 * 小なり比較演算子
+	 * "<"
+	 */
 	@Override
 	public void visit(LessThanNode lessThanNode) {
 		lessThanNode.getLeft().accept(this);
 		lessThanNode.getRight().accept(this);
 	}
 
+	/**
+	 * 以下比較演算子
+	 * "<="
+	 */
 	@Override
 	public void visit(LessThanOrEqualNode lessThanOrEqualNode) {
 		lessThanOrEqualNode.getLeft().accept(this);
 		lessThanOrEqualNode.getRight().accept(this);
 	}
 
+	/**
+	 * 大なり比較演算子
+	 * ">"
+	 */
 	@Override
 	public void visit(GreaterThanNode greaterThanNode) {
 		greaterThanNode.getLeft().accept(this);
 		greaterThanNode.getRight().accept(this);
 	}
 
+	/**
+	 * 以上比較演算子
+	 * ">="
+	 */
 	@Override
 	public void visit(GreaterThanOrEqualNode greaterThanOrEqualNode) {
 		greaterThanOrEqualNode.getLeft().accept(this);
 		greaterThanOrEqualNode.getRight().accept(this);
 	}
 
+	/**
+	 * 条件積演算子
+	 * "&&"
+	 */
 	@Override
 	public void visit(LogicalAndNode logicalAndNode) {
 		logicalAndNode.getLeft().accept(this);
 		logicalAndNode.getRight().accept(this);
 	}
 
+	/**
+	 * 条件和演算子
+	 * "||"
+	 */
 	@Override
 	public void visit(LogicalOrNode logicalOrNode) {
 		logicalOrNode.getLeft().accept(this);
 		logicalOrNode.getRight().accept(this);
 	}
 
+	/**
+	 * 加算式
+	 * "+"
+	 */
 	@Override
 	public void visit(PlusNode plusNode) {
 		plusNode.getLeft().accept(this);
 		plusNode.getRight().accept(this);
 	}
 
+	/**
+	 * 減算式
+	 * "-"
+	 */
 	@Override
 	public void visit(MinusNode minusNode) {
 		minusNode.getLeft().accept(this);
 		minusNode.getRight().accept(this);
 	}
 
+	/**
+	 * 乗算
+	 * "*"
+	 */
 	@Override
 	public void visit(MulNode mulNode) {
 		mulNode.getLeft().accept(this);
 		mulNode.getRight().accept(this);
 	}
 
+	/**
+	 * 除算式
+	 * "/"
+	 */
 	@Override
 	public void visit(DivNode divNode) {
 		divNode.getLeft().accept(this);
 		divNode.getRight().accept(this);
 	}
 
+	/**
+	 * 剰余式
+	 * "%"
+	 */
 	@Override
 	public void visit(ModNode modNode) {
 		modNode.getLeft().accept(this);
 		modNode.getRight().accept(this);
 	}
 
+	/**
+	 * 論理否定演算子
+	 * "!"
+	 */
 	@Override
 	public void visit(ExclamationNode exclamationNode) {
 		exclamationNode.getLeftValue().accept(this);
 	}
 
+	/**
+	 *　単項マイナス式
+	 * "-"
+	 */
 	@Override
 	public void visit(UnaryMinusNode unaryMinusNode) {
 		unaryMinusNode.getLeftValue().accept(this);
 	}
 
+	/**
+	 * 前置増分
+	 * "++"
+	 */
 	@Override
 	public void visit(PreIncrementNode preIncrementNode) {
 		preIncrementNode.getLeftValue().accept(this);
 	}
 
+	/**
+	 * 前置減分
+	 * "--"
+	 */
 	@Override
 	public void visit(PreDecrementNode preDecrementNode) {
 		preDecrementNode.getLeftValue().accept(this);
 	}
 
+	/**
+	 * 後置増分
+	 * "++"
+	 */
 	@Override
 	public void visit(PostIncrementNode postIncrementNode) {
 		postIncrementNode.getLeftValue().accept(this);
 	}
 
+	/**
+	 * 後置減分
+	 * "--"
+	 */
 	@Override
 	public void visit(PostDecrementNode postDecrementNode) {
 		postDecrementNode.getLeftValue().accept(this);
 	}
 
+	/**
+	 * 関数呼び出し
+	 */
 	@Override
 	public void visit(CallNode callNode) {
 		callNode.getFunction().accept(this);
@@ -210,18 +298,27 @@ public class SemanticAnalyzer implements Visitor {
 			}
 		}
 	}
-	
+
+	/**
+	 * 添字式
+	 */
 	@Override
 	public void visit(ArraySubscriptExpressionNode arraySubscriptExpressionNode) {
 		arraySubscriptExpressionNode.getArray().accept(this);
 		arraySubscriptExpressionNode.getIndex().accept(this);
 	}	
 	
+	/**
+	 * 文
+	 */
 	@Override
 	public void visit(StatementNode statementNode) {
 		statementNode.accept(this);
 	}
 
+	/**
+	 * 複合文
+	 */
 	@Override
 	public void visit(BlockNode blockNode) {
 		
@@ -245,6 +342,9 @@ public class SemanticAnalyzer implements Visitor {
 		
 	}
 
+	/**
+	 * if-else文
+	 */
 	@Override
 	public void visit(IfNode ifNode) {
 		ifNode.getConditionalExpression().accept(this);
@@ -254,12 +354,18 @@ public class SemanticAnalyzer implements Visitor {
 		}
 	}
 
+	/**
+	 * while文
+	 */
 	@Override
 	public void visit(WhileNode whileNode) {
 		whileNode.getConditionalExpression().accept(this);
 		whileNode.getBodyStatement().accept(this);
 	}
 
+	/**
+	 * for文
+	 */
 	@Override
 	public void visit(ForNode forNode) {
 		forNode.getInitializeExpression().accept(this);
@@ -268,11 +374,18 @@ public class SemanticAnalyzer implements Visitor {
 		forNode.getBodyStatement().accept(this);
 	}
 
+	/**
+	 * break文
+	 */
 	@Override
 	public void visit(BreakNode breakNode) {
 		// TODO break文
+		// TODO StatementNodeのloopFlagの活用を検討
 	}
 
+	/**
+	 * return文
+	 */
 	@Override
 	public void visit(ReturnNode returnNode) {
 		if (returnNode.getExpression() != null) {
@@ -280,17 +393,27 @@ public class SemanticAnalyzer implements Visitor {
 		}
 	}
 
+	/**
+	 * 式文
+	 */
 	@Override
 	public void visit(ExpressionStatementNode expressionStatementNode) {
 		expressionStatementNode.getExpression().accept(this);
 	}
 
+	/**
+	 * 空文
+	 */
 	@Override
 	public void visit(EmptyStatementNode emptyStatementNode) {
-		// TODO あとで検討する
 		
 	}
 
+	/**
+	 * 変数宣言
+	 * データ型 単純宣言子 ['=' 式] ';'
+	 * データ型 配列宣言子 ';'
+	 */
 	@Override
 	public void visit(DeclareVariableNode declareVariableNode) {
 		declareVariableNode.getIdentifier().accept(this);
@@ -300,6 +423,10 @@ public class SemanticAnalyzer implements Visitor {
 		}
 	}
 
+	/**
+	 * 引数
+	 * データ型 識別子
+	 */
 	@Override
 	public void visit(ParameterNode parameterNode) {
 		parameterNode.getIdentifier().accept(this);
