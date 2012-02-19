@@ -45,8 +45,16 @@ import c0.util.IdentifierType;
 import c0.util.LocalScope;
 import c0.util.SymbolTable;
 
+/**
+ * 意味解析器
+ * 式の型付けのチェック、文法エラー、識別子の有効範囲を検査する
+ * エラーを発見した場合、文字列のリストにエラーメッセージを追加する
+ */
 public class SemanticAnalyzer implements Visitor {
 
+	//エラーメッセージを管理する
+	LinkedList<String> errorMessages;
+	
 	/**
 	 * 抽象構文木のルート
 	 */
@@ -84,6 +92,8 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(IdentifierNode identifierNode) {
+		
+		//TODO 識別子が有効範囲にあるかをチェックする
 		
 		//関数である場合、複合文を走査する
 		
@@ -289,6 +299,9 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(CallNode callNode) {
+		
+		//TODO 関数宣言の引数と関数呼び出しの引数のデータ型、個数が一致するかをチェック
+		
 		callNode.getFunction().accept(this);
 		List<ExpressionNode> parameters = callNode.getArguments();
 		
@@ -398,6 +411,11 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(ExpressionStatementNode expressionStatementNode) {
+		
+		//TODO ここを起点に配下にある式のノードすべてを走査する
+		//TODO 式文の下にある式は演算子単位でチェックを行う
+		//TODO 式の型付けの規則を走査する
+		
 		expressionStatementNode.getExpression().accept(this);
 	}
 
@@ -416,8 +434,10 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(DeclareVariableNode declareVariableNode) {
+		
 		declareVariableNode.getIdentifier().accept(this);
 		
+		//TODO 代入文と同じデータ型のチェックを行う
 		if (declareVariableNode.getExpression() != null) {
 			declareVariableNode.getExpression().accept(this);
 		}
