@@ -51,9 +51,14 @@ import c0.util.SymbolTable;
  * エラーを発見した場合、文字列のリストにエラーメッセージを追加する
  */
 public class SemanticAnalyzer implements Visitor {
-
-	//エラーメッセージを管理する
-	LinkedList<String> errorMessages;
+	
+	LinkedList<String> errorMessages; //エラーメッセージを管理する
+	GlobalScope globalScope = null; //シンボルテーブル
+	
+	public SemanticAnalyzer(GlobalScope globalScope) {
+		super();
+		this.globalScope = globalScope;
+	}
 	
 	/**
 	 * 抽象構文木のルート
