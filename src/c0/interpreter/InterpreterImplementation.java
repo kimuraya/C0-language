@@ -151,35 +151,35 @@ public class InterpreterImplementation implements Interpreter {
 	@Override
 	public ExecuteStatementResult executeBlockStatement(
 			StatementNode statementNode) throws InterpreterRuntimeException {
-
+		
 		BlockNode block = (BlockNode) statementNode;
 		ExecuteStatementResult ret = null;
-
+		
 		//局所変数をスタックに詰める
 		List<DeclareVariableNode> localVariables = block.getLocalVariables();
 		for (DeclareVariableNode declareVariableNode : localVariables) {
-
+			
 			//データ型
 			DataTypeNode localVariableDataTypeNode = declareVariableNode.getDataType();
 			DataType localVariableDataType = localVariableDataTypeNode.getDataType();
-
+			
 			//初期化式の実行
 			Value value = new Value();
-
+			
 			//配列以外の変数の初期化
 			if (declareVariableNode.getExpression() != null
 					&& (localVariableDataType != DataType.INT_ARRAY || localVariableDataType != DataType.BOOLEAN_ARRAY)) {
 				ExpressionNode expression = declareVariableNode.getExpression();
 				this.evaluateExpression(expression);
-
+				
 				StackElement result = this.operandStack.pop();
 				value = result.getValue();
-
+				
 			//配列の初期化
 			//配列の初期化式は認めない。要素数のない配列は作れない
 			} else if (declareVariableNode.getExpression() == null && localVariableDataTypeNode.getElementNumber() != null &&
 					(localVariableDataType == DataType.INT_ARRAY || localVariableDataType == DataType.BOOLEAN_ARRAY)) {
-
+				
 				//要素数の計算
 				Value elementNumberValue = new Value();
 				ExpressionNode elementNumberExpression = localVariableDataTypeNode.getElementNumber();
@@ -216,28 +216,28 @@ public class InterpreterImplementation implements Interpreter {
 					throw new InterpreterRuntimeException(errorMessage, statementNode);
 				}
 			}
-
+			
 			//計算結果をローカル変数にバインドする
 			LocalVariable variable = new LocalVariable();
 			variable.setVariable(declareVariableNode.getIdentifier().getIdentifier()); //識別子をセットする
 			variable.setValue(value); //値をセットする
-
+			
 			//コールスタックに引数を詰める
 			StackElement variableElement = new StackElement();
 			variableElement.setStackElementType(StackElementType.VARIABLE);
 			variableElement.setVariable(variable);
-
+			
 			//局所変数をコールスタックに詰める
 			this.callStack.push(variableElement);
 		}
-
+		
 		//文を実行する
 		List<StatementNode> statements = block.getStatements();
 		for (StatementNode statement : statements) {
-
+			
 			boolean loopFlag = statement.isLoopFlag();
 			ret = this.executeStatement(statement);
-
+			
 			//TODO break文を使えるようにするための応急処置
 			//TODO break文をループ内とswitch文以外の場所で書けないようにする
 
@@ -655,9 +655,9 @@ public class InterpreterImplementation implements Interpreter {
 
 		//グローバル変数（シンボルテーブル）から識別子を探す
 		if (!searchFlag) {
-
+			
 			SymbolTable globalSymbolTable = this.getGlobalScope().getGlobalSymbolTable();
-
+			
 			if (globalSymbolTable.searchSymbol(search.getName())) {
 				searchFlag = true;
 				foundGlobalVariable = globalSymbolTable.getSymbol(search.getName());

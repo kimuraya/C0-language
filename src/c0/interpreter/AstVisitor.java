@@ -99,7 +99,7 @@ public class AstVisitor implements Visitor {
 		
 		//関数を登録する場合
 		if ((identifierNode.getIdentifier().getIdentifierType() == IdentifierType.FUNCTION) && (identifierNode.getBlock() != null)) {
-
+			
 			//シンボルテーブルに登録済みかチェックし、未登録の物を登録する
 			if(!this.globalScope.getGlobalSymbolTable().searchSymbol(identifierNode.getIdentifier().getName())) {
 				

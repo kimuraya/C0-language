@@ -40,9 +40,11 @@ import c0.ast.ReturnNode;
 import c0.ast.StatementNode;
 import c0.ast.UnaryMinusNode;
 import c0.ast.WhileNode;
+import c0.util.DataType;
 import c0.util.GlobalScope;
 import c0.util.IdentifierType;
 import c0.util.LocalScope;
+import c0.util.NodeType;
 import c0.util.SymbolTable;
 
 /**
@@ -58,6 +60,15 @@ public class SemanticAnalyzer implements Visitor {
 	public SemanticAnalyzer(GlobalScope globalScope) {
 		super();
 		this.globalScope = globalScope;
+		this.errorMessages = new LinkedList<String>();
+	}
+	
+	public LinkedList<String> getErrorMessages() {
+		return errorMessages;
+	}
+	
+	public void setErrorMessages(LinkedList<String> errorMessages) {
+		this.errorMessages = errorMessages;
 	}
 	
 	/**
@@ -101,6 +112,13 @@ public class SemanticAnalyzer implements Visitor {
 		//TODO 識別子が有効範囲にあるかをチェックする
 		
 		//関数である場合、複合文を走査する
+		if ((identifierNode.getIdentifier().getIdentifierType() == IdentifierType.FUNCTION) && (identifierNode.getBlock() != null)) {
+			
+			//複合文がある場合
+			if(identifierNode.getBlock() != null) {
+				identifierNode.getBlock().accept(this);
+			}
+		}
 		
 		//変数である場合、生存期間をチェックする
 		
@@ -201,6 +219,7 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(PlusNode plusNode) {
+		this.binaryExpressionCheck(plusNode); //TODO 被演算子のデータ型のチェック
 		plusNode.getLeft().accept(this);
 		plusNode.getRight().accept(this);
 	}
@@ -324,7 +343,7 @@ public class SemanticAnalyzer implements Visitor {
 	public void visit(ArraySubscriptExpressionNode arraySubscriptExpressionNode) {
 		arraySubscriptExpressionNode.getArray().accept(this);
 		arraySubscriptExpressionNode.getIndex().accept(this);
-	}	
+	}
 	
 	/**
 	 * 文
@@ -456,5 +475,56 @@ public class SemanticAnalyzer implements Visitor {
 	public void visit(ParameterNode parameterNode) {
 		parameterNode.getIdentifier().accept(this);
 	}
-
+	
+	/**
+	 * 二項演算子をチェックする
+	 * @param expression
+	 */
+	private void binaryExpressionCheck(ExpressionNode expression) {
+		
+		switch(expression.getNodeType()) {
+			
+			case PLUS: //"+"
+				PlusNode plusNode = (PlusNode) expression;
+				
+				//左右の子のチェック
+				ExpressionNode left = plusNode.getLeft();
+				ExpressionNode right = plusNode.getRight();
+				
+				//else ifを追加する。被演算子が別の式である場合の処理を追加
+				if (left.getNodeType() != NodeType.INT_LITERAL || left.getNodeType() != NodeType.IDENTIFIER) {
+					
+					if (left.getNodeType() == NodeType.IDENTIFIER) {
+						
+						IdentifierNode identifierNode = (IdentifierNode) left;
+						
+						//識別子のチェック
+						this.identifierDataTypeCheck(identifierNode, identifierNode.getReturnDataType().getDataType());
+						
+					} else {
+						//識別子でもなければ、リテラルの整数でもない
+						errorMessages.add("整数でもなければ、識別子でもない");
+					}
+				}
+		}
+	}
+	
+	/**
+	 * 識別子とデータ型の情報を受け取り、
+	 * 識別子が変数か関数か、変数だった場合、
+	 * 指定されたデータ型の変数かをチェックする
+	 * @return
+	 */
+	private boolean identifierDataTypeCheck(IdentifierNode identifierNode, DataType dataType) {
+		
+		//処理中の関数のLocalScopeから識別子を検索
+		
+		//グローバル領域からグローバル変数を検索
+		
+		//取り出した識別子が変数なのか、関数なのかをチェック
+		
+		//変数だった場合、変数のデータ型をチェックする。受け取ったデータ型と一致しなければ、エラー
+		
+		return false;
+	}
 }
