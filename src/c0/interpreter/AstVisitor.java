@@ -54,9 +54,9 @@ import c0.util.SymbolTable;
  */
 public class AstVisitor implements Visitor {
 	
-	//シンボルテーブル
-	GlobalScope globalScope = null;
-	String beingProcessedFunctionName = null; //現在処理中の関数名
+	private GlobalScope globalScope = null; //シンボルテーブル
+	private String beingProcessedFunctionName = null; //現在処理中の関数名
+	private BlockNode beingProcessedBlock = null; //現在処理中の複合文
 	
 	public AstVisitor(GlobalScope globalScope) {
 		super();
@@ -113,7 +113,7 @@ public class AstVisitor implements Visitor {
 			//関数ごとにスコープを新規作成し、処理中の関数名を保存する
 			LocalScope newFunctionScope = new LocalScope();
 			newFunctionScope.setFunctionName(identifierNode.getIdentifier().getName());
-			beingProcessedFunctionName = identifierNode.getIdentifier().getName();
+			this.beingProcessedFunctionName = identifierNode.getIdentifier().getName();
 			newFunctionScope.getLocalSymbolTableList().add(new SymbolTable()); //新しいスコープにシンボルテーブルを追加する
 			
 			this.globalScope.getFunctionScopeList().add(newFunctionScope);
@@ -130,6 +130,7 @@ public class AstVisitor implements Visitor {
 			
 			//複合文がある場合
 			if(identifierNode.getBlock() != null) {
+				this.beingProcessedBlock = null; //関数本体は外側の複合文を持たない為、リンクをnullにする
 				identifierNode.getBlock().accept(this);
 			}
 		}
@@ -147,7 +148,7 @@ public class AstVisitor implements Visitor {
 			for (LocalScope localScope : this.globalScope.getFunctionScopeList()) {
 				
 				//現在処理中の関数のスコープを手に入れる
-				if (localScope.getFunctionName().equals(beingProcessedFunctionName)) {
+				if (localScope.getFunctionName().equals(this.beingProcessedFunctionName)) {
 					
 					//シンボルテーブルに登録済みかチェックし、未登録の物を登録する
 					//下位から上位のシンボルテーブルをチェックする
@@ -170,7 +171,7 @@ public class AstVisitor implements Visitor {
 				
 				//大域変数に無いシンボルで、かつ、関数がまだ処理されていない場合のみ、登録を行う
 				if (!this.globalScope.getGlobalSymbolTable().searchSymbol(identifierNode.getIdentifier().getName())
-						&& beingProcessedFunctionName == null) {
+						&& this.beingProcessedFunctionName == null) {
 					this.globalScope.getGlobalSymbolTable().addSymbol(identifierNode.getIdentifier());
 					//System.out.println("グローバル変数の出力");
 					//System.out.println(identifierNode.getIdentifier().getName());
@@ -178,7 +179,7 @@ public class AstVisitor implements Visitor {
 					//ここまで到達したら、局所変数にも大域変数にも登録されていない
 					for (LocalScope localScope : this.globalScope.getFunctionScopeList()) {
 						//現在処理中の関数のスコープを手に入れる
-						if (localScope.getFunctionName().equals(beingProcessedFunctionName)) {
+						if (localScope.getFunctionName().equals(this.beingProcessedFunctionName)) {
 							LinkedList<SymbolTable> localSymbolTableList = localScope.getLocalSymbolTableList();
 							localSymbolTableList.getLast().addSymbol(identifierNode.getIdentifier());
 							//System.out.println("ローカル変数の出力");
@@ -330,14 +331,26 @@ public class AstVisitor implements Visitor {
 	@Override
 	public void visit(BlockNode blockNode) {
 		
+		//外側の複合文がある場合、リンクを更新する
+		if (this.beingProcessedBlock != null) {
+			blockNode.setOuterNestBlock(this.beingProcessedBlock);
+		}
+		
+		//現在処理中の複合文を更新
+		this.beingProcessedBlock = blockNode;
+		
 		//複合文に入る度、シンボルテーブルを追加する
 		for (LocalScope localScope : this.globalScope.getFunctionScopeList()) {
 			
 			//現在処理中の関数のスコープを手に入れる
-			if (localScope.getFunctionName().equals(beingProcessedFunctionName)) {
+			if (localScope.getFunctionName().equals(this.beingProcessedFunctionName)) {
 				
 				//処理中のスコープにシンボルテーブルを追加する
-				localScope.getLocalSymbolTableList().add(new SymbolTable());
+				SymbolTable symbolTable = new SymbolTable();
+				localScope.getLocalSymbolTableList().add(symbolTable);
+				
+				//複合文に局所変数のシンボルテーブルを保持させる
+				blockNode.setSymbolTable(symbolTable);
 			}
 		}
 		
@@ -360,7 +373,7 @@ public class AstVisitor implements Visitor {
 		}
 		
 	}
-
+	
 	@Override
 	public void visit(IfNode ifNode) {
 		ifNode.getConditionalExpression().accept(this);

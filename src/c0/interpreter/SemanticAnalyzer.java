@@ -54,9 +54,10 @@ import c0.util.SymbolTable;
  */
 public class SemanticAnalyzer implements Visitor {
 	
-	LinkedList<String> errorMessages; //エラーメッセージを管理する
-	GlobalScope globalScope = null; //シンボルテーブル
-	String beingProcessedFunctionName = null; //現在処理中の関数名
+	private LinkedList<String> errorMessages = null; //エラーメッセージを管理する
+	private GlobalScope globalScope = null; //シンボルテーブル
+	private String beingProcessedFunctionName = null; //現在処理中の関数名
+	private BlockNode beingProcessedBlock = null; //現在処理中の複合文
 	
 	public SemanticAnalyzer(GlobalScope globalScope) {
 		super();
@@ -363,6 +364,9 @@ public class SemanticAnalyzer implements Visitor {
 	@Override
 	public void visit(BlockNode blockNode) {
 		
+		//現在処理中の複合文を更新する
+		this.beingProcessedBlock = blockNode;
+		
 		//局所変数が宣言されていた場合
 		if (blockNode.getLocalVariables() != null) {
 			List<DeclareVariableNode> localVariables = blockNode.getLocalVariables();
@@ -422,6 +426,7 @@ public class SemanticAnalyzer implements Visitor {
 	public void visit(BreakNode breakNode) {
 		// TODO break文
 		// TODO StatementNodeのloopFlagの活用を検討
+		// TODO breakの位置から外側にあるループを検索し、無かった場合はエラーにする
 	}
 
 	/**
@@ -545,25 +550,27 @@ public class SemanticAnalyzer implements Visitor {
 		boolean registeredFlag = false; //登録済みならtrue
 		
 		//入れ子の内側から外側の複合文を調べる
-		//関数のスコープを1つずつチェックする
-		registeredSymbol:
-		for (LocalScope localScope : this.globalScope.getFunctionScopeList()) {
-			
-			//現在処理中の関数のスコープを手に入れる
-			if (localScope.getFunctionName().equals(this.beingProcessedFunctionName)) {
+		SymbolTable beingProcessedSymbolTable = this.beingProcessedBlock.getSymbolTable();
+		
+		//現在処理中の複合文にある識別子を検索する
+		if (beingProcessedSymbolTable.searchSymbol(identifierNode.getIdentifier().getName())) {
+			registeredFlag = true;
+			ret = true;
+		}
+		
+		if (!registeredFlag) {
+			//存在しない場合、外側にある複合文への検索を試みる
+			//関数本体の複合文にもない場合、関数内に識別子が存在しないと判断し、処理を打ち切る
+			//関数本体のouterNestBlockはnull
+			for (BlockNode blockNode = this.beingProcessedBlock.getOuterNestBlock(); blockNode != null; blockNode = blockNode.getOuterNestBlock()) {
 				
-				//識別子がシンボルテーブルに登録済みかチェックする
-				//下位から上位のシンボルテーブルをチェックする
-				for (int index = localScope.getLocalSymbolTableList().size();  index < 0; index--) {
-					
-					SymbolTable symbolTable = localScope.getLocalSymbolTableList().get(index);
-					
-					//識別子を見つけた場合、処理を止める
-					if (symbolTable.searchSymbol(identifierNode.getIdentifier().getName())) {
-						registeredFlag = true;
-						ret = true;
-						break registeredSymbol;
-					}
+				SymbolTable symbolTable = blockNode.getSymbolTable();
+				
+				//現在処理中の複合文にある識別子を検索する
+				if (symbolTable.searchSymbol(identifierNode.getIdentifier().getName())) {
+					registeredFlag = true;
+					ret = true;
+					break;
 				}
 			}
 		}
@@ -571,9 +578,9 @@ public class SemanticAnalyzer implements Visitor {
 		//関数のスコープにない場合、大域のシンボルテーブルをチェックする
 		if (!registeredFlag) {
 			
-			//大域領域に識別子が存在する
+			//大域領域の識別子を検索する
 			if (!this.globalScope.getGlobalSymbolTable().searchSymbol(identifierNode.getIdentifier().getName())) {
-				ret = true;	
+				ret = true;
 			}
 		}
 		
