@@ -56,6 +56,7 @@ public class SemanticAnalyzer implements Visitor {
 	
 	LinkedList<String> errorMessages; //エラーメッセージを管理する
 	GlobalScope globalScope = null; //シンボルテーブル
+	String beingProcessedFunctionName = null; //現在処理中の関数名
 	
 	public SemanticAnalyzer(GlobalScope globalScope) {
 		super();
@@ -113,6 +114,9 @@ public class SemanticAnalyzer implements Visitor {
 		
 		//関数である場合、複合文を走査する
 		if ((identifierNode.getIdentifier().getIdentifierType() == IdentifierType.FUNCTION) && (identifierNode.getBlock() != null)) {
+			
+			//現在走査中の関数名を取得
+			this.beingProcessedFunctionName = identifierNode.getIdentifier().getName();
 			
 			//複合文がある場合
 			if(identifierNode.getBlock() != null) {
@@ -498,8 +502,10 @@ public class SemanticAnalyzer implements Visitor {
 						
 						IdentifierNode identifierNode = (IdentifierNode) left;
 						
-						//識別子のチェック
+						//識別子のデータ型チェック
 						this.identifierDataTypeCheck(identifierNode, identifierNode.getReturnDataType().getDataType());
+						
+						//識別子の有効範囲のチェック
 						
 					} else {
 						//識別子でもなければ、リテラルの整数でもない
@@ -526,5 +532,51 @@ public class SemanticAnalyzer implements Visitor {
 		//変数だった場合、変数のデータ型をチェックする。受け取ったデータ型と一致しなければ、エラー
 		
 		return false;
+	}
+	
+	/**
+	 * 識別子の有効範囲をチェックする
+	 * 識別子が有効範囲にある場合、trueを返す
+	 * @return
+	 */
+	private boolean identifierScopeCheck(IdentifierNode identifierNode) {
+		
+		boolean ret = false;
+		boolean registeredFlag = false; //登録済みならtrue
+		
+		//入れ子の内側から外側の複合文を調べる
+		//関数のスコープを1つずつチェックする
+		registeredSymbol:
+		for (LocalScope localScope : this.globalScope.getFunctionScopeList()) {
+			
+			//現在処理中の関数のスコープを手に入れる
+			if (localScope.getFunctionName().equals(this.beingProcessedFunctionName)) {
+				
+				//識別子がシンボルテーブルに登録済みかチェックする
+				//下位から上位のシンボルテーブルをチェックする
+				for (int index = localScope.getLocalSymbolTableList().size();  index < 0; index--) {
+					
+					SymbolTable symbolTable = localScope.getLocalSymbolTableList().get(index);
+					
+					//識別子を見つけた場合、処理を止める
+					if (symbolTable.searchSymbol(identifierNode.getIdentifier().getName())) {
+						registeredFlag = true;
+						ret = true;
+						break registeredSymbol;
+					}
+				}
+			}
+		}
+		
+		//関数のスコープにない場合、大域のシンボルテーブルをチェックする
+		if (!registeredFlag) {
+			
+			//大域領域に識別子が存在する
+			if (!this.globalScope.getGlobalSymbolTable().searchSymbol(identifierNode.getIdentifier().getName())) {
+				ret = true;	
+			}
+		}
+		
+		return ret;
 	}
 }
