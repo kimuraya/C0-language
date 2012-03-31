@@ -58,6 +58,7 @@ public class SemanticAnalyzer implements Visitor {
 	private GlobalScope globalScope = null; //シンボルテーブル
 	private String beingProcessedFunctionName = null; //現在処理中の関数名
 	private BlockNode beingProcessedBlock = null; //現在処理中の複合文
+	private StatementNode  beingProcessedStatement = null; //現在処理中の文
 	
 	public SemanticAnalyzer(GlobalScope globalScope) {
 		super();
@@ -355,6 +356,10 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(StatementNode statementNode) {
+		
+		//現在処理中の文を更新
+		this.beingProcessedStatement = statementNode;
+		
 		statementNode.accept(this);
 	}
 
@@ -363,6 +368,9 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(BlockNode blockNode) {
+		
+		//現在処理中の文を更新
+		this.beingProcessedStatement = blockNode;
 		
 		//現在処理中の複合文を更新する
 		this.beingProcessedBlock = blockNode;
@@ -392,6 +400,10 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(IfNode ifNode) {
+		
+		//現在処理中の文を更新
+		this.beingProcessedStatement = ifNode;
+		
 		ifNode.getConditionalExpression().accept(this);
 		ifNode.getThenStatement().accept(this);
 		if (ifNode.getElseStatement() != null) {
@@ -404,6 +416,10 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(WhileNode whileNode) {
+		
+		//現在処理中の文を更新
+		this.beingProcessedStatement = whileNode;
+		
 		whileNode.getConditionalExpression().accept(this);
 		whileNode.getBodyStatement().accept(this);
 	}
@@ -413,6 +429,10 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(ForNode forNode) {
+		
+		//現在処理中の文を更新
+		this.beingProcessedStatement = forNode;
+		
 		forNode.getInitializeExpression().accept(this);
 		forNode.getConditionalExpression().accept(this);
 		forNode.getUpdateExpression().accept(this);
@@ -424,6 +444,10 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(BreakNode breakNode) {
+		
+		//現在処理中の文を更新
+		this.beingProcessedStatement = breakNode;
+		
 		// TODO break文
 		// TODO StatementNodeのloopFlagの活用を検討
 		// TODO breakの位置から外側にあるループを検索し、無かった場合はエラーにする
@@ -434,6 +458,10 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(ReturnNode returnNode) {
+		
+		//現在処理中の文を更新
+		this.beingProcessedStatement = returnNode;
+		
 		if (returnNode.getExpression() != null) {
 			returnNode.getExpression().accept(this);
 		}
@@ -444,6 +472,9 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(ExpressionStatementNode expressionStatementNode) {
+		
+		//現在処理中の文を更新
+		this.beingProcessedStatement = expressionStatementNode;
 		
 		//TODO ここを起点に配下にある式のノードすべてを走査する
 		//TODO 式文の下にある式は演算子単位でチェックを行う
@@ -458,6 +489,9 @@ public class SemanticAnalyzer implements Visitor {
 	@Override
 	public void visit(EmptyStatementNode emptyStatementNode) {
 		
+		//現在処理中の文を更新
+		this.beingProcessedStatement = emptyStatementNode;
+		
 	}
 
 	/**
@@ -467,6 +501,9 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(DeclareVariableNode declareVariableNode) {
+		
+		//現在処理中の文を更新
+		this.beingProcessedStatement = declareVariableNode;
 		
 		declareVariableNode.getIdentifier().accept(this);
 		
@@ -482,6 +519,10 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(ParameterNode parameterNode) {
+		
+		//現在処理中の文を更新
+		this.beingProcessedStatement = parameterNode;
+		
 		parameterNode.getIdentifier().accept(this);
 	}
 	
@@ -501,16 +542,21 @@ public class SemanticAnalyzer implements Visitor {
 				ExpressionNode right = plusNode.getRight();
 				
 				//else ifを追加する。被演算子が別の式である場合の処理を追加
-				if (left.getNodeType() != NodeType.INT_LITERAL || left.getNodeType() != NodeType.IDENTIFIER) {
+				if (left.getNodeType() != NodeType.INT_LITERAL || left.getNodeType() == NodeType.IDENTIFIER) {
 					
 					if (left.getNodeType() == NodeType.IDENTIFIER) {
 						
 						IdentifierNode identifierNode = (IdentifierNode) left;
 						
 						//識別子のデータ型チェック
-						this.identifierDataTypeCheck(identifierNode, identifierNode.getReturnDataType().getDataType());
+						if(this.identifierDataTypeCheck(identifierNode, DataType.INT)) {
+							errorMessages.add("識別子のデータ型が正しくない");
+						}
 						
 						//識別子の有効範囲のチェック
+						if(this.identifierScopeCheck(identifierNode)) {
+							errorMessages.add("識別子が有効範囲に存在しない");
+						}
 						
 					} else {
 						//識別子でもなければ、リテラルの整数でもない
@@ -533,10 +579,20 @@ public class SemanticAnalyzer implements Visitor {
 		//グローバル領域からグローバル変数を検索
 		
 		//取り出した識別子が変数なのか、関数なのかをチェック
+		IdentifierType identifierType = this.identifierTypeCheck(identifierNode);
 		
 		//変数だった場合、変数のデータ型をチェックする。受け取ったデータ型と一致しなければ、エラー
 		
 		return false;
+	}
+	
+	/**
+	 * 識別子が変数なのか、関数なのかをチェック
+	 * @param identifierNode
+	 * @return
+	 */
+	private IdentifierType identifierTypeCheck(IdentifierNode identifierNode) {
+		return IdentifierType.FUNCTION;
 	}
 	
 	/**
