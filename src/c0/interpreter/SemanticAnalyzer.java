@@ -1,8 +1,9 @@
 package c0.interpreter;
 
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
 import java.util.List;
-
+import java.util.Map;
+import java.util.Properties;
 import c0.ast.ArraySubscriptExpressionNode;
 import c0.ast.AssignNode;
 import c0.ast.AstNode;
@@ -43,7 +44,6 @@ import c0.ast.WhileNode;
 import c0.util.DataType;
 import c0.util.GlobalScope;
 import c0.util.IdentifierType;
-import c0.util.LocalScope;
 import c0.util.NodeType;
 import c0.util.SymbolTable;
 
@@ -54,26 +54,35 @@ import c0.util.SymbolTable;
  */
 public class SemanticAnalyzer implements Visitor {
 	
-	private LinkedList<String> errorMessages = null; //エラーメッセージを管理する
+	private Map<String, StatementNode> errorMessages = null; //エラーメッセージを管理する
 	private GlobalScope globalScope = null; //シンボルテーブル
 	private String beingProcessedFunctionName = null; //現在処理中の関数名
 	private BlockNode beingProcessedBlock = null; //現在処理中の複合文
 	private StatementNode  beingProcessedStatement = null; //現在処理中の文
+	private Properties properties = null; //エラーメッセージ
 	
 	public SemanticAnalyzer(GlobalScope globalScope) {
 		super();
 		this.globalScope = globalScope;
-		this.errorMessages = new LinkedList<String>();
+		this.errorMessages = new LinkedHashMap<String, StatementNode>();
 	}
 	
-	public LinkedList<String> getErrorMessages() {
+	public Map<String, StatementNode> getErrorMessages() {
 		return errorMessages;
 	}
-	
-	public void setErrorMessages(LinkedList<String> errorMessages) {
+
+	public void setErrorMessages(Map<String, StatementNode> errorMessages) {
 		this.errorMessages = errorMessages;
 	}
-	
+
+	public Properties getProperties() {
+		return properties;
+	}
+
+	public void setProperties(Properties properties) {
+		this.properties = properties;
+	}
+
 	/**
 	 * 抽象構文木のルート
 	 */
@@ -550,17 +559,19 @@ public class SemanticAnalyzer implements Visitor {
 						
 						//識別子のデータ型チェック
 						if(this.identifierDataTypeCheck(identifierNode, DataType.INT)) {
-							errorMessages.add("識別子のデータ型が正しくない");
+							String errorMessage = this.properties.getProperty("error.IncorrectDataTypeOfIdentifierUsedInTheFormula");
+							this.errorMessages.put(errorMessage, this.beingProcessedStatement);
 						}
 						
 						//識別子の有効範囲のチェック
-						if(this.identifierScopeCheck(identifierNode)) {
-							errorMessages.add("識別子が有効範囲に存在しない");
+						if(!this.identifierScopeCheck(identifierNode)) {
+							String errorMessage = this.properties.getProperty("error.IdentifierIsValidOutsideTheRange");
+							this.errorMessages.put(errorMessage, this.beingProcessedStatement);
 						}
 						
 					} else {
 						//識別子でもなければ、リテラルの整数でもない
-						errorMessages.add("整数でもなければ、識別子でもない");
+						this.errorMessages.put("整数でもなければ、識別子でもない", this.beingProcessedStatement);
 					}
 				}
 		}
@@ -635,7 +646,7 @@ public class SemanticAnalyzer implements Visitor {
 		if (!registeredFlag) {
 			
 			//大域領域の識別子を検索する
-			if (!this.globalScope.getGlobalSymbolTable().searchSymbol(identifierNode.getIdentifier().getName())) {
+			if (this.globalScope.getGlobalSymbolTable().searchSymbol(identifierNode.getIdentifier().getName())) {
 				ret = true;
 			}
 		}
