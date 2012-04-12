@@ -159,7 +159,7 @@ public class C0Interpreter extends InterpreterImplementation {
 		SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(globalScope);
 		semanticAnalyzer.setProperties(this.properties);
 		program.accept(semanticAnalyzer);
-		Map<String, StatementNode> errorMessages = semanticAnalyzer.getErrorMessages();
+		Map<Integer, Map<String, StatementNode>> errorMessages = semanticAnalyzer.getErrorMessages();
 		
 		/*
 		if (main.getFunctionNode() != null) {
@@ -279,14 +279,21 @@ public class C0Interpreter extends InterpreterImplementation {
 		
 		//意味解析時のエラーメッセージの出力
 		} else {
+			
 			System.out.println("/******************エラーメッセージ******************/");
-			for (Map.Entry<String, StatementNode> errorMessageMap : errorMessages.entrySet()) {
-				String errorMessage = errorMessageMap.getKey();
-				StatementNode errorStatement = errorMessageMap.getValue();
-				Location location = errorStatement.location();
-				Token token = location.getToken();
-				System.out.println("問題のあった行:" + token.beginLine + "行," + token.beginColumn + "列," + token.endLine + "行," + token.endColumn + "列");
-				System.out.println(errorMessage);
+			
+			for (Map.Entry<Integer, Map<String, StatementNode>> errorMap : errorMessages.entrySet()) {
+				
+				Map<String, StatementNode> errorMessageMap = errorMap.getValue();
+				
+				for (Map.Entry<String, StatementNode> errorMessageMap2 : errorMessageMap.entrySet()) {
+					String errorMessage = errorMessageMap2.getKey();
+					StatementNode errorStatement = errorMessageMap2.getValue();
+					Location location = errorStatement.location();
+					Token token = location.getToken();
+					System.out.println("問題のあった行:" + token.beginLine + "行," + token.beginColumn + "列," + token.endLine + "行," + token.endColumn + "列");
+					System.out.println(errorMessage);
+				}
 			}
 		}
 		

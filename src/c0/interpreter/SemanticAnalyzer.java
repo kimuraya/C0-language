@@ -54,24 +54,25 @@ import c0.util.SymbolTable;
  */
 public class SemanticAnalyzer implements Visitor {
 	
-	private Map<String, StatementNode> errorMessages = null; //エラーメッセージを管理する
+	private Map<Integer, Map<String, StatementNode>> errorMessages = null; //エラーメッセージを管理する
 	private GlobalScope globalScope = null; //シンボルテーブル
 	private String beingProcessedFunctionName = null; //現在処理中の関数名
 	private BlockNode beingProcessedBlock = null; //現在処理中の複合文
 	private StatementNode  beingProcessedStatement = null; //現在処理中の文
 	private Properties properties = null; //エラーメッセージ
+	private Integer errorCount = 1; //エラーの数
 	
 	public SemanticAnalyzer(GlobalScope globalScope) {
 		super();
 		this.globalScope = globalScope;
-		this.errorMessages = new LinkedHashMap<String, StatementNode>();
+		this.errorMessages = new LinkedHashMap<Integer, Map<String, StatementNode>>();
 	}
 	
-	public Map<String, StatementNode> getErrorMessages() {
+	public Map<Integer, Map<String, StatementNode>> getErrorMessages() {
 		return errorMessages;
 	}
 
-	public void setErrorMessages(Map<String, StatementNode> errorMessages) {
+	public void setErrorMessages(Map<Integer, Map<String, StatementNode>> errorMessages) {
 		this.errorMessages = errorMessages;
 	}
 
@@ -399,6 +400,12 @@ public class SemanticAnalyzer implements Visitor {
 			
 			for (StatementNode statement : statements) {
 				statement.accept(this);
+				
+				//複合分の場合、現在処理中の複合文が更新されている
+				if (statement.getNodeType() == NodeType.BLOCK_STATEMENT) {
+					//現在処理中の複合文を元に戻す
+					this.beingProcessedBlock = blockNode;
+				}
 			}
 		}
 		
@@ -559,19 +566,28 @@ public class SemanticAnalyzer implements Visitor {
 						
 						//識別子のデータ型チェック
 						if(this.identifierDataTypeCheck(identifierNode, DataType.INT)) {
+							errorCount++;
 							String errorMessage = this.properties.getProperty("error.IncorrectDataTypeOfIdentifierUsedInTheFormula");
-							this.errorMessages.put(errorMessage, this.beingProcessedStatement);
+							Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+							errorMap.put(errorMessage, this.beingProcessedStatement);
+							this.errorMessages.put(errorCount, errorMap);
 						}
 						
 						//識別子の有効範囲のチェック
 						if(!this.identifierScopeCheck(identifierNode)) {
+							errorCount++;
 							String errorMessage = this.properties.getProperty("error.IdentifierIsValidOutsideTheRange");
-							this.errorMessages.put(errorMessage, this.beingProcessedStatement);
+							Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+							errorMap.put(errorMessage, this.beingProcessedStatement);
+							this.errorMessages.put(errorCount, errorMap);
 						}
 						
 					} else {
 						//識別子でもなければ、リテラルの整数でもない
-						this.errorMessages.put("整数でもなければ、識別子でもない", this.beingProcessedStatement);
+						errorCount++;
+						Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+						errorMap.put("整数でもなければ、識別子でもない", this.beingProcessedStatement);
+						this.errorMessages.put(errorCount, errorMap);
 					}
 				}
 		}
