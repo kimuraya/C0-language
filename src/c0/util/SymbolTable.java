@@ -51,10 +51,10 @@ public class SymbolTable {
 	
 	/**
 	 * 識別子をシンボルテーブルに追加する
-	 * @param Symbol
+	 * @param symbol
 	 */
-	public void addSymbol(Identifier Symbol) {
-		this.symbolTable.add(Symbol);
+	public void addSymbol(Identifier symbol) {
+		this.symbolTable.add(symbol);
 	}
 	
 	/**
@@ -79,10 +79,10 @@ public class SymbolTable {
 	
 	/**
 	 * 同名の識別子を更新する
-	 * @param Symbol
+	 * @param symbol
 	 * @return
 	 */
-	public boolean updateSymbol(Identifier Symbol) {
+	public boolean updateSymbol(Identifier symbol) {
 		
 		int cnt = 0;
 		
@@ -90,8 +90,8 @@ public class SymbolTable {
 		for (Identifier updateSymbol : this.symbolTable) {
 			
 			//名前が一致した場合、更新を行う
-			if (updateSymbol.getName().equals(Symbol.getName())) {
-				this.symbolTable.set(cnt, Symbol);
+			if (updateSymbol.getName().equals(symbol.getName())) {
+				this.symbolTable.set(cnt, symbol);
 				return true;
 			}
 			

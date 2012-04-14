@@ -10,6 +10,7 @@ import c0.ast.AstNode;
 import c0.ast.BlockNode;
 import c0.ast.BreakNode;
 import c0.ast.CallNode;
+import c0.ast.DataTypeNode;
 import c0.ast.DeclareVariableNode;
 import c0.ast.DivNode;
 import c0.ast.EmptyStatementNode;
@@ -42,6 +43,7 @@ import c0.ast.ReturnNode;
 import c0.ast.StatementNode;
 import c0.ast.UnaryMinusNode;
 import c0.ast.WhileNode;
+import c0.util.DataType;
 import c0.util.GlobalScope;
 import c0.util.Identifier;
 import c0.util.IdentifierType;
@@ -423,6 +425,12 @@ public class AstVisitor implements Visitor {
 
 	@Override
 	public void visit(DeclareVariableNode declareVariableNode) {
+		
+		//識別子のデータ型をセットする
+		DataTypeNode dataTypeNode = declareVariableNode.getDataType();
+		DataType dataType = dataTypeNode.getDataType();
+		declareVariableNode.getIdentifier().getIdentifier().setDataType(dataType);
+		
 		declareVariableNode.getIdentifier().accept(this);
 		
 		if (declareVariableNode.getExpression() != null) {

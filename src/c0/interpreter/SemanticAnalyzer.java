@@ -43,6 +43,7 @@ import c0.ast.UnaryMinusNode;
 import c0.ast.WhileNode;
 import c0.util.DataType;
 import c0.util.GlobalScope;
+import c0.util.Identifier;
 import c0.util.IdentifierType;
 import c0.util.NodeType;
 import c0.util.SymbolTable;
@@ -564,22 +565,28 @@ public class SemanticAnalyzer implements Visitor {
 						
 						IdentifierNode identifierNode = (IdentifierNode) left;
 						
-						//識別子のデータ型チェック
-						if(this.identifierDataTypeCheck(identifierNode, DataType.INT)) {
-							errorCount++;
-							String errorMessage = this.properties.getProperty("error.IncorrectDataTypeOfIdentifierUsedInTheFormula");
-							Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
-							errorMap.put(errorMessage, this.beingProcessedStatement);
-							this.errorMessages.put(errorCount, errorMap);
-						}
-						
 						//識別子の有効範囲のチェック
 						if(!this.identifierScopeCheck(identifierNode)) {
+							
 							errorCount++;
 							String errorMessage = this.properties.getProperty("error.IdentifierIsValidOutsideTheRange");
 							Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
 							errorMap.put(errorMessage, this.beingProcessedStatement);
 							this.errorMessages.put(errorCount, errorMap);
+							
+						} else {
+							
+							//識別子のデータ型チェック
+							//識別子のデータ型のチェックは、識別子が有効範囲に存在する場合のみ、実施する
+							if(!this.identifierDataTypeCheck(identifierNode, DataType.INT)) {
+								
+								errorCount++;
+								String errorMessage = this.properties.getProperty("error.IncorrectDataTypeOfIdentifierUsedInTheFormula");
+								Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+								errorMap.put(errorMessage, this.beingProcessedStatement);
+								this.errorMessages.put(errorCount, errorMap);
+								
+							}
 						}
 						
 					} else {
@@ -597,29 +604,46 @@ public class SemanticAnalyzer implements Visitor {
 	 * 識別子とデータ型の情報を受け取り、
 	 * 識別子が変数か関数か、変数だった場合、
 	 * 指定されたデータ型の変数かをチェックする
+	 * データ型が正しい場合、trueを返す
 	 * @return
 	 */
-	private boolean identifierDataTypeCheck(IdentifierNode identifierNode, DataType dataType) {
+	private boolean identifierDataTypeCheck(IdentifierNode checkIdentifierNode, DataType checkDataType) {
+		
+		boolean ret = false;
+		boolean foundFlag = false; //見つかっているならtrue
+		Identifier searchSymbol = null; //シンボルテーブルから検索された識別子
 		
 		//処理中の関数のLocalScopeから識別子を検索
+		SymbolTable beingProcessedSymbolTable = this.beingProcessedBlock.getSymbolTable();
+		
+		//現在処理中の複合文にある識別子をsymbol検索する
+		if (beingProcessedSymbolTable.searchSymbol(checkIdentifierNode.getIdentifier().getName())) {
+			searchSymbol = beingProcessedSymbolTable.getSymbol(checkIdentifierNode.getIdentifier().getName());
+			foundFlag = true;
+		}
 		
 		//グローバル領域からグローバル変数を検索
+		if (!foundFlag) {
+			//大域領域の識別子を検索する
+			if (this.globalScope.getGlobalSymbolTable().searchSymbol(checkIdentifierNode.getIdentifier().getName())) {
+				searchSymbol = this.globalScope.getGlobalSymbolTable().getSymbol(checkIdentifierNode.getIdentifier().getName());
+			}
+		}
 		
 		//取り出した識別子が変数なのか、関数なのかをチェック
-		IdentifierType identifierType = this.identifierTypeCheck(identifierNode);
+		IdentifierType identifierType = searchSymbol.getIdentifierType();
 		
 		//変数だった場合、変数のデータ型をチェックする。受け取ったデータ型と一致しなければ、エラー
+		if (identifierType == IdentifierType.VARIABLE) {
+			
+			//識別子のデータ型が正しいか比較する
+			if (searchSymbol.getDataType() == checkDataType) {
+				ret = true;
+			}
+			
+		}
 		
-		return false;
-	}
-	
-	/**
-	 * 識別子が変数なのか、関数なのかをチェック
-	 * @param identifierNode
-	 * @return
-	 */
-	private IdentifierType identifierTypeCheck(IdentifierNode identifierNode) {
-		return IdentifierType.FUNCTION;
+		return ret;
 	}
 	
 	/**
@@ -630,18 +654,16 @@ public class SemanticAnalyzer implements Visitor {
 	private boolean identifierScopeCheck(IdentifierNode identifierNode) {
 		
 		boolean ret = false;
-		boolean registeredFlag = false; //登録済みならtrue
 		
 		//入れ子の内側から外側の複合文を調べる
 		SymbolTable beingProcessedSymbolTable = this.beingProcessedBlock.getSymbolTable();
 		
 		//現在処理中の複合文にある識別子を検索する
 		if (beingProcessedSymbolTable.searchSymbol(identifierNode.getIdentifier().getName())) {
-			registeredFlag = true;
 			ret = true;
 		}
 		
-		if (!registeredFlag) {
+		if (!ret) {
 			//存在しない場合、外側にある複合文への検索を試みる
 			//関数本体の複合文にもない場合、関数内に識別子が存在しないと判断し、処理を打ち切る
 			//関数本体のouterNestBlockはnull
@@ -651,7 +673,6 @@ public class SemanticAnalyzer implements Visitor {
 				
 				//現在処理中の複合文にある識別子を検索する
 				if (symbolTable.searchSymbol(identifierNode.getIdentifier().getName())) {
-					registeredFlag = true;
 					ret = true;
 					break;
 				}
@@ -659,7 +680,7 @@ public class SemanticAnalyzer implements Visitor {
 		}
 		
 		//関数のスコープにない場合、大域のシンボルテーブルをチェックする
-		if (!registeredFlag) {
+		if (!ret) {
 			
 			//大域領域の識別子を検索する
 			if (this.globalScope.getGlobalSymbolTable().searchSymbol(identifierNode.getIdentifier().getName())) {

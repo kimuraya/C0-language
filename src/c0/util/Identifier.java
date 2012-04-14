@@ -3,6 +3,7 @@ package c0.util;
 import java.util.List;
 
 import c0.ast.BlockNode;
+import c0.ast.DataTypeNode;
 import c0.ast.ExpressionNode;
 import c0.ast.IdentifierNode;
 
@@ -18,6 +19,7 @@ public class Identifier {
 	private List<Identifier> parameters;     //引数のリスト
 	private String standardFunctionName;     //標準関数に使用するクラス名を入れる
 	private IdentifierNode functionNode;     //構文木にある自分のノードへのリンク
+	private DataType dataType; //識別子のデータ型
 	
 	public Identifier(String name) {
 		super();
@@ -70,6 +72,14 @@ public class Identifier {
 
 	public void setFunctionNode(IdentifierNode functionNode) {
 		this.functionNode = functionNode;
+	}
+
+	public DataType getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(DataType dataType) {
+		this.dataType = dataType;
 	}
 
 	//デバッグ用
