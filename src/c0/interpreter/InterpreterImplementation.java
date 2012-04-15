@@ -153,7 +153,8 @@ public class InterpreterImplementation implements Interpreter {
 			StatementNode statementNode) throws InterpreterRuntimeException {
 		
 		BlockNode block = (BlockNode) statementNode;
-		ExecuteStatementResult ret = null;
+		ExecuteStatementResult ret = new ExecuteStatementResult();
+		ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
 		
 		//局所変数をスタックに詰める
 		List<DeclareVariableNode> localVariables = block.getLocalVariables();

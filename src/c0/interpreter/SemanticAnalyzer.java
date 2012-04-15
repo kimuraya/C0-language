@@ -616,10 +616,29 @@ public class SemanticAnalyzer implements Visitor {
 		//処理中の関数のLocalScopeから識別子を検索
 		SymbolTable beingProcessedSymbolTable = this.beingProcessedBlock.getSymbolTable();
 		
-		//現在処理中の複合文にある識別子をsymbol検索する
+		//複合文にある識別子を検索する
 		if (beingProcessedSymbolTable.searchSymbol(checkIdentifierNode.getIdentifier().getName())) {
 			searchSymbol = beingProcessedSymbolTable.getSymbol(checkIdentifierNode.getIdentifier().getName());
 			foundFlag = true;
+		}
+		
+		//存在しない場合、外側にある複合文への検索を試みる
+		//関数本体の複合文にもない場合、関数内に識別子が存在しないと判断し、処理を打ち切る
+		//関数本体のouterNestBlockはnull
+		if (!foundFlag) {
+			for (BlockNode blockNode = this.beingProcessedBlock.getOuterNestBlock(); blockNode != null; blockNode = blockNode.getOuterNestBlock()) {
+				
+				//外側の複合文から識別子を検索
+				SymbolTable symbolTable = blockNode.getSymbolTable();
+				
+				//複合文にある識別子を検索する
+				if (symbolTable.searchSymbol(checkIdentifierNode.getIdentifier().getName())) {
+					searchSymbol = symbolTable.getSymbol(checkIdentifierNode.getIdentifier().getName());
+					foundFlag = true;
+					break;
+				}
+			
+			}
 		}
 		
 		//グローバル領域からグローバル変数を検索
