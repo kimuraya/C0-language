@@ -146,6 +146,10 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(AssignNode assignNode) {
+		
+		//TODO ここで初期化のフラグを立てる
+		//シンボルテーブルから識別子を検索し、フラグを立てる
+		
 		assignNode.getLeftValue().accept(this);
 		assignNode.getExpression().accept(this);
 	}
@@ -527,6 +531,9 @@ public class SemanticAnalyzer implements Visitor {
 		//TODO 代入文と同じデータ型のチェックを行う
 		if (declareVariableNode.getExpression() != null) {
 			declareVariableNode.getExpression().accept(this);
+			
+			//代入が行われた為、フラグを更新する
+			declareVariableNode.getIdentifier().getIdentifier().setAssignFlag(true);
 		}
 	}
 
@@ -561,6 +568,7 @@ public class SemanticAnalyzer implements Visitor {
 				//else ifを追加する。被演算子が別の式である場合の処理を追加
 				if (left.getNodeType() != NodeType.INT_LITERAL || left.getNodeType() == NodeType.IDENTIFIER) {
 					
+					//識別子の処理
 					if (left.getNodeType() == NodeType.IDENTIFIER) {
 						
 						IdentifierNode identifierNode = (IdentifierNode) left;
@@ -587,13 +595,23 @@ public class SemanticAnalyzer implements Visitor {
 								this.errorMessages.put(errorCount, errorMap);
 								
 							}
+							
+							//識別子が初期化されているかチェックする
+							if(!this.identifierInitializationCheck(identifierNode)) {
+								errorCount++;
+								String errorMessage = this.properties.getProperty("error.VariableHasNotBeenInitialized");
+								Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+								errorMap.put(errorMessage, this.beingProcessedStatement);
+								this.errorMessages.put(errorCount, errorMap);
+							}
 						}
 						
 					} else {
 						//識別子でもなければ、リテラルの整数でもない
 						errorCount++;
+						String errorMessage = this.properties.getProperty("error.TheDataTypeOfTheOperandIsIncorrect");
 						Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
-						errorMap.put("整数でもなければ、識別子でもない", this.beingProcessedStatement);
+						errorMap.put(errorMessage, this.beingProcessedStatement);
 						this.errorMessages.put(errorCount, errorMap);
 					}
 				}
@@ -657,6 +675,70 @@ public class SemanticAnalyzer implements Visitor {
 			
 			//識別子のデータ型が正しいか比較する
 			if (searchSymbol.getDataType() == checkDataType) {
+				ret = true;
+			}
+			
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 識別子が初期化されているかチェックする
+	 * 初期化されている場合、trueを返す
+	 * @param checkIdentifierNode
+	 * @return
+	 */
+	private boolean identifierInitializationCheck(IdentifierNode checkIdentifierNode) {
+		
+		boolean ret = false;
+		boolean foundFlag = false; //見つかっているならtrue
+		Identifier searchSymbol = null; //シンボルテーブルから検索された識別子
+		
+		//処理中の関数のLocalScopeから識別子を検索
+		SymbolTable beingProcessedSymbolTable = this.beingProcessedBlock.getSymbolTable();
+		
+		//複合文にある識別子を検索する
+		if (beingProcessedSymbolTable.searchSymbol(checkIdentifierNode.getIdentifier().getName())) {
+			searchSymbol = beingProcessedSymbolTable.getSymbol(checkIdentifierNode.getIdentifier().getName());
+			foundFlag = true;
+		}
+		
+		//存在しない場合、外側にある複合文への検索を試みる
+		//関数本体の複合文にもない場合、関数内に識別子が存在しないと判断し、処理を打ち切る
+		//関数本体のouterNestBlockはnull
+		if (!foundFlag) {
+			for (BlockNode blockNode = this.beingProcessedBlock.getOuterNestBlock(); blockNode != null; blockNode = blockNode.getOuterNestBlock()) {
+				
+				//外側の複合文から識別子を検索
+				SymbolTable symbolTable = blockNode.getSymbolTable();
+				
+				//複合文にある識別子を検索する
+				if (symbolTable.searchSymbol(checkIdentifierNode.getIdentifier().getName())) {
+					searchSymbol = symbolTable.getSymbol(checkIdentifierNode.getIdentifier().getName());
+					foundFlag = true;
+					break;
+				}
+			
+			}
+		}
+		
+		//グローバル領域からグローバル変数を検索
+		if (!foundFlag) {
+			//大域領域の識別子を検索する
+			if (this.globalScope.getGlobalSymbolTable().searchSymbol(checkIdentifierNode.getIdentifier().getName())) {
+				searchSymbol = this.globalScope.getGlobalSymbolTable().getSymbol(checkIdentifierNode.getIdentifier().getName());
+			}
+		}
+		
+		//取り出した識別子が変数なのか、関数なのかをチェック
+		IdentifierType identifierType = searchSymbol.getIdentifierType();
+		
+		//変数だった場合、変数のデータ型をチェックする。受け取ったデータ型と一致しなければ、エラー
+		if (identifierType == IdentifierType.VARIABLE) {
+			
+			//代入が行われているかチェックする
+			if(searchSymbol.isAssignFlag()) {
 				ret = true;
 			}
 			

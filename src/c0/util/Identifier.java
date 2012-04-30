@@ -20,6 +20,7 @@ public class Identifier {
 	private String standardFunctionName;     //標準関数に使用するクラス名を入れる
 	private IdentifierNode functionNode;     //構文木にある自分のノードへのリンク
 	private DataType dataType; //識別子のデータ型
+	private boolean assignFlag; //代入が行われた場合、trueになる
 	
 	public Identifier(String name) {
 		super();
@@ -80,6 +81,14 @@ public class Identifier {
 
 	public void setDataType(DataType dataType) {
 		this.dataType = dataType;
+	}
+
+	public boolean isAssignFlag() {
+		return assignFlag;
+	}
+
+	public void setAssignFlag(boolean assignFlag) {
+		this.assignFlag = assignFlag;
 	}
 
 	//デバッグ用
