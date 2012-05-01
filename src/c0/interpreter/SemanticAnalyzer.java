@@ -149,6 +149,9 @@ public class SemanticAnalyzer implements Visitor {
 		
 		//TODO ここで初期化のフラグを立てる
 		//シンボルテーブルから識別子を検索し、フラグを立てる
+		//識別子の有効範囲をチェックする
+		//有効範囲にある場合、識別子のノードを受け取り、識別子を返すメソッドを実装する
+		//メソッドから手に入れた識別子に対し、フラグを立てる
 		
 		assignNode.getLeftValue().accept(this);
 		assignNode.getExpression().accept(this);
