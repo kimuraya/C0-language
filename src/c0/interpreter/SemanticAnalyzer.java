@@ -440,6 +440,16 @@ public class SemanticAnalyzer implements Visitor {
 		//現在処理中の文を更新
 		this.beingProcessedStatement = ifNode;
 		
+		//条件式のチェック
+		ExpressionNode conditionalExpression = ifNode.getConditionalExpression();
+		if (!this.conditionalExpressionCheck(conditionalExpression)) {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.ConditionalExpressionError");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, this.beingProcessedStatement);
+			this.errorMessages.put(errorCount, errorMap);
+		}
+		
 		ifNode.getConditionalExpression().accept(this);
 		ifNode.getThenStatement().accept(this);
 		if (ifNode.getElseStatement() != null) {
@@ -456,6 +466,16 @@ public class SemanticAnalyzer implements Visitor {
 		//現在処理中の文を更新
 		this.beingProcessedStatement = whileNode;
 		
+		//条件式のチェック
+		ExpressionNode conditionalExpression = whileNode.getConditionalExpression();
+		if (!this.conditionalExpressionCheck(conditionalExpression)) {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.ConditionalExpressionError");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, this.beingProcessedStatement);
+			this.errorMessages.put(errorCount, errorMap);
+		}
+		
 		whileNode.getConditionalExpression().accept(this);
 		whileNode.getBodyStatement().accept(this);
 	}
@@ -468,6 +488,16 @@ public class SemanticAnalyzer implements Visitor {
 		
 		//現在処理中の文を更新
 		this.beingProcessedStatement = forNode;
+		
+		//条件式のチェック
+		ExpressionNode conditionalExpression = forNode.getConditionalExpression();
+		if (!this.conditionalExpressionCheck(conditionalExpression)) {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.ConditionalExpressionError");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, this.beingProcessedStatement);
+			this.errorMessages.put(errorCount, errorMap);
+		}
 		
 		forNode.getInitializeExpression().accept(this);
 		forNode.getConditionalExpression().accept(this);
@@ -786,6 +816,38 @@ public class SemanticAnalyzer implements Visitor {
 			if (this.globalScope.getGlobalSymbolTable().searchSymbol(identifierNode.getIdentifier().getName())) {
 				ret = this.globalScope.getGlobalSymbolTable().getSymbol(identifierNode.getIdentifier().getName());
 			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 条件式が真偽値定数であるか、関係式、同等式、不等式、論理否定、論理AND、論理ORである場合、true
+	 * @return
+	 */
+	private boolean conditionalExpressionCheck(ExpressionNode conditionalExpression) {
+		
+		boolean ret = false;
+		
+		switch(conditionalExpression.getNodeType()) {
+			
+			//結果が真偽値になる式であった場合
+			case EQUIVALENCE: //"=="
+			case NOT_EQUIVALENCE: //"!="
+			case LESS_THAN: //"<"
+			case LESS_THAN_OR_EQUAL: //"<="
+			case GREATER_THAN: //">"
+			case GREATER_THAN_OR_EQUAL: //">="
+			case LOGICAL_AND: //"&&"
+			case LOGICAL_OR: //"||"
+			case EXCLAMATION: //"!"
+			case BOOLEAN_LITERAL: //true, false
+				ret = true;
+				break;
+				
+			//結果が真偽値にならない式の場合
+			default:
+				break;
 		}
 		
 		return ret;
