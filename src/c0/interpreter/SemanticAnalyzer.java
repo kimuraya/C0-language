@@ -10,6 +10,7 @@ import c0.ast.AstNode;
 import c0.ast.BlockNode;
 import c0.ast.BreakNode;
 import c0.ast.CallNode;
+import c0.ast.DataTypeNode;
 import c0.ast.DeclareVariableNode;
 import c0.ast.DivNode;
 import c0.ast.EmptyStatementNode;
@@ -57,7 +58,7 @@ public class SemanticAnalyzer implements Visitor {
 	
 	private Map<Integer, Map<String, StatementNode>> errorMessages = null; //エラーメッセージを管理する
 	private GlobalScope globalScope = null; //シンボルテーブル
-	private String beingProcessedFunctionName = null; //現在処理中の関数名
+	private IdentifierNode beingProcessedFunction = null; //現在処理中の関数名
 	private BlockNode beingProcessedBlock = null; //現在処理中の複合文
 	private StatementNode  beingProcessedStatement = null; //現在処理中の文
 	private Properties properties = null; //エラーメッセージ
@@ -129,7 +130,7 @@ public class SemanticAnalyzer implements Visitor {
 		if ((identifierNode.getIdentifier().getIdentifierType() == IdentifierType.FUNCTION) && (identifierNode.getBlock() != null)) {
 			
 			//現在走査中の関数名を取得
-			this.beingProcessedFunctionName = identifierNode.getIdentifier().getName();
+			this.beingProcessedFunction = identifierNode;
 			
 			//複合文がある場合
 			if(identifierNode.getBlock() != null) {
@@ -527,6 +528,18 @@ public class SemanticAnalyzer implements Visitor {
 		
 		//現在処理中の文を更新
 		this.beingProcessedStatement = returnNode;
+		
+		//現在処理中の関数から戻り値のデータ型を入手し、戻り値のデータ型と比較
+		DataTypeNode dataTypeNode = this.beingProcessedFunction.getReturnDataType();
+		DataType returnDataType = dataTypeNode.getDataType();
+		
+		if ((returnDataType == DataType.VOID) && (returnNode.getExpression() != null)) {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.TryingToReturnAVoidReturnValueYet");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, this.beingProcessedStatement);
+			this.errorMessages.put(errorCount, errorMap);
+		}
 		
 		if (returnNode.getExpression() != null) {
 			returnNode.getExpression().accept(this);
