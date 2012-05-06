@@ -533,9 +533,19 @@ public class SemanticAnalyzer implements Visitor {
 		DataTypeNode dataTypeNode = this.beingProcessedFunction.getReturnDataType();
 		DataType returnDataType = dataTypeNode.getDataType();
 		
+		//戻り値がvoidである場合
 		if ((returnDataType == DataType.VOID) && (returnNode.getExpression() != null)) {
 			errorCount++;
 			String errorMessage = this.properties.getProperty("error.TryingToReturnAVoidReturnValueYet");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, this.beingProcessedStatement);
+			this.errorMessages.put(errorCount, errorMap);
+		}
+		
+		//戻り値がvoidでない場合、戻り値が書かれているかチェックする
+		if ((returnDataType != DataType.VOID) && (returnNode.getExpression() == null)) {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.ThisFunctionShouldReturnAValue");
 			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
 			errorMap.put(errorMessage, this.beingProcessedStatement);
 			this.errorMessages.put(errorCount, errorMap);
