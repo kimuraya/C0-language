@@ -822,7 +822,7 @@ public class SemanticAnalyzer implements Visitor {
 	}
 	
 	/**
-	 * 条件式が真偽値定数であるか、関係式、同等式、不等式、論理否定、論理AND、論理ORである場合、true
+	 * 条件式が真偽値定数、真偽値の変数、真偽値の添字式、関係式、同等式、不等式、論理否定、論理AND、論理ORである場合、true
 	 * @return
 	 */
 	private boolean conditionalExpressionCheck(ExpressionNode conditionalExpression) {
@@ -844,6 +844,27 @@ public class SemanticAnalyzer implements Visitor {
 			case BOOLEAN_LITERAL: //true, false
 				ret = true;
 				break;
+			
+			//シンボルテーブルから識別子を検索し、識別子が変数であり、かつ、データ型がbooleanであるかを調べる
+			case IDENTIFIER:
+				IdentifierNode identifierNode = (IdentifierNode) conditionalExpression;
+				Identifier identifier = this.searchIdentifier(identifierNode);
+				
+				if ((identifier.getDataType() == DataType.BOOLEAN)) {
+					ret = true;
+				}
+				
+				break;
+				
+			//添字式である場合、添字式の識別子のデータ型を調べる
+			case ARRAY_SUBSCRIPT:
+				ArraySubscriptExpressionNode arraySubscriptExpressionNode = (ArraySubscriptExpressionNode) conditionalExpression;
+				IdentifierNode arrayIdentifierNode = arraySubscriptExpressionNode.getArray();
+				Identifier arrayIdentifier = this.searchIdentifier(arrayIdentifierNode);
+				
+				if ((arrayIdentifier.getDataType() == DataType.BOOLEAN_ARRAY)) {
+					ret = true;
+				}
 				
 			//結果が真偽値にならない式の場合
 			default:
