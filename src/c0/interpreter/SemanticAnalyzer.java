@@ -1,9 +1,12 @@
 package c0.interpreter;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+
 import c0.ast.ArraySubscriptExpressionNode;
 import c0.ast.AssignNode;
 import c0.ast.AstNode;
@@ -101,9 +104,18 @@ public class SemanticAnalyzer implements Visitor {
 		List<IdentifierNode> functions = astNode.getFunctions();
 		
 		//main関数が宣言されているかチェック
-		if (this.searchMainFunction(functions)) {
+		if (!this.searchMainFunction(functions)) {
 			errorCount++;
 			String errorMessage = this.properties.getProperty("error.NotFoundMainFunction");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, null);
+			this.errorMessages.put(errorCount, errorMap);
+		}
+		
+		//関数名の重複をチェックする
+		if (this.getDuplicateCheckingFunction(functions)) {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.DuplicateCheckingFunction");
 			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
 			errorMap.put(errorMessage, null);
 			this.errorMessages.put(errorCount, errorMap);
@@ -946,6 +958,35 @@ public class SemanticAnalyzer implements Visitor {
 			//関数名をチェック
 			if (functionName.equals(identifier.getName())) {
 				ret = function;
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 関数名の重複をチェックする。関数の宣言が重複していた場合、trueを返す
+	 * @param functions
+	 * @return
+	 */
+	private boolean getDuplicateCheckingFunction(List<IdentifierNode> functions) {
+		
+		boolean ret = false;
+		
+		Set<String> set = new HashSet<String>();
+		
+		for (IdentifierNode function : functions) {
+			
+			Identifier identifier = function.getIdentifier();
+			String functionName = identifier.getName();
+			
+			if (set.contains(functionName)) {
+				
+				//関数名の重複を見つけた
+				ret = true;
+				
+			} else {
+				set.add(functionName);
 			}
 		}
 		
