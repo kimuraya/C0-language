@@ -289,9 +289,13 @@ public class C0Interpreter extends InterpreterImplementation {
 				for (Map.Entry<String, StatementNode> errorMessageMap2 : errorMessageMap.entrySet()) {
 					String errorMessage = errorMessageMap2.getKey();
 					StatementNode errorStatement = errorMessageMap2.getValue();
-					Location location = errorStatement.location();
-					Token token = location.getToken();
-					System.out.println("問題のあった行:" + token.beginLine + "行," + token.beginColumn + "列," + token.endLine + "行," + token.endColumn + "列");
+					
+					if (errorStatement != null) {
+						Location location = errorStatement.location();
+						Token token = location.getToken();
+						System.out.println("問題のあった行:" + token.beginLine + "行," + token.beginColumn + "列," + token.endLine + "行," + token.endColumn + "列");
+					}
+					
 					System.out.println(errorMessage);
 				}
 			}

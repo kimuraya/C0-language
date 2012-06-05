@@ -100,6 +100,15 @@ public class SemanticAnalyzer implements Visitor {
 		
 		List<IdentifierNode> functions = astNode.getFunctions();
 		
+		//main関数が宣言されているかチェック
+		if (this.searchMainFunction(functions)) {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.NotFoundMainFunction");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, null);
+			this.errorMessages.put(errorCount, errorMap);
+		}
+		
 		for (IdentifierNode function : functions) {
 			function.accept(this);
 		}
@@ -892,6 +901,52 @@ public class SemanticAnalyzer implements Visitor {
 			//結果が真偽値にならない式の場合
 			default:
 				break;
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 関数のリストから、main関数を探す。main関数が見つかった場合、trueを返す
+	 * @param functions
+	 * @return
+	 */
+	private boolean searchMainFunction(List<IdentifierNode> functions) {
+	
+		boolean ret = false;
+		
+		for (IdentifierNode function : functions) {
+			
+			Identifier identifier = function.getIdentifier();
+			String functionName = identifier.getName();
+			
+			//関数名をチェック
+			if (functionName.equals("main")) {
+				ret = true;
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 指定された名前の関数を探し、識別子のノードを返す
+	 * @param functions
+	 * @param functionName
+	 * @return
+	 */
+	private IdentifierNode getFunction(List<IdentifierNode> functions, String functionName) {
+		
+		IdentifierNode ret = null;
+		
+		for (IdentifierNode function : functions) {
+			
+			Identifier identifier = function.getIdentifier();
+			
+			//関数名をチェック
+			if (functionName.equals(identifier.getName())) {
+				ret = function;
+			}
 		}
 		
 		return ret;
