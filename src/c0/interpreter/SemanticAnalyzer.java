@@ -102,6 +102,16 @@ public class SemanticAnalyzer implements Visitor {
 		}
 		
 		List<IdentifierNode> functions = astNode.getFunctions();
+		List<DeclareVariableNode> glovalVariables = astNode.getGlobalVariables();
+		
+		//変数名の重複をチェックする
+		if (this.getDuplicateCheckingVariable(glovalVariables)) {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.DuplicateCheckingVariable");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, this.beingProcessedStatement);
+			this.errorMessages.put(errorCount, errorMap);
+		}
 		
 		//main関数が宣言されているかチェック
 		if (!this.searchMainFunction(functions)) {
@@ -429,7 +439,17 @@ public class SemanticAnalyzer implements Visitor {
 		
 		//局所変数が宣言されていた場合
 		if (blockNode.getLocalVariables() != null) {
+			
 			List<DeclareVariableNode> localVariables = blockNode.getLocalVariables();
+			
+			//変数名の重複をチェックする
+			if (this.getDuplicateCheckingVariable(localVariables)) {
+				errorCount++;
+				String errorMessage = this.properties.getProperty("error.DuplicateCheckingVariable");
+				Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+				errorMap.put(errorMessage, this.beingProcessedStatement);
+				this.errorMessages.put(errorCount, errorMap);
+			}
 			
 			for (DeclareVariableNode localVariable : localVariables) {
 				localVariable.accept(this);
@@ -987,6 +1007,35 @@ public class SemanticAnalyzer implements Visitor {
 				
 			} else {
 				set.add(functionName);
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 変数名の重複をチェックする。重複していた場合、trueを返す
+	 * @param variables
+	 * @return
+	 */
+	private boolean getDuplicateCheckingVariable(List<DeclareVariableNode> variables) {
+		
+		boolean ret = false;
+		
+		Set<String> set = new HashSet<String>();
+		
+		for (DeclareVariableNode variable : variables) {
+			
+			Identifier identifier = variable.getIdentifier().getIdentifier();
+			String variableName = identifier.getName();
+			
+			if (set.contains(variableName)) {
+				
+				//変数名の重複を見つけた
+				ret = true;
+				
+			} else {
+				set.add(variableName);
 			}
 		}
 		
