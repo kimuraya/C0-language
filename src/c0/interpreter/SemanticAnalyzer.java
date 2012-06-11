@@ -1090,7 +1090,7 @@ public class SemanticAnalyzer implements Visitor {
 			case PRE_DECREMENT: //"--" 前置減分
 			case POST_INCREMENT: //"++" 後置増分
 			case POST_DECREMENT: //"--" 後置減分
-				//
+				ret = this.unaryExpressionCheck(expression);
 				break;
 			case CALL: //関数呼び出し
 				//TODO 戻り値のデータ型を返せば問題ないか？
@@ -1189,11 +1189,113 @@ public class SemanticAnalyzer implements Visitor {
 		//被演算子のデータ型が正しくない場合
 		}  else {
 			errorCount++;
-			String errorMessage = this.properties.getProperty("error.IncorrectDataTypeOfIdentifierUsedInTheFormula");
+			String errorMessage = this.properties.getProperty("error.ExpressionIsNotProperly");
 			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
 			errorMap.put(errorMessage, this.beingProcessedStatement);
 			this.errorMessages.put(errorCount, errorMap);
 		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 単項演算子をチェックする
+	 * @param expression
+	 * @return
+	 */
+	private DataType unaryExpressionCheck(ExpressionNode expression) {
+		
+		DataType ret = null;
+		DataType leftDataType = null;
+		ExpressionNode left = null;
+		
+		//ノードの種類によって、処理を分ける
+		switch(expression.getNodeType()) {
+			
+			case EXCLAMATION: //"!"
+				ExclamationNode exclamationNode = (ExclamationNode) expression;
+				left = exclamationNode.getLeftValue();
+				break;
+			case UNARY_MINUS: //"-" 単項マイナス式
+				UnaryMinusNode unaryMinusNode = (UnaryMinusNode) expression;
+				left = unaryMinusNode.getLeftValue();
+				break;
+			case PRE_INCREMENT: //"++" 前置増分
+				PreIncrementNode preIncrementNode = (PreIncrementNode) expression;
+				left = preIncrementNode.getLeftValue();
+				break;
+			case PRE_DECREMENT: //"--" 前置減分
+				PreDecrementNode preDecrementNode = (PreDecrementNode) expression;
+				left = preDecrementNode.getLeftValue();
+				break;
+			case POST_INCREMENT: //"++" 後置増分
+				PostIncrementNode postIncrementNode = (PostIncrementNode) expression;
+				left = postIncrementNode.getLeftValue();
+				break;
+			case POST_DECREMENT: //"--" 後置減分
+				PostDecrementNode postDecrementNode = (PostDecrementNode) expression;
+				left = postDecrementNode.getLeftValue();
+				break;
+		}
+		
+		//左のデータ型を得る
+		leftDataType = this.expressionCheck(left);
+		
+		//データ型のチェック
+		//整数の式
+		switch(expression.getNodeType()) {
+		
+		case EXCLAMATION: //"!"
+			
+			if (leftDataType == DataType.BOOLEAN) {
+				
+				ret = DataType.BOOLEAN;
+				
+			} else {
+				errorCount++;
+				String errorMessage = this.properties.getProperty("error.ExpressionIsNotProperly");
+				Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+				errorMap.put(errorMessage, this.beingProcessedStatement);
+				this.errorMessages.put(errorCount, errorMap);
+			}
+			
+			break;
+			
+		case UNARY_MINUS: //"-" 単項マイナス式
+			
+			if (leftDataType == DataType.INT) {
+				
+				ret = DataType.INT;
+				
+			} else {
+				errorCount++;
+				String errorMessage = this.properties.getProperty("error.ExpressionIsNotProperly");
+				Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+				errorMap.put(errorMessage, this.beingProcessedStatement);
+				this.errorMessages.put(errorCount, errorMap);
+			}
+			
+			break;
+			
+		case PRE_INCREMENT: //"++" 前置増分
+		case PRE_DECREMENT: //"--" 前置減分
+		case POST_INCREMENT: //"++" 後置増分
+		case POST_DECREMENT: //"--" 後置減分
+			
+			if ((left instanceof IdentifierNode) && (leftDataType == DataType.INT)) {
+				
+				ret = DataType.INT;
+				
+			} else {
+				errorCount++;
+				String errorMessage = this.properties.getProperty("error.ExpressionIsNotProperly");
+				Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+				errorMap.put(errorMessage, this.beingProcessedStatement);
+				this.errorMessages.put(errorCount, errorMap);
+			}
+			
+			break;
+	}
 		
 		return ret;
 	}
