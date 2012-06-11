@@ -51,6 +51,7 @@ import c0.util.Identifier;
 import c0.util.IdentifierType;
 import c0.util.NodeType;
 import c0.util.SymbolTable;
+import c0.util.Value;
 
 /**
  * 意味解析器
@@ -287,7 +288,7 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(PlusNode plusNode) {
-		this.binaryExpressionCheck(plusNode); //TODO 被演算子のデータ型のチェック
+		//this.binaryExpressionCheck(plusNode); //TODO 被演算子のデータ型のチェック
 		plusNode.getLeft().accept(this);
 		plusNode.getRight().accept(this);
 	}
@@ -609,6 +610,8 @@ public class SemanticAnalyzer implements Visitor {
 		//TODO ここを起点に配下にある式のノードすべてを走査する
 		//TODO 式文の下にある式は演算子単位でチェックを行う
 		//TODO 式の型付けの規則を走査する
+		ExpressionNode expression = expressionStatementNode.getExpression();
+		this.expressionCheck(expression);
 		
 		expressionStatementNode.getExpression().accept(this);
 	}
@@ -660,75 +663,6 @@ public class SemanticAnalyzer implements Visitor {
 	}
 	
 	/**
-	 * 二項演算子をチェックする
-	 * @param expression
-	 */
-	private void binaryExpressionCheck(ExpressionNode expression) {
-		
-		switch(expression.getNodeType()) {
-			
-			case PLUS: //"+"
-				PlusNode plusNode = (PlusNode) expression;
-				
-				//左右の子のチェック
-				ExpressionNode left = plusNode.getLeft();
-				ExpressionNode right = plusNode.getRight();
-				
-				//else ifを追加する。被演算子が別の式である場合の処理を追加
-				if (left.getNodeType() != NodeType.INT_LITERAL || left.getNodeType() == NodeType.IDENTIFIER) {
-					
-					//識別子の処理
-					//TODO 識別子が関数化変数のどちらかをチェックするメソッドを追加する
-					if (left.getNodeType() == NodeType.IDENTIFIER) {
-						
-						IdentifierNode identifierNode = (IdentifierNode) left;
-						
-						//識別子の有効範囲のチェック
-						if(!this.identifierScopeCheck(identifierNode)) {
-							
-							errorCount++;
-							String errorMessage = this.properties.getProperty("error.IdentifierIsValidOutsideTheRange");
-							Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
-							errorMap.put(errorMessage, this.beingProcessedStatement);
-							this.errorMessages.put(errorCount, errorMap);
-							
-						} else {
-							
-							//識別子のデータ型チェック
-							//識別子のデータ型のチェックは、識別子が有効範囲に存在する場合のみ、実施する
-							if(!this.identifierDataTypeCheck(identifierNode, DataType.INT)) {
-								
-								errorCount++;
-								String errorMessage = this.properties.getProperty("error.IncorrectDataTypeOfIdentifierUsedInTheFormula");
-								Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
-								errorMap.put(errorMessage, this.beingProcessedStatement);
-								this.errorMessages.put(errorCount, errorMap);
-								
-							}
-							
-							//識別子が初期化されているかチェックする
-							if(!this.identifierInitializationCheck(identifierNode)) {
-								errorCount++;
-								String errorMessage = this.properties.getProperty("error.VariableHasNotBeenInitialized");
-								Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
-								errorMap.put(errorMessage, this.beingProcessedStatement);
-								this.errorMessages.put(errorCount, errorMap);
-							}
-						}
-						
-					} else {
-						//識別子でもなければ、リテラルの整数でもない
-						errorCount++;
-						String errorMessage = this.properties.getProperty("error.TheDataTypeOfTheOperandIsIncorrect");
-						Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
-						errorMap.put(errorMessage, this.beingProcessedStatement);
-						this.errorMessages.put(errorCount, errorMap);
-					}
-				}
-		}
-	}
-	
-	/**
 	 * 識別子とデータ型の情報を受け取り、
 	 * 識別子が変数か関数か、変数だった場合、
 	 * 指定されたデータ型の変数かをチェックする
@@ -738,13 +672,15 @@ public class SemanticAnalyzer implements Visitor {
 	private boolean identifierDataTypeCheck(IdentifierNode checkIdentifierNode, DataType checkDataType) {
 		
 		boolean ret = false;
-		boolean foundFlag = false; //見つかっているならtrue
 		Identifier searchSymbol = null; //シンボルテーブルから検索された識別子
 		
 		searchSymbol = this.searchIdentifier(checkIdentifierNode);
 		
 		//取り出した識別子が変数なのか、関数なのかをチェック
-		IdentifierType identifierType = searchSymbol.getIdentifierType();
+		IdentifierType identifierType = null;
+		if (searchSymbol != null) {
+			identifierType = searchSymbol.getIdentifierType();
+		}
 		
 		//変数だった場合、変数のデータ型をチェックする。受け取ったデータ型と一致しなければ、エラー
 		//TODO 取り出した識別子が関数だった場合の処理を追加する
@@ -1037,6 +973,226 @@ public class SemanticAnalyzer implements Visitor {
 			} else {
 				set.add(variableName);
 			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 式のチェックを行う
+	 * @param expression
+	 */
+	public DataType expressionCheck(ExpressionNode expression) {
+		
+		DataType ret = null;
+		
+		switch(expression.getNodeType()) {
+		
+			case INT_LITERAL: //10進定数
+				LiteralNode integerLiteral = (LiteralNode) expression;
+				Value integer = integerLiteral.getLiteral();
+				ret = integer.getDataType();
+				break;
+				
+			case STRING_LITERAL: //文字列定数
+				LiteralNode stringLiteral = (LiteralNode) expression;
+				Value string = stringLiteral.getLiteral();
+				ret = string.getDataType();
+				break;
+				
+			case BOOLEAN_LITERAL: //真偽値定数
+				LiteralNode booleanLiteral = (LiteralNode) expression;
+				Value bool = booleanLiteral.getLiteral();
+				ret = bool.getDataType();
+				break;
+				
+			case IDENTIFIER: //識別子
+				
+				IdentifierNode identifierNode = (IdentifierNode) expression;
+				
+				//識別子の処理
+				//TODO 識別子が関数化変数のどちらかをチェックするメソッドを追加する
+				
+				//識別子の有効範囲のチェック
+				if(!this.identifierScopeCheck(identifierNode)) {
+					
+					errorCount++;
+					String errorMessage = this.properties.getProperty("error.IdentifierIsValidOutsideTheRange");
+					Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+					errorMap.put(errorMessage, this.beingProcessedStatement);
+					this.errorMessages.put(errorCount, errorMap);
+					
+				} else {
+					
+					//識別子が初期化されているかチェックする
+					if(!this.identifierInitializationCheck(identifierNode)) {
+						errorCount++;
+						String errorMessage = this.properties.getProperty("error.VariableHasNotBeenInitialized");
+						Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+						errorMap.put(errorMessage, this.beingProcessedStatement);
+						this.errorMessages.put(errorCount, errorMap);
+					}
+				}
+				
+				//TODO 書き直す
+				//識別子（変数）が持つデータ型をチェックする
+				if(this.identifierDataTypeCheck(identifierNode, DataType.INT)) {
+					ret = DataType.INT;
+				} else if (this.identifierDataTypeCheck(identifierNode, DataType.BOOLEAN)) {
+					ret = DataType.BOOLEAN;
+				} else {
+					//TODO 宣言されていない変数など、データ型が分からない変数の処理
+				}
+				
+				//TODO あとで追記する。配列の処理など
+				
+				break;
+				
+			case ARRAY_SUBSCRIPT: //添字式
+				
+				ArraySubscriptExpressionNode arraySubscriptExpressionNode = (ArraySubscriptExpressionNode) expression;
+				
+				IdentifierNode array = arraySubscriptExpressionNode.getArray();
+				
+				if(this.identifierDataTypeCheck(array, DataType.INT_ARRAY)) {
+					ret = DataType.INT; //欲しいのは式の実行結果のデータ型である為、この書き方で良い
+				} else if (this.identifierDataTypeCheck(array, DataType.BOOLEAN_ARRAY)) {
+					ret = DataType.BOOLEAN; //欲しいのは式の実行結果のデータ型である為、この書き方で良い
+				}
+				
+				//TODO あとで追記する
+				
+				break;
+				
+			case ASSIGN: //"="
+				//不要？
+				break;
+			case LOGICAL_AND: //"&&"
+			case LOGICAL_OR: //"||"
+				//
+				break;
+			case EQUIVALENCE: //"=="
+			case NOT_EQUIVALENCE: //"!="
+			case LESS_THAN: //"<"
+			case LESS_THAN_OR_EQUAL: //"<="
+			case GREATER_THAN: //">"
+			case GREATER_THAN_OR_EQUAL: //">="
+			case PLUS: //"+"
+			case MINUS: //"-"
+			case MUL: //"*"
+			case DIV: //"/"
+			case MOD: //"%"
+				ret = this.binaryExpressionCheck(expression);
+				break;
+			case EXCLAMATION: //"!"
+			case UNARY_MINUS: //"-" 単項マイナス式
+			case PRE_INCREMENT: //"++" 前置増分
+			case PRE_DECREMENT: //"--" 前置減分
+			case POST_INCREMENT: //"++" 後置増分
+			case POST_DECREMENT: //"--" 後置減分
+				//
+				break;
+			case CALL: //関数呼び出し
+				//TODO 戻り値のデータ型を返せば問題ないか？
+				break;
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 二項演算子をチェックする
+	 * @param expression
+	 */
+	private DataType binaryExpressionCheck(ExpressionNode expression) {
+		
+		DataType ret = null;
+		DataType leftDataType = null;
+		DataType rightDataType = null;
+		ExpressionNode left = null;
+		ExpressionNode right = null;
+		
+		switch(expression.getNodeType()) {
+			
+			case EQUIVALENCE: //"=="
+				EquivalenceNode equivalenceNode = (EquivalenceNode) expression;
+				left = equivalenceNode.getLeft();
+				right = equivalenceNode.getRight();
+				break;
+			case NOT_EQUIVALENCE: //"!="
+				NotEquivalenceNode notEquivalenceNode = (NotEquivalenceNode) expression;
+				left = notEquivalenceNode.getLeft();
+				right = notEquivalenceNode.getRight();
+				break;
+			case LESS_THAN: //"<"
+				LessThanNode lessThanNode = (LessThanNode) expression;
+				left = lessThanNode.getLeft();
+				right = lessThanNode.getRight();
+				break;
+			case LESS_THAN_OR_EQUAL: //"<="
+				LessThanOrEqualNode lessThanOrEqualNode = (LessThanOrEqualNode) expression;
+				left = lessThanOrEqualNode.getLeft();
+				right = lessThanOrEqualNode.getRight();
+				break;
+			case GREATER_THAN: //">"
+				GreaterThanNode greaterThanNode = (GreaterThanNode) expression;
+				left = greaterThanNode.getLeft();
+				right = greaterThanNode.getRight();
+				break;
+			case GREATER_THAN_OR_EQUAL: //">="
+				GreaterThanOrEqualNode greaterThanOrEqualNode = (GreaterThanOrEqualNode) expression;
+				left = greaterThanOrEqualNode.getLeft();
+				right = greaterThanOrEqualNode.getRight();
+				break;
+			case PLUS: //"+"
+				PlusNode plusNode = (PlusNode) expression;
+				left = plusNode.getLeft();
+				right = plusNode.getRight();
+				break;
+			case MINUS: //"-"
+				MinusNode minusNode = (MinusNode) expression;
+				left = minusNode.getLeft();
+				right = minusNode.getRight();
+				break;
+			case MUL: //"*"
+				MulNode mulNode = (MulNode) expression;
+				left = mulNode.getLeft();
+				right = mulNode.getRight();
+				break;
+			case DIV: //"/"
+				DivNode divNode = (DivNode) expression;
+				left = divNode.getLeft();
+				right = divNode.getRight();
+				break;
+			case MOD: //"%"
+				ModNode modNode = (ModNode) expression;
+				left = modNode.getLeft();
+				right = modNode.getRight();
+				break;
+		}
+		
+		//左右のデータ型を得る
+		leftDataType = this.expressionCheck(left);
+		rightDataType = this.expressionCheck(right);
+		
+		//左右のデータ型をチェックする
+		//整数の式
+		if ((leftDataType == DataType.INT) && (rightDataType == DataType.INT)) {
+			
+			ret = DataType.INT;
+			
+		//真偽値の式
+		} else if ((leftDataType == DataType.BOOLEAN) && (rightDataType == DataType.BOOLEAN)) {
+			
+			ret = DataType.BOOLEAN;
+			
+		//被演算子のデータ型が正しくない場合
+		}  else {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.IncorrectDataTypeOfIdentifierUsedInTheFormula");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, this.beingProcessedStatement);
+			this.errorMessages.put(errorCount, errorMap);
 		}
 		
 		return ret;
