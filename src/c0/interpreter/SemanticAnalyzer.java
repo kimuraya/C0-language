@@ -180,6 +180,8 @@ public class SemanticAnalyzer implements Visitor {
 	@Override
 	public void visit(AssignNode assignNode) {
 		
+		//TODO 添字式だった場合の処理を追加する
+		
 		IdentifierNode identifierNode = (IdentifierNode) assignNode.getLeftValue();
 		
 		//識別子の有効範囲のチェック
@@ -1069,7 +1071,7 @@ public class SemanticAnalyzer implements Visitor {
 				break;
 			case LOGICAL_AND: //"&&"
 			case LOGICAL_OR: //"||"
-				//
+				this.logicalOperatorExpressionCheck(expression);
 				break;
 			case EQUIVALENCE: //"=="
 			case NOT_EQUIVALENCE: //"!="
@@ -1082,7 +1084,7 @@ public class SemanticAnalyzer implements Visitor {
 			case MUL: //"*"
 			case DIV: //"/"
 			case MOD: //"%"
-				ret = this.binaryExpressionCheck(expression);
+				ret = this.binaryOperatorExpressionCheck(expression);
 				break;
 			case EXCLAMATION: //"!"
 			case UNARY_MINUS: //"-" 単項マイナス式
@@ -1090,7 +1092,7 @@ public class SemanticAnalyzer implements Visitor {
 			case PRE_DECREMENT: //"--" 前置減分
 			case POST_INCREMENT: //"++" 後置増分
 			case POST_DECREMENT: //"--" 後置減分
-				ret = this.unaryExpressionCheck(expression);
+				ret = this.unaryOperatorExpressionCheck(expression);
 				break;
 			case CALL: //関数呼び出し
 				//TODO 戻り値のデータ型を返せば問題ないか？
@@ -1101,10 +1103,59 @@ public class SemanticAnalyzer implements Visitor {
 	}
 	
 	/**
+	 * 論理AND, 論理ORをチェックする
+	 * @param expression
+	 * @return
+	 */
+	private DataType logicalOperatorExpressionCheck(ExpressionNode expression) {
+		
+		DataType ret = null;
+		DataType leftDataType = null;
+		DataType rightDataType = null;
+		ExpressionNode left = null;
+		ExpressionNode right = null;
+		
+		switch(expression.getNodeType()) {
+			
+			case LOGICAL_AND: //"&&"
+				LogicalAndNode logicalAndNode = (LogicalAndNode) expression;
+				left = logicalAndNode.getLeft();
+				right = logicalAndNode.getRight();
+				break;
+				
+			case LOGICAL_OR: //"||"
+				LogicalOrNode logicalOrNode = (LogicalOrNode) expression;
+				left = logicalOrNode.getLeft();
+				right = logicalOrNode.getRight();
+				break;
+		}
+		
+		//左右のデータ型を得る
+		leftDataType = this.expressionCheck(left);
+		rightDataType = this.expressionCheck(right);
+		
+		//左右のデータ型をチェックする
+		if ((leftDataType == DataType.BOOLEAN) && (rightDataType == DataType.BOOLEAN)) {
+			
+			ret = DataType.BOOLEAN;
+			
+		//被演算子のデータ型が正しくない場合
+		}  else {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.ExpressionIsNotProperly");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, this.beingProcessedStatement);
+			this.errorMessages.put(errorCount, errorMap);
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 * 二項演算子をチェックする
 	 * @param expression
 	 */
-	private DataType binaryExpressionCheck(ExpressionNode expression) {
+	private DataType binaryOperatorExpressionCheck(ExpressionNode expression) {
 		
 		DataType ret = null;
 		DataType leftDataType = null;
@@ -1203,7 +1254,7 @@ public class SemanticAnalyzer implements Visitor {
 	 * @param expression
 	 * @return
 	 */
-	private DataType unaryExpressionCheck(ExpressionNode expression) {
+	private DataType unaryOperatorExpressionCheck(ExpressionNode expression) {
 		
 		DataType ret = null;
 		DataType leftDataType = null;
