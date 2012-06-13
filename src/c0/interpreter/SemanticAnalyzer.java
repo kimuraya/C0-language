@@ -1095,7 +1095,7 @@ public class SemanticAnalyzer implements Visitor {
 				ret = this.unaryOperatorExpressionCheck(expression);
 				break;
 			case CALL: //関数呼び出し
-				//TODO 戻り値のデータ型を返せば問題ないか？
+				ret = this.functionCallExpressionCheck(expression);
 				break;
 		}
 		
@@ -1347,6 +1347,26 @@ public class SemanticAnalyzer implements Visitor {
 			
 			break;
 	}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 * @param expression
+	 * @return
+	 */
+	private DataType functionCallExpressionCheck(ExpressionNode expression) {
+		
+		DataType ret = null;
+		
+		CallNode callNode = (CallNode) expression;
+		IdentifierNode identifierNode = (IdentifierNode) callNode.getFunction();
+		Identifier identifier = identifierNode.getIdentifier();
+		Identifier function = this.globalScope.getGlobalSymbolTable().getSymbol(identifier.getName());
+		IdentifierNode functionNode = function.getFunctionNode();
+		DataTypeNode returnDataType = functionNode.getReturnDataType();
+		ret = returnDataType.getDataType();
 		
 		return ret;
 	}
