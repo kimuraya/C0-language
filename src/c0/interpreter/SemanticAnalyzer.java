@@ -290,7 +290,6 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(PlusNode plusNode) {
-		//this.binaryExpressionCheck(plusNode); //TODO 被演算子のデータ型のチェック
 		plusNode.getLeft().accept(this);
 		plusNode.getRight().accept(this);
 	}
@@ -1352,7 +1351,7 @@ public class SemanticAnalyzer implements Visitor {
 	}
 	
 	/**
-	 * 
+	 * 関数呼び出しの戻り値のデータ型を返す
 	 * @param expression
 	 * @return
 	 */
@@ -1361,12 +1360,22 @@ public class SemanticAnalyzer implements Visitor {
 		DataType ret = null;
 		
 		CallNode callNode = (CallNode) expression;
-		IdentifierNode identifierNode = (IdentifierNode) callNode.getFunction();
+		IdentifierNode identifierNode = (IdentifierNode) callNode.getFunction(); //関数呼び出しから識別子を取り出す。この識別子は関数名だけを持つ
 		Identifier identifier = identifierNode.getIdentifier();
-		Identifier function = this.globalScope.getGlobalSymbolTable().getSymbol(identifier.getName());
-		IdentifierNode functionNode = function.getFunctionNode();
-		DataTypeNode returnDataType = functionNode.getReturnDataType();
-		ret = returnDataType.getDataType();
+		Identifier function = this.globalScope.getGlobalSymbolTable().getSymbol(identifier.getName()); //関数名でシンボルテーブルを検索
+		
+		//シンボルテーブルに存在しない識別子を使った呼び出し、関数以外の識別子を使った関数呼び出しを禁止する
+		if (function != null && function.getIdentifierType() == IdentifierType.FUNCTION) {
+			IdentifierNode functionNode = function.getFunctionNode(); //識別子から構文木上の関数のノードを取り出す
+			DataTypeNode returnDataType = functionNode.getReturnDataType(); //関数のノードから戻り値のデータ型を得る
+			ret = returnDataType.getDataType();
+		} else {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.ExpressionIsNotProperly");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, this.beingProcessedStatement);
+			this.errorMessages.put(errorCount, errorMap);
+		}
 		
 		return ret;
 	}
