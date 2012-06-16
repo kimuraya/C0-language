@@ -576,6 +576,12 @@ public class SemanticAnalyzer implements Visitor {
 		DataTypeNode dataTypeNode = this.beingProcessedFunction.getReturnDataType();
 		DataType returnDataType = dataTypeNode.getDataType();
 		
+		//関数の戻り値のデータ型を取得
+		DataType returnValueDatatype = null;
+		if (returnNode.getExpression() != null) {
+			returnValueDatatype = this.expressionCheck(returnNode.getExpression());
+		}
+		
 		//戻り値がvoidである場合
 		if ((returnDataType == DataType.VOID) && (returnNode.getExpression() != null)) {
 			errorCount++;
@@ -593,6 +599,16 @@ public class SemanticAnalyzer implements Visitor {
 			errorMap.put(errorMessage, this.beingProcessedStatement);
 			this.errorMessages.put(errorCount, errorMap);
 		}
+		
+		//関数の戻り値のデータ型をチェックする
+		if ((returnNode.getExpression() != null) && returnDataType != returnValueDatatype) {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.DoesNotMatchTheDeclaredDataTypeOfTheValueReturnedByTheReturn");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, this.beingProcessedStatement);
+			this.errorMessages.put(errorCount, errorMap);
+		}
+		
 		
 		if (returnNode.getExpression() != null) {
 			returnNode.getExpression().accept(this);
