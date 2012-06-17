@@ -180,8 +180,10 @@ public class SemanticAnalyzer implements Visitor {
 	@Override
 	public void visit(AssignNode assignNode) {
 		
+		//TODO 左辺値が識別子で無かった場合、エラーにする
 		//TODO 添字式だった場合の処理を追加する
 		
+		/*
 		IdentifierNode identifierNode = (IdentifierNode) assignNode.getLeftValue();
 		
 		//識別子の有効範囲のチェック
@@ -199,6 +201,7 @@ public class SemanticAnalyzer implements Visitor {
 			Identifier identifier = this.searchIdentifier(identifierNode);
 			identifier.setAssignFlag(true);
 		}
+		*/
 		
 		assignNode.getLeftValue().accept(this);
 		assignNode.getExpression().accept(this);
@@ -1057,6 +1060,10 @@ public class SemanticAnalyzer implements Visitor {
 					ret = DataType.INT;
 				} else if (this.identifierDataTypeCheck(identifierNode, DataType.BOOLEAN)) {
 					ret = DataType.BOOLEAN;
+				} else if (this.identifierDataTypeCheck(identifierNode, DataType.INT_ARRAY)) {
+					ret = DataType.INT_ARRAY;
+				} else if (this.identifierDataTypeCheck(identifierNode, DataType.BOOLEAN_ARRAY)) {
+					ret = DataType.BOOLEAN_ARRAY;
 				} else {
 					//TODO 宣言されていない変数など、データ型が分からない変数の処理
 				}
@@ -1348,13 +1355,15 @@ public class SemanticAnalyzer implements Visitor {
 		case POST_INCREMENT: //"++" 後置増分
 		case POST_DECREMENT: //"--" 後置減分
 			
-			if ((left instanceof IdentifierNode) && (leftDataType == DataType.INT)) {
+			//TODO 添字式の処理も書く
+			
+			if ((left instanceof IdentifierNode) && (leftDataType == DataType.INT) || (left instanceof ArraySubscriptExpressionNode) && (leftDataType == DataType.INT)) {
 				
 				ret = DataType.INT;
 				
 			} else {
 				errorCount++;
-				String errorMessage = this.properties.getProperty("error.ExpressionIsNotProperly");
+				String errorMessage = this.properties.getProperty("error.FormulaOtherThanTheIdentifiersAreUsedInOperator");
 				Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
 				errorMap.put(errorMessage, this.beingProcessedStatement);
 				this.errorMessages.put(errorCount, errorMap);
@@ -1375,6 +1384,10 @@ public class SemanticAnalyzer implements Visitor {
 		
 		DataType ret = null;
 		
+		//TODO 識別子以外の式を使った呼び出しにも対応する
+		//1();
+		//true();
+		
 		CallNode callNode = (CallNode) expression;
 		IdentifierNode identifierNode = (IdentifierNode) callNode.getFunction(); //関数呼び出しから識別子を取り出す。この識別子は関数名だけを持つ
 		Identifier identifier = identifierNode.getIdentifier();
@@ -1387,7 +1400,7 @@ public class SemanticAnalyzer implements Visitor {
 			ret = returnDataType.getDataType();
 		} else {
 			errorCount++;
-			String errorMessage = this.properties.getProperty("error.ExpressionIsNotProperly");
+			String errorMessage = this.properties.getProperty("error.UsingTheIdentifierThatIsNotAFunction");
 			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
 			errorMap.put(errorMessage, this.beingProcessedStatement);
 			this.errorMessages.put(errorCount, errorMap);
