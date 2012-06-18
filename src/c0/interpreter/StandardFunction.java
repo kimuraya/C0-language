@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import c0.ast.DataTypeNode;
 import c0.ast.ExpressionNode;
 import c0.ast.IdentifierNode;
 import c0.ast.LiteralNode;
@@ -11,6 +12,7 @@ import c0.util.DataType;
 import c0.util.GlobalScope;
 import c0.util.Identifier;
 import c0.util.IdentifierType;
+import c0.util.NodeType;
 import c0.util.Value;
 
 /**
@@ -102,6 +104,13 @@ public class StandardFunction {
 		printFunc.setIdentifierType(IdentifierType.FUNCTION);
 		printFunc.setStandardFunctionFlag(true); //標準関数である
 		printFunc.setStandardFunctionName("printFunction"); //ラッパーの名前を保存する
+		
+		//識別子のノードの作製
+		IdentifierNode identifierNode = new IdentifierNode();
+		identifierNode.setIdentifier(printFunc);
+		identifierNode.setNodeType(NodeType.CALL);
+		identifierNode.setReturnDataType(new DataTypeNode(DataType.VOID, null));
+		printFunc.setFunctionNode(identifierNode);
 		
 		functionList.add(printFunc);
 		

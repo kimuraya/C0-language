@@ -20,6 +20,10 @@ public class IdentifierNode extends ExpressionNode {
 		this.location = location;
 		this.nodeType = NodeType.IDENTIFIER;
 	}
+	
+	public IdentifierNode() {
+		super();
+	}
 
 	public Identifier getIdentifier() {
 		return identifier;
