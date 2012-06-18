@@ -397,8 +397,6 @@ public class SemanticAnalyzer implements Visitor {
 	@Override
 	public void visit(CallNode callNode) {
 		
-		//TODO 関数宣言の引数と関数呼び出しの引数のデータ型、個数が一致するかをチェック
-		
 		callNode.getFunction().accept(this);
 		List<ExpressionNode> parameters = callNode.getArguments();
 		
@@ -1396,9 +1394,23 @@ public class SemanticAnalyzer implements Visitor {
 				
 				//シンボルテーブルに存在しない識別子を使った呼び出し、関数以外の識別子を使った関数呼び出しを禁止する
 				if (function != null && function.getIdentifierType() == IdentifierType.FUNCTION) {
+					
 					IdentifierNode functionNode = function.getFunctionNode(); //識別子から構文木上の関数のノードを取り出す
 					DataTypeNode returnDataType = functionNode.getReturnDataType(); //関数のノードから戻り値のデータ型を得る
 					ret = returnDataType.getDataType();
+					
+					//関数宣言の引数と関数呼び出しの引数のデータ型、個数が一致するかをチェック
+					List<ParameterNode> parameters = functionNode.getParameters(); //関数宣言の引数
+					List<ExpressionNode> arguments = callNode.getArguments(); //関数呼び出しの引数
+					
+					if (parameters.size() != arguments.size()) {
+						errorCount++;
+						String errorMessage = this.properties.getProperty("error.NumberOfArgumentsOfTheFunctionDeclarationAndFunctionCallDoesNotMatch");
+						Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+						errorMap.put(errorMessage, this.beingProcessedStatement);
+						this.errorMessages.put(errorCount, errorMap);
+					}
+					
 				} else {
 					errorCount++;
 					String errorMessage = this.properties.getProperty("error.UsingTheIdentifierThatIsNotAFunction");
