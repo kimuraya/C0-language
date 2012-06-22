@@ -440,6 +440,12 @@ public class AstVisitor implements Visitor {
 
 	@Override
 	public void visit(ParameterNode parameterNode) {
+		
+		//引数のデータ型をセットする
+		DataTypeNode dataTypeNode = parameterNode.getDataType();
+		DataType dataType = dataTypeNode.getDataType();
+		parameterNode.getIdentifier().getIdentifier().setDataType(dataType);
+		
 		parameterNode.getIdentifier().accept(this);
 	}
 

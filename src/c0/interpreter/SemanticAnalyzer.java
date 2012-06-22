@@ -164,6 +164,15 @@ public class SemanticAnalyzer implements Visitor {
 			//現在走査中の関数名を取得
 			this.beingProcessedFunction = identifierNode;
 			
+			//引数がある場合
+			if (identifierNode.getParameters() != null) {
+				List<ParameterNode> parameters = identifierNode.getParameters();
+				
+				for (ParameterNode parameterNode : parameters) {
+					parameterNode.accept(this);
+				}
+			}
+			
 			//複合文がある場合
 			if(identifierNode.getBlock() != null) {
 				identifierNode.getBlock().accept(this);
@@ -677,6 +686,9 @@ public class SemanticAnalyzer implements Visitor {
 		//現在処理中の文を更新
 		this.beingProcessedStatement = parameterNode;
 		
+		//引数の値は関数呼び出しの引数と結び付けられる為、代入済みとみなす
+		parameterNode.getIdentifier().getIdentifier().setAssignFlag(true);
+		
 		parameterNode.getIdentifier().accept(this);
 	}
 	
@@ -754,12 +766,27 @@ public class SemanticAnalyzer implements Visitor {
 		
 		boolean ret = false;
 		
+		//TODO 関数の引数も調べるように修正
+		//変数beingProcessedFunctionから引数の情報を取り出す
+		
 		//入れ子の内側から外側の複合文を調べる
 		SymbolTable beingProcessedSymbolTable = this.beingProcessedBlock.getSymbolTable();
+		
+		
 		
 		//現在処理中の複合文にある識別子を検索する
 		if (beingProcessedSymbolTable.searchSymbol(identifierNode.getIdentifier().getName())) {
 			ret = true;
+		}
+		
+		//処理中の関数の引数を調べる
+		if (!ret) {
+			
+			List<ParameterNode> parameters = this.beingProcessedFunction.getParameters();
+			
+			if(this.searchParameter(parameters, identifierNode)) {
+				ret = true;
+			}
 		}
 		
 		if (!ret) {
@@ -791,6 +818,29 @@ public class SemanticAnalyzer implements Visitor {
 	}
 	
 	/**
+	 * 引数のリストから該当する識別子が含まれているかをチェックする
+	 * @param parameters
+	 * @return
+	 */
+	private boolean searchParameter(List<ParameterNode> parameters, IdentifierNode search) {
+		
+		boolean ret = false;
+		String searchName = search.getIdentifier().getName();
+		
+		for (ParameterNode parameter : parameters) {
+			IdentifierNode identifierNode = parameter.getIdentifier();
+			String parameterName = identifierNode.getIdentifier().getName();
+			
+			if (searchName.equals(parameterName)) {
+				ret = true; //探している引数が見つかった
+			}
+			
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 * 識別子の名前を使い、シンボルテーブルから識別子を検索する
 	 * @param identifierNode
 	 * @return
@@ -807,6 +857,20 @@ public class SemanticAnalyzer implements Visitor {
 		if (beingProcessedSymbolTable.searchSymbol(identifierNode.getIdentifier().getName())) {
 			ret = beingProcessedSymbolTable.getSymbol(identifierNode.getIdentifier().getName());
 			foundFlag = true;
+		}
+		
+		//処理中の関数の引数から識別子を検索する
+		if (!foundFlag) {
+			List<ParameterNode> parameters = this.beingProcessedFunction.getParameters();
+			
+			for (ParameterNode parameter : parameters) {
+				Identifier identifier = parameter.getIdentifier().getIdentifier();
+				
+				if (identifier.getName().equals(identifierNode.getIdentifier().getName())) {
+					ret = identifier;
+					foundFlag = true;
+				}
+			}
 		}
 		
 		//存在しない場合、外側にある複合文への検索を試みる
