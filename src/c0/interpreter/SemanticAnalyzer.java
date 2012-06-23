@@ -1467,7 +1467,17 @@ public class SemanticAnalyzer implements Visitor {
 					List<ParameterNode> parameters = functionNode.getParameters(); //関数宣言の引数
 					List<ExpressionNode> arguments = callNode.getArguments(); //関数呼び出しの引数
 					
-					if (parameters.size() != arguments.size()) {
+					if (parameters != null && arguments != null) {
+					
+						if ((parameters.size() != arguments.size()) && !function.isVariableArgumentFlag()) {
+							errorCount++;
+							String errorMessage = this.properties.getProperty("error.NumberOfArgumentsOfTheFunctionDeclarationAndFunctionCallDoesNotMatch");
+							Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+							errorMap.put(errorMessage, this.beingProcessedStatement);
+							this.errorMessages.put(errorCount, errorMap);
+						}
+						
+					} else if (((parameters == null && arguments != null) || (parameters != null && arguments == null)) && !function.isVariableArgumentFlag()) {
 						errorCount++;
 						String errorMessage = this.properties.getProperty("error.NumberOfArgumentsOfTheFunctionDeclarationAndFunctionCallDoesNotMatch");
 						Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();

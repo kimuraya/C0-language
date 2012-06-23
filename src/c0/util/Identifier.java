@@ -21,6 +21,7 @@ public class Identifier {
 	private IdentifierNode functionNode;     //構文木にある自分のノードへのリンク
 	private DataType dataType; //識別子のデータ型
 	private boolean assignFlag; //代入が行われた場合、trueになる
+	private boolean variableArgumentFlag; //可変長引数を持つ関数である場合、trueにする
 	
 	public Identifier(String name) {
 		super();
@@ -89,6 +90,14 @@ public class Identifier {
 
 	public void setAssignFlag(boolean assignFlag) {
 		this.assignFlag = assignFlag;
+	}
+
+	public boolean isVariableArgumentFlag() {
+		return variableArgumentFlag;
+	}
+
+	public void setVariableArgumentFlag(boolean variableArgumentFlag) {
+		this.variableArgumentFlag = variableArgumentFlag;
 	}
 
 	//デバッグ用

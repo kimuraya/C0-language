@@ -104,6 +104,7 @@ public class StandardFunction {
 		printFunc.setIdentifierType(IdentifierType.FUNCTION);
 		printFunc.setStandardFunctionFlag(true); //標準関数である
 		printFunc.setStandardFunctionName("printFunction"); //ラッパーの名前を保存する
+		printFunc.setVariableArgumentFlag(true); //可変長引数を持つ関数である為、trueにする
 		
 		//識別子のノードの作製
 		IdentifierNode identifierNode = new IdentifierNode();
