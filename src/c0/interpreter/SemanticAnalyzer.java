@@ -189,28 +189,49 @@ public class SemanticAnalyzer implements Visitor {
 	@Override
 	public void visit(AssignNode assignNode) {
 		
-		//TODO 左辺値が識別子で無かった場合、エラーにする
-		//TODO 添字式だった場合の処理を追加する
+		ExpressionNode expression = assignNode.getLeftValue();
 		
-		/*
-		IdentifierNode identifierNode = (IdentifierNode) assignNode.getLeftValue();
-		
-		//識別子の有効範囲のチェック
-		if(!this.identifierScopeCheck(identifierNode)) {
+		//左辺値かどうかをチェック
+		switch(expression.getNodeType()) {
 			
-			errorCount++;
-			String errorMessage = this.properties.getProperty("error.IdentifierIsValidOutsideTheRange");
-			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
-			errorMap.put(errorMessage, this.beingProcessedStatement);
-			this.errorMessages.put(errorCount, errorMap);
-			
-		} else {
-			//ここで初期化のフラグを立てる
-			//識別子をシンボルテーブルから探す。式文の節にあるノードには、識別子の名前しか情報が無い為の処置
-			Identifier identifier = this.searchIdentifier(identifierNode);
-			identifier.setAssignFlag(true);
+			case IDENTIFIER: //識別子
+				
+				IdentifierNode identifierNode = (IdentifierNode) assignNode.getLeftValue();
+				
+				//識別子の有効範囲のチェック
+				if(!this.identifierScopeCheck(identifierNode)) {
+					
+					errorCount++;
+					String errorMessage = this.properties.getProperty("error.IdentifierIsValidOutsideTheRange");
+					Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+					errorMap.put(errorMessage, this.beingProcessedStatement);
+					this.errorMessages.put(errorCount, errorMap);
+					
+				} else {
+					//ここで初期化のフラグを立てる
+					//識別子をシンボルテーブルから探す。式文の節にあるノードには、識別子の名前しか情報が無い為の処置
+					Identifier identifier = this.searchIdentifier(identifierNode);
+					identifier.setAssignFlag(true);
+				}
+				
+				break;
+				
+			case ARRAY_SUBSCRIPT: //添字式
+				
+				//TODO 添字式だった場合の処理を追加する
+				
+				break;
+				
+			default:
+				
+				//左辺値でない為、エラーメッセージを表示する
+				errorCount++;
+				String errorMessage = this.properties.getProperty("error.TheLeftExpressionIsNotAnLvalue");
+				Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+				errorMap.put(errorMessage, this.beingProcessedStatement);
+				this.errorMessages.put(errorCount, errorMap);
+				
 		}
-		*/
 		
 		assignNode.getLeftValue().accept(this);
 		assignNode.getExpression().accept(this);
@@ -734,6 +755,8 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	private boolean identifierInitializationCheck(IdentifierNode checkIdentifierNode) {
 		
+		//TODO 添字式の処理を追記する
+		
 		boolean ret = false;
 		boolean foundFlag = false; //見つかっているならtrue
 		Identifier searchSymbol = null; //シンボルテーブルから検索された識別子
@@ -766,13 +789,8 @@ public class SemanticAnalyzer implements Visitor {
 		
 		boolean ret = false;
 		
-		//TODO 関数の引数も調べるように修正
-		//変数beingProcessedFunctionから引数の情報を取り出す
-		
 		//入れ子の内側から外側の複合文を調べる
 		SymbolTable beingProcessedSymbolTable = this.beingProcessedBlock.getSymbolTable();
-		
-		
 		
 		//現在処理中の複合文にある識別子を検索する
 		if (beingProcessedSymbolTable.searchSymbol(identifierNode.getIdentifier().getName())) {
@@ -784,8 +802,10 @@ public class SemanticAnalyzer implements Visitor {
 			
 			List<ParameterNode> parameters = this.beingProcessedFunction.getParameters();
 			
-			if(this.searchParameter(parameters, identifierNode)) {
-				ret = true;
+			if (parameters != null) {
+				if(this.searchParameter(parameters, identifierNode)) {
+					ret = true;
+				}
 			}
 		}
 		
@@ -863,12 +883,14 @@ public class SemanticAnalyzer implements Visitor {
 		if (!foundFlag) {
 			List<ParameterNode> parameters = this.beingProcessedFunction.getParameters();
 			
-			for (ParameterNode parameter : parameters) {
-				Identifier identifier = parameter.getIdentifier().getIdentifier();
-				
-				if (identifier.getName().equals(identifierNode.getIdentifier().getName())) {
-					ret = identifier;
-					foundFlag = true;
+			if (parameters != null) {
+				for (ParameterNode parameter : parameters) {
+					Identifier identifier = parameter.getIdentifier().getIdentifier();
+					
+					if (identifier.getName().equals(identifierNode.getIdentifier().getName())) {
+						ret = identifier;
+						foundFlag = true;
+					}
 				}
 			}
 		}
@@ -1140,13 +1162,32 @@ public class SemanticAnalyzer implements Visitor {
 				
 				IdentifierNode array = arraySubscriptExpressionNode.getArray();
 				
+				//識別子の有効範囲のチェック
+				if(!this.identifierScopeCheck(array)) {
+					
+					errorCount++;
+					String errorMessage = this.properties.getProperty("error.IdentifierIsValidOutsideTheRange");
+					Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+					errorMap.put(errorMessage, this.beingProcessedStatement);
+					this.errorMessages.put(errorCount, errorMap);
+					
+				} else {
+					
+					//識別子が初期化されているかチェックする
+					if(!this.identifierInitializationCheck(array)) {
+						errorCount++;
+						String errorMessage = this.properties.getProperty("error.VariableHasNotBeenInitialized");
+						Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+						errorMap.put(errorMessage, this.beingProcessedStatement);
+						this.errorMessages.put(errorCount, errorMap);
+					}
+				}
+				
 				if(this.identifierDataTypeCheck(array, DataType.INT_ARRAY)) {
 					ret = DataType.INT; //欲しいのは式の実行結果のデータ型である為、この書き方で良い
 				} else if (this.identifierDataTypeCheck(array, DataType.BOOLEAN_ARRAY)) {
 					ret = DataType.BOOLEAN; //欲しいのは式の実行結果のデータ型である為、この書き方で良い
 				}
-				
-				//TODO あとで追記する
 				
 				break;
 				
