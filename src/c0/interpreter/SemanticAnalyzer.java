@@ -189,12 +189,14 @@ public class SemanticAnalyzer implements Visitor {
 	@Override
 	public void visit(AssignNode assignNode) {
 		
-		ExpressionNode expression = assignNode.getLeftValue();
+		ExpressionNode leftValue = assignNode.getLeftValue();
 		
 		//左辺値かどうかをチェック
-		switch(expression.getNodeType()) {
+		switch(leftValue.getNodeType()) {
 			
 			case IDENTIFIER: //識別子
+				
+				//TODO 識別子が関数だった場合の処理を追加する
 				
 				IdentifierNode identifierNode = (IdentifierNode) assignNode.getLeftValue();
 				
@@ -208,17 +210,73 @@ public class SemanticAnalyzer implements Visitor {
 					this.errorMessages.put(errorCount, errorMap);
 					
 				} else {
-					//ここで初期化のフラグを立てる
-					//識別子をシンボルテーブルから探す。式文の節にあるノードには、識別子の名前しか情報が無い為の処置
+					
 					Identifier identifier = this.searchIdentifier(identifierNode);
-					identifier.setAssignFlag(true);
+					
+					//左辺値と右辺値のデータ型を比較する
+					ExpressionNode expression = assignNode.getExpression();
+					DataType dataType = this.expressionCheck(expression);
+					
+					//代入先と式のデータ型を比較する
+					if (dataType == identifier.getDataType()) {
+						
+						//ここで初期化のフラグを立てる
+						//識別子をシンボルテーブルから探す。式文の節にあるノードには、識別子の名前しか情報が無い為の処置
+						identifier.setAssignFlag(true);
+						
+					} else {
+						
+						errorCount++;
+						String errorMessage = this.properties.getProperty("error.TheDataTypeOfTheValueToAssignToTheRight-handSideIsDifferent");
+						Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+						errorMap.put(errorMessage, this.beingProcessedStatement);
+						this.errorMessages.put(errorCount, errorMap);
+						
+					}
 				}
 				
 				break;
 				
 			case ARRAY_SUBSCRIPT: //添字式
 				
-				//TODO 添字式だった場合の処理を追加する
+				ArraySubscriptExpressionNode arraySubscriptExpressionNode = (ArraySubscriptExpressionNode) assignNode.getLeftValue();
+				IdentifierNode array = arraySubscriptExpressionNode.getArray();
+				
+				//識別子の有効範囲のチェック
+				if(!this.identifierScopeCheck(array)) {
+					
+					errorCount++;
+					String errorMessage = this.properties.getProperty("error.IdentifierIsValidOutsideTheRange");
+					Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+					errorMap.put(errorMessage, this.beingProcessedStatement);
+					this.errorMessages.put(errorCount, errorMap);
+					
+				} else {
+					//TODO 配列の初期化フラグについては再検討する
+					Identifier identifier = this.searchIdentifier(array);
+					
+					//左辺値と右辺値のデータ型を比較する
+					ExpressionNode expression = assignNode.getExpression();
+					DataType dataType = this.expressionCheck(expression);
+					
+					//代入先と式のデータ型を比較する
+					if ((dataType == DataType.INT) && (identifier.getDataType() == DataType.INT_ARRAY) || 
+						(dataType == DataType.BOOLEAN) && (identifier.getDataType() == DataType.BOOLEAN_ARRAY)) {
+						
+						//ここで初期化のフラグを立てる
+						//識別子をシンボルテーブルから探す。式文の節にあるノードには、識別子の名前しか情報が無い為の処置
+						identifier.setAssignFlag(true);
+						
+					} else {
+						
+						errorCount++;
+						String errorMessage = this.properties.getProperty("error.TheDataTypeOfTheValueToAssignToTheRight-handSideIsDifferent");
+						Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+						errorMap.put(errorMessage, this.beingProcessedStatement);
+						this.errorMessages.put(errorCount, errorMap);
+						
+					}
+				}
 				
 				break;
 				
@@ -688,12 +746,41 @@ public class SemanticAnalyzer implements Visitor {
 		
 		declareVariableNode.getIdentifier().accept(this);
 		
-		//TODO 代入文と同じデータ型のチェックを行う
+		//初期化式がある場合
 		if (declareVariableNode.getExpression() != null) {
-			declareVariableNode.getExpression().accept(this);
 			
-			//代入が行われた為、フラグを更新する
-			declareVariableNode.getIdentifier().getIdentifier().setAssignFlag(true);
+			Identifier identifier = declareVariableNode.getIdentifier().getIdentifier();
+			
+			//左辺値と右辺値のデータ型を比較する
+			ExpressionNode expression = declareVariableNode.getExpression();
+			DataType dataType = this.expressionCheck(expression);
+			
+			//配列に対して、初期化を行おうとした場合
+			if ((identifier.getDataType() == DataType.BOOLEAN_ARRAY) || (identifier.getDataType() == DataType.INT_ARRAY)) {
+				
+				errorCount++;
+				String errorMessage = this.properties.getProperty("error.ArrayCanNotBeInitialized");
+				Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+				errorMap.put(errorMessage, this.beingProcessedStatement);
+				this.errorMessages.put(errorCount, errorMap);
+			
+			//代入先と式のデータ型を比較する
+			} else if (dataType != identifier.getDataType()) {
+				
+				errorCount++;
+				String errorMessage = this.properties.getProperty("error.TheDataTypeOfTheValueToAssignToTheRight-handSideIsDifferent");
+				Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+				errorMap.put(errorMessage, this.beingProcessedStatement);
+				this.errorMessages.put(errorCount, errorMap);
+				
+			} else {
+				
+				//代入が行われた為、フラグを更新する
+				declareVariableNode.getIdentifier().getIdentifier().setAssignFlag(true);
+				
+			}
+			
+			declareVariableNode.getExpression().accept(this);
 		}
 	}
 
