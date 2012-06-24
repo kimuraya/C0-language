@@ -236,7 +236,6 @@ public class InterpreterImplementation implements Interpreter {
 		List<StatementNode> statements = block.getStatements();
 		for (StatementNode statement : statements) {
 			
-			boolean loopFlag = statement.isLoopFlag();
 			ret = this.executeStatement(statement);
 			
 			//TODO break文を使えるようにするための応急処置

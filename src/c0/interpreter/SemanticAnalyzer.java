@@ -67,6 +67,7 @@ public class SemanticAnalyzer implements Visitor {
 	private StatementNode  beingProcessedStatement = null; //現在処理中の文
 	private Properties properties = null; //エラーメッセージ
 	private Integer errorCount = 1; //エラーの数
+	private boolean loopFlag = false;
 	
 	public SemanticAnalyzer(GlobalScope globalScope) {
 		super();
@@ -610,7 +611,10 @@ public class SemanticAnalyzer implements Visitor {
 		}
 		
 		whileNode.getConditionalExpression().accept(this);
+		
+		this.loopFlag = true; //ループの内側を解析している
 		whileNode.getBodyStatement().accept(this);
+		this.loopFlag = false; //ループの解析が終わった為、フラグを落とす
 	}
 
 	/**
@@ -635,7 +639,10 @@ public class SemanticAnalyzer implements Visitor {
 		forNode.getInitializeExpression().accept(this);
 		forNode.getConditionalExpression().accept(this);
 		forNode.getUpdateExpression().accept(this);
+		
+		this.loopFlag = true; //ループの内側を解析している
 		forNode.getBodyStatement().accept(this);
+		this.loopFlag = false; //ループの解析が終わった為、フラグを落とす
 	}
 
 	/**
@@ -647,9 +654,14 @@ public class SemanticAnalyzer implements Visitor {
 		//現在処理中の文を更新
 		this.beingProcessedStatement = breakNode;
 		
-		// TODO break文
-		// TODO StatementNodeのloopFlagの活用を検討
-		// TODO breakの位置から外側にあるループを検索し、無かった場合はエラーにする
+		//ループの内側でない場合、警告文を出す
+		if (!this.loopFlag) {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.TheBreakStatementHasNotBeenWrittenOnTheInsideOfTheLoop");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, this.beingProcessedStatement);
+			this.errorMessages.put(errorCount, errorMap);
+		}
 	}
 
 	/**
