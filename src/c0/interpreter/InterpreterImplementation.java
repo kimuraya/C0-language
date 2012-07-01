@@ -1576,11 +1576,11 @@ public class InterpreterImplementation implements Interpreter {
 	@Override
 	public void arraySubscriptExpression(ExpressionNode expression) throws InterpreterRuntimeException {
 
-		ArraySubscriptExpressionNode ArraySubscriptExpressionNode = (ArraySubscriptExpressionNode) expression;
+		ArraySubscriptExpressionNode arraySubscriptExpressionNode = (ArraySubscriptExpressionNode) expression;
 
 		//添字を計算する
 		Value value = new Value();
-		ExpressionNode indexExpression = ArraySubscriptExpressionNode.getIndex();
+		ExpressionNode indexExpression = arraySubscriptExpressionNode.getIndex();
 		this.evaluateExpression(indexExpression);
 		StackElement resultElement = this.operandStack.pop();
 		value = resultElement.getValue();
@@ -1601,7 +1601,7 @@ public class InterpreterImplementation implements Interpreter {
 		
 		//配列を取り出す
 		//グローバル変数とローカル変数で処理を分ける
-		IdentifierNode arrayNode = ArraySubscriptExpressionNode.getArray();
+		IdentifierNode arrayNode = arraySubscriptExpressionNode.getArray();
 		Identifier arrayIdentifier = arrayNode.getIdentifier();
 		Value arrayValue = null;
 		DataType arrayDataType = null;

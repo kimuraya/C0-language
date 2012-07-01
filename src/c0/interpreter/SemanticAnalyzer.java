@@ -2,6 +2,7 @@ package c0.interpreter;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -106,6 +107,15 @@ public class SemanticAnalyzer implements Visitor {
 		List<IdentifierNode> functions = astNode.getFunctions();
 		List<DeclareVariableNode> glovalVariables = astNode.getGlobalVariables();
 		
+		//外部宣言の重複をチェックする
+		if (this.getDuplicateCheckingIdentifier(functions, globalVariables)) {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.IdentifierOfTheExternalDeclarationHasBeenDuplicated");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, this.beingProcessedStatement);
+			this.errorMessages.put(errorCount, errorMap);
+		}
+		
 		//変数名の重複をチェックする
 		if (this.getDuplicateCheckingVariable(glovalVariables)) {
 			errorCount++;
@@ -157,13 +167,40 @@ public class SemanticAnalyzer implements Visitor {
 	@Override
 	public void visit(IdentifierNode identifierNode) {
 		
-		//TODO 識別子が有効範囲にあるかをチェックする
-		
 		//関数である場合、複合文を走査する
 		if ((identifierNode.getIdentifier().getIdentifierType() == IdentifierType.FUNCTION) && (identifierNode.getBlock() != null)) {
 			
 			//現在走査中の関数名を取得
 			this.beingProcessedFunction = identifierNode;
+			
+			//戻り値がvoidでない場合、値をreturnで戻しているかをチェックする
+			if (identifierNode.getReturnDataType().getDataType() != DataType.VOID) {
+				
+				BlockNode block = (BlockNode) identifierNode.getBlock();
+				this.beingProcessedStatement = identifierNode.getBlock(); //現在処理中の文を更新する
+				
+				//複合文の最後がreturn文であるかをチェックする
+				LinkedList<StatementNode> statements = (LinkedList<StatementNode>) block.getStatements();
+				StatementNode lastStatement = null;
+				if (!statements.isEmpty()) {
+					lastStatement = statements.getLast();
+				}
+				
+				//最後の文がreturnかチェック
+				if (lastStatement == null) {
+					errorCount++;
+					String errorMessage = this.properties.getProperty("error.ThisFunctionShouldReturnAValueInTheReturnStatement");
+					Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+					errorMap.put(errorMessage, this.beingProcessedStatement);
+					this.errorMessages.put(errorCount, errorMap);
+				} else if (lastStatement.getNodeType() != NodeType.RETURN_STATEMENT) {
+					errorCount++;
+					String errorMessage = this.properties.getProperty("error.ThisFunctionShouldReturnAValueInTheReturnStatement");
+					Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+					errorMap.put(errorMessage, this.beingProcessedStatement);
+					this.errorMessages.put(errorCount, errorMap);
+				}
+			}
 			
 			//引数がある場合
 			if (identifierNode.getParameters() != null) {
@@ -501,6 +538,36 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	@Override
 	public void visit(ArraySubscriptExpressionNode arraySubscriptExpressionNode) {
+		
+		//TODO 配列を宣言する際、要素数が0か0より小さい場合、エラーにする
+		//TODO 配列の範囲外の要素数を指定して、式を実行しようとした場合、エラーにする
+		
+		IdentifierNode array = arraySubscriptExpressionNode.getArray();
+		ExpressionNode index = arraySubscriptExpressionNode.getIndex();
+		
+		//識別子が配列かどうかをチェックする
+		Identifier arrayIdentifier = this.searchIdentifier(array);
+		DataType arrayDataType = arrayIdentifier.getDataType();
+		
+		if (arrayDataType != DataType.INT_ARRAY || arrayDataType != DataType.BOOLEAN_ARRAY) {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.IdentifierIsNotAnArray");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, this.beingProcessedStatement);
+			this.errorMessages.put(errorCount, errorMap);
+		}
+		
+		//要素数が整数かどうかをチェックする
+		DataType indexDataType = this.expressionCheck(index);
+		
+		if (indexDataType != DataType.INT) {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.IsNotAnIntegerNumberOfElements");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, this.beingProcessedStatement);
+			this.errorMessages.put(errorCount, errorMap);
+		}
+		
 		arraySubscriptExpressionNode.getArray().accept(this);
 		arraySubscriptExpressionNode.getIndex().accept(this);
 	}
@@ -1182,6 +1249,53 @@ public class SemanticAnalyzer implements Visitor {
 	}
 	
 	/**
+	 * 外部宣言を受け取り、重複している識別子がないかをチェックする。重複している場合、trueを返す
+	 * @param functions
+	 * @param variables
+	 * @return
+	 */
+	private boolean getDuplicateCheckingIdentifier(List<IdentifierNode> functions, List<DeclareVariableNode> variables) {
+		
+		boolean ret = false;
+		
+		Set<String> set = new HashSet<String>();
+		
+		for (DeclareVariableNode variable : variables) {
+			
+			Identifier identifier = variable.getIdentifier().getIdentifier();
+			String variableName = identifier.getName();
+			
+			if (set.contains(variableName)) {
+				
+				//識別子の重複を見つけた
+				ret = true;
+				
+			} else {
+				set.add(variableName);
+			}
+		}
+		
+		if (!ret) {
+			for (IdentifierNode function : functions) {
+				
+				Identifier identifier = function.getIdentifier();
+				String functionName = identifier.getName();
+				
+				if (set.contains(functionName)) {
+					
+					//識別子の重複を見つけた
+					ret = true;
+					
+				} else {
+					set.add(functionName);
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 * 式のチェックを行う
 	 * @param expression
 	 */
@@ -1617,6 +1731,34 @@ public class SemanticAnalyzer implements Visitor {
 							this.errorMessages.put(errorCount, errorMap);
 						}
 						
+						//関数呼び出しに適応する引数の式の結果が、関数宣言の引数のデータ型と異なる場合、エラーにする
+						if ((parameters.size() == arguments.size()) && !function.isVariableArgumentFlag()) {
+							
+							boolean mismatchFlag = false; //trueの場合、エラーがあった事を示す
+							for (int i = 0; i < arguments.size(); i++) {
+								
+								ExpressionNode argument = arguments.get(i);
+								ParameterNode parameter = parameters.get(i);
+								
+								DataType argDataType = this.expressionCheck(argument); //関数呼び出しの引数のデータ型
+								DataType paraDataType = parameter.getDataType().getDataType(); //関数宣言の引数のデータ型
+								
+								if (argDataType != paraDataType) {
+									mismatchFlag = true; //引数のデータ型が一致しない
+								}
+								
+							}
+							
+							if (mismatchFlag) {
+								errorCount++;
+								String errorMessage = this.properties.getProperty("error.TheDataTypeOfTheArgumentIsDifferent");
+								Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+								errorMap.put(errorMessage, this.beingProcessedStatement);
+								this.errorMessages.put(errorCount, errorMap);
+							}
+							
+						}
+						
 					} else if (((parameters == null && arguments != null) || (parameters != null && arguments == null)) && !function.isVariableArgumentFlag()) {
 						errorCount++;
 						String errorMessage = this.properties.getProperty("error.NumberOfArgumentsOfTheFunctionDeclarationAndFunctionCallDoesNotMatch");
@@ -1625,6 +1767,7 @@ public class SemanticAnalyzer implements Visitor {
 						this.errorMessages.put(errorCount, errorMap);
 					}
 					
+				//関数以外の識別子を使って、関数呼び出しを試みた
 				} else {
 					errorCount++;
 					String errorMessage = this.properties.getProperty("error.UsingTheIdentifierThatIsNotAFunction");
