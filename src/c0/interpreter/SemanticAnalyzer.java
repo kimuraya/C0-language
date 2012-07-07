@@ -836,6 +836,25 @@ public class SemanticAnalyzer implements Visitor {
 		
 		declareVariableNode.getIdentifier().accept(this);
 		
+		//配列だった場合、添字のデータ型をチェックする
+		DataTypeNode dataTypeNode = declareVariableNode.getDataType();
+		DataType dataType = dataTypeNode.getDataType();
+		
+		if (dataType == DataType.INT_ARRAY || dataType == DataType.BOOLEAN_ARRAY) {
+			ExpressionNode elementNumberExpression = dataTypeNode.getElementNumber();
+			DataType elementNumberDataType = this.expressionCheck(elementNumberExpression);
+			
+			if (elementNumberDataType != DataType.INT) {
+				
+				errorCount++;
+				String errorMessage = this.properties.getProperty("error.IsNotAnIntegerNumberOfElements");
+				Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+				errorMap.put(errorMessage, this.beingProcessedStatement);
+				this.errorMessages.put(errorCount, errorMap);
+				
+			}
+		}
+		
 		//初期化式がある場合
 		if (declareVariableNode.getExpression() != null) {
 			
@@ -843,7 +862,7 @@ public class SemanticAnalyzer implements Visitor {
 			
 			//左辺値と右辺値のデータ型を比較する
 			ExpressionNode expression = declareVariableNode.getExpression();
-			DataType dataType = this.expressionCheck(expression);
+			DataType expDataType = this.expressionCheck(expression);
 			
 			//配列に対して、初期化を行おうとした場合
 			if ((identifier.getDataType() == DataType.BOOLEAN_ARRAY) || (identifier.getDataType() == DataType.INT_ARRAY)) {
@@ -855,7 +874,7 @@ public class SemanticAnalyzer implements Visitor {
 				this.errorMessages.put(errorCount, errorMap);
 			
 			//代入先と式のデータ型を比較する
-			} else if (dataType != identifier.getDataType()) {
+			} else if (expDataType != identifier.getDataType()) {
 				
 				errorCount++;
 				String errorMessage = this.properties.getProperty("error.TheDataTypeOfTheValueToAssignToTheRight-handSideIsDifferent");
