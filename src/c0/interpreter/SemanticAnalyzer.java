@@ -234,8 +234,6 @@ public class SemanticAnalyzer implements Visitor {
 			
 			case IDENTIFIER: //識別子
 				
-				//TODO 識別子が関数だった場合の処理を追加する
-				
 				IdentifierNode identifierNode = (IdentifierNode) assignNode.getLeftValue();
 				
 				//識別子の有効範囲のチェック
@@ -254,6 +252,16 @@ public class SemanticAnalyzer implements Visitor {
 					//左辺値と右辺値のデータ型を比較する
 					ExpressionNode expression = assignNode.getExpression();
 					DataType dataType = this.expressionCheck(expression);
+					
+					//識別子が関数でないかをチェックする
+					IdentifierType identifierType = identifier.getIdentifierType();
+					if (identifierType == IdentifierType.FUNCTION) {
+						errorCount++;
+						String errorMessage = this.properties.getProperty("error.BeingUsedAsAVariableFunction");
+						Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+						errorMap.put(errorMessage, this.beingProcessedStatement);
+						this.errorMessages.put(errorCount, errorMap);
+					}
 					
 					//代入先と式のデータ型を比較する
 					if (dataType == identifier.getDataType()) {
@@ -290,22 +298,25 @@ public class SemanticAnalyzer implements Visitor {
 					this.errorMessages.put(errorCount, errorMap);
 					
 				} else {
-					//TODO 配列の初期化フラグについては再検討する
 					Identifier identifier = this.searchIdentifier(array);
+					
+					//識別子が関数でないかをチェックする
+					IdentifierType identifierType = identifier.getIdentifierType();
+					if (identifierType == IdentifierType.FUNCTION) {
+						errorCount++;
+						String errorMessage = this.properties.getProperty("error.BeingUsedAsAVariableFunction");
+						Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+						errorMap.put(errorMessage, this.beingProcessedStatement);
+						this.errorMessages.put(errorCount, errorMap);
+					}
 					
 					//左辺値と右辺値のデータ型を比較する
 					ExpressionNode expression = assignNode.getExpression();
 					DataType dataType = this.expressionCheck(expression);
 					
 					//代入先と式のデータ型を比較する
-					if ((dataType == DataType.INT) && (identifier.getDataType() == DataType.INT_ARRAY) || 
-						(dataType == DataType.BOOLEAN) && (identifier.getDataType() == DataType.BOOLEAN_ARRAY)) {
-						
-						//ここで初期化のフラグを立てる
-						//識別子をシンボルテーブルから探す。式文の節にあるノードには、識別子の名前しか情報が無い為の処置
-						identifier.setAssignFlag(true);
-						
-					} else {
+					if (!(dataType == DataType.INT) && (identifier.getDataType() == DataType.INT_ARRAY) || 
+						!(dataType == DataType.BOOLEAN) && (identifier.getDataType() == DataType.BOOLEAN_ARRAY)) {
 						
 						errorCount++;
 						String errorMessage = this.properties.getProperty("error.TheDataTypeOfTheValueToAssignToTheRight-handSideIsDifferent");
@@ -539,33 +550,35 @@ public class SemanticAnalyzer implements Visitor {
 	@Override
 	public void visit(ArraySubscriptExpressionNode arraySubscriptExpressionNode) {
 		
-		//TODO 配列を宣言する際、要素数が0か0より小さい場合、エラーにする
-		//TODO 配列の範囲外の要素数を指定して、式を実行しようとした場合、エラーにする
-		
 		IdentifierNode array = arraySubscriptExpressionNode.getArray();
 		ExpressionNode index = arraySubscriptExpressionNode.getIndex();
 		
 		//識別子が配列かどうかをチェックする
 		Identifier arrayIdentifier = this.searchIdentifier(array);
-		DataType arrayDataType = arrayIdentifier.getDataType();
 		
-		if (arrayDataType != DataType.INT_ARRAY || arrayDataType != DataType.BOOLEAN_ARRAY) {
-			errorCount++;
-			String errorMessage = this.properties.getProperty("error.IdentifierIsNotAnArray");
-			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
-			errorMap.put(errorMessage, this.beingProcessedStatement);
-			this.errorMessages.put(errorCount, errorMap);
-		}
-		
-		//要素数が整数かどうかをチェックする
-		DataType indexDataType = this.expressionCheck(index);
-		
-		if (indexDataType != DataType.INT) {
-			errorCount++;
-			String errorMessage = this.properties.getProperty("error.IsNotAnIntegerNumberOfElements");
-			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
-			errorMap.put(errorMessage, this.beingProcessedStatement);
-			this.errorMessages.put(errorCount, errorMap);
+		if (arrayIdentifier != null) {
+			
+			DataType arrayDataType = arrayIdentifier.getDataType();
+			
+			//識別子が配列であるかどうかをチェックする
+			if (arrayDataType != DataType.INT_ARRAY && arrayDataType != DataType.BOOLEAN_ARRAY) {
+				errorCount++;
+				String errorMessage = this.properties.getProperty("error.IdentifierIsNotAnArray");
+				Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+				errorMap.put(errorMessage, this.beingProcessedStatement);
+				this.errorMessages.put(errorCount, errorMap);
+			}
+			
+			//要素数が整数かどうかをチェックする
+			DataType indexDataType = this.expressionCheck(index);
+			
+			if (indexDataType != DataType.INT) {
+				errorCount++;
+				String errorMessage = this.properties.getProperty("error.IsNotAnIntegerNumberOfElements");
+				Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+				errorMap.put(errorMessage, this.beingProcessedStatement);
+				this.errorMessages.put(errorCount, errorMap);
+			}
 		}
 		
 		arraySubscriptExpressionNode.getArray().accept(this);
@@ -792,9 +805,7 @@ public class SemanticAnalyzer implements Visitor {
 		//現在処理中の文を更新
 		this.beingProcessedStatement = expressionStatementNode;
 		
-		//TODO ここを起点に配下にある式のノードすべてを走査する
-		//TODO 式文の下にある式は演算子単位でチェックを行う
-		//TODO 式の型付けの規則を走査する
+		//ここを起点に配下にある式のノードすべてを走査する
 		ExpressionNode expression = expressionStatementNode.getExpression();
 		this.expressionCheck(expression);
 		
@@ -900,7 +911,6 @@ public class SemanticAnalyzer implements Visitor {
 		}
 		
 		//変数だった場合、変数のデータ型をチェックする。受け取ったデータ型と一致しなければ、エラー
-		//TODO 取り出した識別子が関数だった場合の処理を追加する
 		if (identifierType == IdentifierType.VARIABLE) {
 			
 			//識別子のデータ型が正しいか比較する
@@ -921,10 +931,7 @@ public class SemanticAnalyzer implements Visitor {
 	 */
 	private boolean identifierInitializationCheck(IdentifierNode checkIdentifierNode) {
 		
-		//TODO 添字式の処理を追記する
-		
 		boolean ret = false;
-		boolean foundFlag = false; //見つかっているならtrue
 		Identifier searchSymbol = null; //シンボルテーブルから検索された識別子
 		
 		searchSymbol = this.searchIdentifier(checkIdentifierNode);
@@ -933,7 +940,6 @@ public class SemanticAnalyzer implements Visitor {
 		IdentifierType identifierType = searchSymbol.getIdentifierType();
 		
 		//変数だった場合、変数のデータ型をチェックする。受け取ったデータ型と一致しなければ、エラー
-		//TODO 取り出した識別子が関数だった場合の処理を追加する
 		if (identifierType == IdentifierType.VARIABLE) {
 			
 			//代入が行われているかチェックする
@@ -941,6 +947,13 @@ public class SemanticAnalyzer implements Visitor {
 				ret = true;
 			}
 			
+		//取り出した識別子が関数だった場合
+		} else if (identifierType == IdentifierType.FUNCTION) {
+			errorCount++;
+			String errorMessage = this.properties.getProperty("error.BeingUsedAsAVariableFunction");
+			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+			errorMap.put(errorMessage, this.beingProcessedStatement);
+			this.errorMessages.put(errorCount, errorMap);
 		}
 		
 		return ret;
@@ -1168,29 +1181,6 @@ public class SemanticAnalyzer implements Visitor {
 	}
 	
 	/**
-	 * 指定された名前の関数を探し、識別子のノードを返す
-	 * @param functions
-	 * @param functionName
-	 * @return
-	 */
-	private IdentifierNode getFunction(List<IdentifierNode> functions, String functionName) {
-		
-		IdentifierNode ret = null;
-		
-		for (IdentifierNode function : functions) {
-			
-			Identifier identifier = function.getIdentifier();
-			
-			//関数名をチェック
-			if (functionName.equals(identifier.getName())) {
-				ret = function;
-			}
-		}
-		
-		return ret;
-	}
-	
-	/**
 	 * 関数名の重複をチェックする。関数の宣言が重複していた場合、trueを返す
 	 * @param functions
 	 * @return
@@ -1372,7 +1362,6 @@ public class SemanticAnalyzer implements Visitor {
 			case ARRAY_SUBSCRIPT: //添字式
 				
 				ArraySubscriptExpressionNode arraySubscriptExpressionNode = (ArraySubscriptExpressionNode) expression;
-				
 				IdentifierNode array = arraySubscriptExpressionNode.getArray();
 				
 				//識別子の有効範囲のチェック
@@ -1384,16 +1373,6 @@ public class SemanticAnalyzer implements Visitor {
 					errorMap.put(errorMessage, this.beingProcessedStatement);
 					this.errorMessages.put(errorCount, errorMap);
 					
-				} else {
-					
-					//識別子が初期化されているかチェックする
-					if(!this.identifierInitializationCheck(array)) {
-						errorCount++;
-						String errorMessage = this.properties.getProperty("error.VariableHasNotBeenInitialized");
-						Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
-						errorMap.put(errorMessage, this.beingProcessedStatement);
-						this.errorMessages.put(errorCount, errorMap);
-					}
 				}
 				
 				if(this.identifierDataTypeCheck(array, DataType.INT_ARRAY)) {
