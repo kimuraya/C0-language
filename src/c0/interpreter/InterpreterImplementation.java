@@ -1225,14 +1225,48 @@ public class InterpreterImplementation implements Interpreter {
 		}
 
 		//左が左辺値でない場合、例外を出す
-		Identifier search;
+		Identifier search = null;
+		int index = 0; //添字
+		
 		try {
-			IdentifierNode identifierNode = (IdentifierNode) left;
-			search = identifierNode.getIdentifier();
+			
+			ArraySubscriptExpressionNode arraySubscriptExpressionNode = null;
+			IdentifierNode identifierNode = null;
+			
+			if (left instanceof IdentifierNode) {
+				
+				identifierNode = (IdentifierNode) left;
+				search = identifierNode.getIdentifier();
+				
+			} else if (left instanceof ArraySubscriptExpressionNode) {
+				
+				arraySubscriptExpressionNode = (ArraySubscriptExpressionNode) left;
+				identifierNode = arraySubscriptExpressionNode.getArray();
+				search = identifierNode.getIdentifier();
+				
+				//添字を計算する
+				Value value = this.getIndexValue(arraySubscriptExpressionNode);
+				
+				//添字が整数でなかった場合
+				if (value.getDataType() != DataType.INT) {
+					String errorMessage = this.properties.getProperty("error.IsNotAnIntegerNumberOfElements");
+					throw new InterpreterRuntimeException(errorMessage);
+				}
+				
+				index = value.getInteger();
+				
+				//添字が0より小さいかどうかチェック
+				if (index < 0) {
+					String errorMessage = this.properties.getProperty("error.NumberOfElementsIsLessThanZero");
+					throw new InterpreterRuntimeException(errorMessage);
+				}
+			}
+			
 		} catch (java.lang.ClassCastException e) {
 			String errorMessage = this.properties.getProperty("error.IncrementAndTheDecrementOperatorIsNecessaryToUseTheIdentifier");
 			throw new InterpreterRuntimeException(errorMessage);
 		}
+		
 		LocalVariable foundLocalVariable = null;
 		Identifier foundGlobalVariable = null;
 		boolean searchFlag = false; //識別子が見つかっかどうかを表す。trueなら見つかっている
@@ -1274,14 +1308,57 @@ public class InterpreterImplementation implements Interpreter {
 		//左辺値を更新する
 		//識別子が存在すれば、値を取り出し、オペランドスタックに詰める
 		if (searchFlag) {
-
+			
 			//見つかった識別子に対し、代入を実行する
-			if (foundLocalVariable != null) {
-				foundLocalVariable.setValue(value);
-			} else if (foundGlobalVariable != null) {
-				foundGlobalVariable.setLeftValue(value);
+			if (left instanceof IdentifierNode) {
+				
+				if (foundLocalVariable != null) {
+					foundLocalVariable.setValue(value);
+				} else if (foundGlobalVariable != null) {
+					foundGlobalVariable.setLeftValue(value);
+				}
+				
+			//添字式の更新
+			} else if (left instanceof ArraySubscriptExpressionNode) {
+				
+				if (foundLocalVariable != null) {
+					
+					Value localVal = foundLocalVariable.getValue();
+					
+					if (localVal.getDataType() == DataType.INT_ARRAY) {
+						
+						int[] array = localVal.getIntegerArray();
+						
+						if (index < array.length) {
+							array[index] = leftValue;
+						} else {
+							//範囲外の要素を参照しようとした
+							String errorMessage = this.properties.getProperty("error.IsGreaterThanTheBoundsOfTheArrayElement");
+							throw new InterpreterRuntimeException(errorMessage);
+						}
+					}
+					
+					
+				} else if (foundGlobalVariable != null) {
+					
+					Value globalVal = foundGlobalVariable.getLeftValue();
+					
+					if (globalVal.getDataType() == DataType.INT_ARRAY) {
+						
+						int[] array = globalVal.getIntegerArray();
+						
+						if (index < array.length) {
+							array[index] = leftValue;
+						} else {
+							//範囲外の要素を参照しようとした
+							String errorMessage = this.properties.getProperty("error.IsGreaterThanTheBoundsOfTheArrayElement");
+							throw new InterpreterRuntimeException(errorMessage);
+						}
+					}
+				}
+				
 			}
-
+			
 		} else {
 			//識別子がローカル変数にも、グローバル変数にも存在しない場合、例外を投げる
 			String errorMessage = this.properties.getProperty("error.IdentifierDoesNotExist");
