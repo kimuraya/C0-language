@@ -1,13 +1,10 @@
 package c0.interpreter;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,10 +26,8 @@ import c0.parser.Token;
 import c0.util.DataType;
 import c0.util.GlobalScope;
 import c0.util.Identifier;
-import c0.util.IdentifierType;
 import c0.util.LocalScope;
 import c0.util.StackElement;
-import c0.util.StackElementType;
 import c0.util.SymbolTable;
 import c0.util.Value;
 
@@ -56,42 +51,62 @@ public class C0Interpreter extends InterpreterImplementation {
 		//mainメソッドの引数をチェック。ファイル名が無ければ、警告を出して終了
 		String fileName = null;
 		FileReader fileReader = null;
+		
 		try {
 			
 			//引数チェック
 			if (args.length >= 1) {
+				
 				fileName = args[0];
+				
 			} else {
+				
 				throw new Exception("引数にファイル名が指定されていません");
+				
 			}
 			
 			File file = null;
 			if (fileName != null) {
+				
 				file = new File(fileName);
+				
 			}
 			
+			//ファイルが存在するか、読み込めるかをチェックする
 			if (file.exists() && file.canRead()) {
+				
 				fileReader = new FileReader(fileName);
+				
 			} else if (!file.exists()) {
+				
 				throw new Exception("ファイルが存在しません");
+				
 			} else if (!file.canRead()) {
+				
 				throw new Exception("ファイルが読み込めません");
+				
 			}
 			
 		} catch (java.lang.ArrayIndexOutOfBoundsException e) {
+			
 			e.printStackTrace();
+			
 		} catch (FileNotFoundException e) {
+			
 			e.printStackTrace();
+			
 		} catch (Exception e) {
+			
 			e.printStackTrace();
+			
 		}
 		
 		//インタプリタのエントリーポイント
-		Stack<StackElement> callStack = new Stack<StackElement>();
-		Stack<StackElement> operandStack = new Stack<StackElement>();
-		GlobalScope globalScope = new GlobalScope();
+		Stack<StackElement> callStack = new Stack<StackElement>(); //コールスタックの生成
+		Stack<StackElement> operandStack = new Stack<StackElement>(); //オペランドスタックの生成
+		GlobalScope globalScope = new GlobalScope(); //グローバル領域の生成
 		
-		C0Interpreter interpreter = new C0Interpreter(callStack, operandStack, globalScope);
+		C0Interpreter interpreter = new C0Interpreter(callStack, operandStack, globalScope); //インタプリタの生成
 		interpreter.interpretation(fileName, fileReader); //実行
 	}
 	
@@ -105,21 +120,30 @@ public class C0Interpreter extends InterpreterImplementation {
 		//プロパティファイルの読み込み
 		this.properties = new Properties();
 		InputStreamReader inputStreamReader = null;
+		
 		try {
+			
 			inputStreamReader = new InputStreamReader(new FileInputStream("error.properties"), "UTF-8");
 			this.properties.load(inputStreamReader);
+			
 		} catch (IOException e) {
+			
 			e.printStackTrace();
+			
 		} finally {
 			
 			try {
+				
 				if (inputStreamReader != null) {
+					
 					inputStreamReader.close();
 				}
+				
 			} catch (IOException e) {
+				
 				e.printStackTrace();
+				
 			}
-			
 		}
 		
 		AstNode program = null; //構文木
@@ -128,15 +152,18 @@ public class C0Interpreter extends InterpreterImplementation {
 		C0Language parser = new C0Language(fileReader);
 		parser.setFileName(fileName);
 		
-		//parser.enable_tracing(); //パーサのトレース機能を開始
-		
+		//TODO 必要な時以外はコメントにする
 		//構文木の出力
-		try {			
+		try {
+			
 			program = parser.file();
 			int depth = 0;
 			program.dump(depth, true);
+			
 		} catch (ParseException e1) {
+			
 			e1.printStackTrace();
+			
 		}
 		
 		//シンボルテーブル
@@ -152,29 +179,23 @@ public class C0Interpreter extends InterpreterImplementation {
 		//シンボルテーブルの作成
 		program.accept(astVisitor);
 		
+		//TODO 必要な時以外はコメントにする
 		//シンボルテーブルの出力
 		this.outputSymbolTable(astVisitor);
 		
 		//意味解析
-		SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(globalScope);
-		semanticAnalyzer.setProperties(this.properties);
-		program.accept(semanticAnalyzer);
-		Map<Integer, Map<String, StatementNode>> errorMessages = semanticAnalyzer.getErrorMessages();
+		SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(globalScope); //グローバル領域のセット
+		semanticAnalyzer.setProperties(this.properties); //プロパティファイルのセット
+		program.accept(semanticAnalyzer); //意味解析を実行する
+		Map<Integer, Map<String, StatementNode>> errorMessages = semanticAnalyzer.getErrorMessages(); //意味解析中のエラーメッセージ
 		
-		/*
-		if (main.getFunctionNode() != null) {
-			System.out.println(main.getFunctionNode().getIdentifier().getName());
-			System.out.println(main.getFunctionNode().getIdentifier().getIdentifierType());
-		}
-		*/
-		
-		//エラーメッセージが無い場合
+		//エラーメッセージが無い場合、インタプリタを実行する
 		if (errorMessages.size() == 0) {
 			
 			//グローバル変数の初期化
-			List<DeclareVariableNode> getGlobalVariables = program.getGlobalVariables();
+			List<DeclareVariableNode> globalVariables = program.getGlobalVariables();
 			
-			for (DeclareVariableNode globalVariable : getGlobalVariables) {
+			for (DeclareVariableNode globalVariable : globalVariables) {
 				
 				IdentifierNode identifierNode = globalVariable.getIdentifier();
 				Identifier search = identifierNode.getIdentifier(); //この識別子を探す
@@ -182,7 +203,6 @@ public class C0Interpreter extends InterpreterImplementation {
 				Identifier foundGlobalVariable = null;
 				DataTypeNode globalVariableDataTypeNode = globalVariable.getDataType();
 				DataType globalVariableDataType = globalVariableDataTypeNode.getDataType();
-				
 				Value value = new Value();
 				
 				//配列以外の変数の初期化
@@ -190,12 +210,17 @@ public class C0Interpreter extends InterpreterImplementation {
 					
 					//初期化式の実行
 					ExpressionNode expression = globalVariable.getExpression();
+					
 					try {
+						
 						this.evaluateExpression(expression);
+						
 					} catch (InterpreterRuntimeException e) {
-						// TODO 自動生成された catch ブロック
+						
 						e.printStackTrace();
+						
 					}
+					
 					StackElement result = this.operandStack.pop();
 					value = result.getValue();
 					
@@ -205,15 +230,19 @@ public class C0Interpreter extends InterpreterImplementation {
 						(globalVariableDataType == DataType.INT_ARRAY || globalVariableDataType == DataType.BOOLEAN_ARRAY)) {
 					
 					//要素数の計算
-					//TODO 結果が整数でなければ、例外を投げる
 					Value elementNumberValue = new Value();
 					ExpressionNode elementNumberExpression = globalVariableDataTypeNode.getElementNumber();
 					try {
+						
 						this.evaluateExpression(elementNumberExpression);
+						
 					} catch (InterpreterRuntimeException e) {
-						// TODO 自動生成された catch ブロック
+						
 						e.printStackTrace();
+						
 					}
+					
+					//要素数の計算結果を取り出す
 					StackElement result = this.operandStack.pop();
 					elementNumberValue = result.getValue();
 					
@@ -243,8 +272,10 @@ public class C0Interpreter extends InterpreterImplementation {
 				SymbolTable globalSymbolTable = this.getGlobalScope().getGlobalSymbolTable();
 				
 				if (globalSymbolTable.searchSymbol(search.getName())) {
+					
 					searchFlag = true;
 					foundGlobalVariable = globalSymbolTable.getSymbol(search.getName());
+					
 				}
 				
 				//計算結果をグローバル変数に代入する
@@ -252,11 +283,13 @@ public class C0Interpreter extends InterpreterImplementation {
 					
 					//見つかった識別子に対し、代入を実行する
 					if (foundGlobalVariable != null) {
+						
 						foundGlobalVariable.setLeftValue(value);
+						
 					}
 					
 				} else {
-					//識別子がグローバル変数に存在しない場合、例外を投げる
+					//TODO 識別子がグローバル変数に存在しない場合、例外を投げる
 				}
 			}
 			
@@ -266,15 +299,20 @@ public class C0Interpreter extends InterpreterImplementation {
 			Identifier main = globalScope.getGlobalSymbolTable().getSymbol("main");
 			IdentifierNode mainFunction = main.getFunctionNode();
 			List<ExpressionNode> arguments = new LinkedList<ExpressionNode>();
+			
 			try {
+				
 				this.executeFunctionCall(new CallNode(mainFunction, arguments));
+				
 			} catch (InterpreterRuntimeException e) {
+				
 				System.out.println("/******************エラーメッセージ******************/");
 				StatementNode statementNode = e.getStatementNode();
 				Location location = statementNode.location();
 				Token token = location.getToken();
 				System.out.println("問題のあった行:" + token.beginLine + "行," + token.beginColumn + "列," + token.endLine + "行," + token.endColumn + "列");
 				e.printStackTrace();
+				
 			}
 		
 		//意味解析時のエラーメッセージの出力

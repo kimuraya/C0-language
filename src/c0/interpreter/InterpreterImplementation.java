@@ -27,7 +27,6 @@ import c0.ast.IfNode;
 import c0.ast.LessThanNode;
 import c0.ast.LessThanOrEqualNode;
 import c0.ast.LiteralNode;
-import c0.ast.Location;
 import c0.ast.LogicalAndNode;
 import c0.ast.LogicalOrNode;
 import c0.ast.MinusNode;
@@ -44,7 +43,6 @@ import c0.ast.ReturnNode;
 import c0.ast.StatementNode;
 import c0.ast.UnaryMinusNode;
 import c0.ast.WhileNode;
-import c0.parser.Token;
 import c0.util.DataType;
 import c0.util.ExecuteStatementResult;
 import c0.util.FramePointer;
@@ -238,14 +236,11 @@ public class InterpreterImplementation implements Interpreter {
 			
 			ret = this.executeStatement(statement);
 			
-			//TODO break文を使えるようにするための応急処置
-			//TODO break文をループ内とswitch文以外の場所で書けないようにする
-
 			//return文を実行したら、処理を終える
 			if (ret.getStatementResultFlag() == StatementResultFlag.RETURN_STATEMENT_RESULT) {
-
+				
 				break;
-
+				
 			//ループの中でbreak文を実行したら、処理を終える
 			} else if (ret.getStatementResultFlag() == StatementResultFlag.BREAK_STATEMENT_RESULT) {
 				
@@ -479,14 +474,10 @@ public class InterpreterImplementation implements Interpreter {
 		//StatementResultFlagをRETURN_STATEMENT_RESULTにする
 		ExecuteStatementResult executeStatementResult = new ExecuteStatementResult();
 		executeStatementResult.setStatementResultFlag(StatementResultFlag.RETURN_STATEMENT_RESULT);
-
-		//TODO 関数の戻り値のデータ型をチェックする処理を入れる。
-		//TODO 戻り値のデータ型と計算結果のデータ型が合わない場合、
-		//TODO 戻り値がvoidなのに、戻り値を戻そうとしている場合、例外を投げる
-
+		
 		//戻り値を計算する
 		ReturnNode returnNode = (ReturnNode) statementNode;
-
+		
 		if (returnNode.getExpression() != null) {
 			ExpressionNode expression = returnNode.getExpression();
 			this.evaluateExpression(expression);
@@ -1911,8 +1902,7 @@ public class InterpreterImplementation implements Interpreter {
 		if (function.getFunctionNode() != null && function.getFunctionNode().getParameters() != null) {
 			parameters = function.getFunctionNode().getParameters();
 		}
-
-		//TODO 引数の数が合わない場合、例外を出す
+		
 		//呼び出そうとしている関数が標準関数か、ユーザー定義関数かチェックする
 		//関数呼び出しと関数の引数の数が異なる場合、例外を投げるようにする
 
@@ -1992,8 +1982,6 @@ public class InterpreterImplementation implements Interpreter {
 
 			}
 
-		} else {
-			//TODO ここに到達した場合、例外を投げる
 		}
 
 		return;
@@ -2029,7 +2017,7 @@ public class InterpreterImplementation implements Interpreter {
 
 		LinkedList<Value> valueList = new LinkedList<Value>();
 		//String standardFunctionName = functionNode.getIdentifier().getStandardFunctionName(); //呼び出そうとしている関数名
-		String standardFunctionName = function.getStandardFunctionName();
+		String standardFunctionName = function.getStandardFunctionName(); //標準関数を実行するメソッド名
 		StandardFunction standardFunction = new StandardFunction(); //標準関数
 
 		//引数の式を計算する
