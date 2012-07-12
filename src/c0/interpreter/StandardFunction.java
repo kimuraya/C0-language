@@ -5,9 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import c0.ast.DataTypeNode;
-import c0.ast.ExpressionNode;
 import c0.ast.IdentifierNode;
-import c0.ast.LiteralNode;
 import c0.util.DataType;
 import c0.util.GlobalScope;
 import c0.util.Identifier;

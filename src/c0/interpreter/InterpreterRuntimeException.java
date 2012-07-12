@@ -1,7 +1,6 @@
 package c0.interpreter;
 
 import c0.ast.StatementNode;
-import c0.parser.Token;
 
 /**
  * C0言語インタプリタ実行時に発生した例外

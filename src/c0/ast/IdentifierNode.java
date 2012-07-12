@@ -1,6 +1,5 @@
 package c0.ast;
 
-import java.util.LinkedList;
 import java.util.List;
 import c0.ast.Location;
 import c0.interpreter.Visitor;

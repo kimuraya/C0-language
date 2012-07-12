@@ -4,7 +4,6 @@ import c0.ast.ExpressionNode;
 import c0.ast.StatementNode;
 import c0.util.ExecuteStatementResult;
 import c0.util.NodeType;
-import c0.util.Value;
 
 public interface Interpreter {
 	

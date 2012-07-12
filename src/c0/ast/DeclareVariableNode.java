@@ -1,7 +1,6 @@
 package c0.ast;
 
 import c0.interpreter.Visitor;
-import c0.util.DataType;
 
 /**
  * 変数宣言

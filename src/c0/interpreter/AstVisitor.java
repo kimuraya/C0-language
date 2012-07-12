@@ -2,7 +2,6 @@ package c0.interpreter;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 
 import c0.ast.ArraySubscriptExpressionNode;
 import c0.ast.AssignNode;
@@ -31,7 +30,6 @@ import c0.ast.LogicalOrNode;
 import c0.ast.MinusNode;
 import c0.ast.ModNode;
 import c0.ast.MulNode;
-import c0.ast.Node;
 import c0.ast.NotEquivalenceNode;
 import c0.ast.ParameterNode;
 import c0.ast.PlusNode;
@@ -45,10 +43,8 @@ import c0.ast.UnaryMinusNode;
 import c0.ast.WhileNode;
 import c0.util.DataType;
 import c0.util.GlobalScope;
-import c0.util.Identifier;
 import c0.util.IdentifierType;
 import c0.util.LocalScope;
-import c0.util.StackElement;
 import c0.util.SymbolTable;
 
 /**

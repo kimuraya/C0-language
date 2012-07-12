@@ -2,9 +2,6 @@ package c0.util;
 
 import java.util.List;
 
-import c0.ast.BlockNode;
-import c0.ast.DataTypeNode;
-import c0.ast.ExpressionNode;
 import c0.ast.IdentifierNode;
 
 /**
