@@ -195,115 +195,132 @@ public class C0Interpreter extends InterpreterImplementation {
 			//グローバル変数の初期化
 			List<DeclareVariableNode> globalVariables = program.getGlobalVariables();
 			
-			for (DeclareVariableNode globalVariable : globalVariables) {
-				
-				IdentifierNode identifierNode = globalVariable.getIdentifier();
-				Identifier search = identifierNode.getIdentifier(); //この識別子を探す
-				boolean searchFlag = false; //識別子が見つかったかどうかを表す。trueなら見つかっている
-				Identifier foundGlobalVariable = null;
-				DataTypeNode globalVariableDataTypeNode = globalVariable.getDataType();
-				DataType globalVariableDataType = globalVariableDataTypeNode.getDataType();
-				Value value = new Value();
-				
-				//配列以外の変数の初期化
-				if (globalVariable.getExpression() != null && (globalVariableDataType != DataType.INT_ARRAY || globalVariableDataType != DataType.BOOLEAN_ARRAY)) {
-					
-					//初期化式の実行
-					ExpressionNode expression = globalVariable.getExpression();
-					
-					try {
-						
-						this.evaluateExpression(expression);
-						
-					} catch (InterpreterRuntimeException e) {
-						
-						e.printStackTrace();
-						
-					}
-					
-					StackElement result = this.operandStack.pop();
-					value = result.getValue();
-					
-				//配列の初期化
-				//配列の初期化式は認めない。要素数のない配列は作れない
-				} else if (globalVariable.getExpression() == null && globalVariableDataTypeNode.getElementNumber() != null &&
-						(globalVariableDataType == DataType.INT_ARRAY || globalVariableDataType == DataType.BOOLEAN_ARRAY)) {
-					
-					//要素数の計算
-					Value elementNumberValue = new Value();
-					ExpressionNode elementNumberExpression = globalVariableDataTypeNode.getElementNumber();
-					try {
-						
-						this.evaluateExpression(elementNumberExpression);
-						
-					} catch (InterpreterRuntimeException e) {
-						
-						e.printStackTrace();
-						
-					}
-					
-					//要素数の計算結果を取り出す
-					StackElement result = this.operandStack.pop();
-					elementNumberValue = result.getValue();
-					
-					//配列の生成
-					int elementNumber = elementNumberValue.getInteger();
-					
-					int intArray[];
-					boolean  boolArray[];
-					if (globalVariableDataType == DataType.INT_ARRAY && elementNumber > 0) {
-						
-						intArray = new int[elementNumber];
-						value.setDataType(DataType.INT_ARRAY);
-						value.setIntegerArray(intArray);
-						
-					} else if (globalVariableDataType == DataType.BOOLEAN_ARRAY && elementNumber > 0) {
-						
-						boolArray = new boolean[elementNumber];
-						value.setDataType(DataType.BOOLEAN_ARRAY);
-						value.setBooleanArray(boolArray);
-						
-					} else if (elementNumber <= 0) {
-						//TODO 配列の要素数が0か、0より小さい場合は例外を投げる
-					}
-				}
-				
-				//シンボルテーブルの検索
-				SymbolTable globalSymbolTable = this.getGlobalScope().getGlobalSymbolTable();
-				
-				if (globalSymbolTable.searchSymbol(search.getName())) {
-					
-					searchFlag = true;
-					foundGlobalVariable = globalSymbolTable.getSymbol(search.getName());
-					
-				}
-				
-				//計算結果をグローバル変数に代入する
-				if (searchFlag) {
-					
-					//見つかった識別子に対し、代入を実行する
-					if (foundGlobalVariable != null) {
-						
-						foundGlobalVariable.setLeftValue(value);
-						
-					}
-					
-				} else {
-					//TODO 識別子がグローバル変数に存在しない場合、例外を投げる
-				}
-			}
-			
-			//main関数の引数の処理
-			
-			//main関数の呼び出し
-			Identifier main = globalScope.getGlobalSymbolTable().getSymbol("main");
-			IdentifierNode mainFunction = main.getFunctionNode();
-			List<ExpressionNode> arguments = new LinkedList<ExpressionNode>();
-			
 			try {
+			
+				for (DeclareVariableNode globalVariable : globalVariables) {
+					
+					IdentifierNode identifierNode = globalVariable.getIdentifier();
+					Identifier search = identifierNode.getIdentifier(); //この識別子を探す
+					boolean searchFlag = false; //識別子が見つかったかどうかを表す。trueなら見つかっている
+					Identifier foundGlobalVariable = null;
+					DataTypeNode globalVariableDataTypeNode = globalVariable.getDataType();
+					DataType globalVariableDataType = globalVariableDataTypeNode.getDataType();
+					Value value = new Value();
+					
+					//配列以外の変数の初期化
+					if (globalVariable.getExpression() != null && (globalVariableDataType != DataType.INT_ARRAY || globalVariableDataType != DataType.BOOLEAN_ARRAY)) {
+						
+						//初期化式の実行
+						ExpressionNode expression = globalVariable.getExpression();
+						
+						try {
+							
+							this.evaluateExpression(expression);
+							
+						} catch (InterpreterRuntimeException e) {
+							
+							e.setStatementNode(globalVariable);
+							throw e;
+							
+						}
+						
+						StackElement result = this.operandStack.pop();
+						value = result.getValue();
+						
+					//配列の初期化
+					//配列の初期化式は認めない。要素数のない配列は作れない
+					} else if (globalVariable.getExpression() == null && globalVariableDataTypeNode.getElementNumber() != null &&
+							(globalVariableDataType == DataType.INT_ARRAY || globalVariableDataType == DataType.BOOLEAN_ARRAY)) {
+						
+						//要素数の計算
+						Value elementNumberValue = new Value();
+						ExpressionNode elementNumberExpression = globalVariableDataTypeNode.getElementNumber();
+						try {
+							
+							this.evaluateExpression(elementNumberExpression);
+							
+						} catch (InterpreterRuntimeException e) {
+							
+							e.setStatementNode(globalVariable);
+							throw e;
+							
+						}
+						
+						//要素数の計算結果を取り出す
+						StackElement result = this.operandStack.pop();
+						elementNumberValue = result.getValue();
+						
+						//配列の生成
+						int elementNumber = elementNumberValue.getInteger();
+						
+						int intArray[];
+						boolean  boolArray[];
+						if (globalVariableDataType == DataType.INT_ARRAY && elementNumber > 0) {
+							
+							intArray = new int[elementNumber];
+							value.setDataType(DataType.INT_ARRAY);
+							value.setIntegerArray(intArray);
+							
+						} else if (globalVariableDataType == DataType.BOOLEAN_ARRAY && elementNumber > 0) {
+							
+							boolArray = new boolean[elementNumber];
+							value.setDataType(DataType.BOOLEAN_ARRAY);
+							value.setBooleanArray(boolArray);
+							
+						} else if (elementNumber <= 0) {
+							//配列の要素数が0か、0より小さい場合は例外を投げる
+							String errorMessage = this.properties.getProperty("error.LessThanOrEqualToZeroTheNumberOfElements");
+							throw new InterpreterRuntimeException(errorMessage, globalVariable);
+						}
+					}
+					
+					//シンボルテーブルの検索
+					SymbolTable globalSymbolTable = this.getGlobalScope().getGlobalSymbolTable();
+					
+					if (globalSymbolTable.searchSymbol(search.getName())) {
+						
+						searchFlag = true;
+						foundGlobalVariable = globalSymbolTable.getSymbol(search.getName());
+						
+					}
+					
+					//計算結果をグローバル変数に代入する
+					if (searchFlag) {
+						
+						//見つかった識別子に対し、代入を実行する
+						if (foundGlobalVariable != null) {
+							
+							foundGlobalVariable.setLeftValue(value);
+							
+						}
+						
+					}
+					
+				}
 				
-				this.executeFunctionCall(new CallNode(mainFunction, arguments));
+				//main関数の引数の処理
 				
+				//main関数の呼び出し
+				Identifier main = globalScope.getGlobalSymbolTable().getSymbol("main");
+				IdentifierNode mainFunction = main.getFunctionNode();
+				List<ExpressionNode> arguments = new LinkedList<ExpressionNode>();
+				
+				try {
+					
+					this.executeFunctionCall(new CallNode(mainFunction, arguments));
+					
+				} catch (InterpreterRuntimeException e) {
+					
+					System.out.println("/******************エラーメッセージ******************/");
+					StatementNode statementNode = e.getStatementNode();
+					Location location = statementNode.location();
+					Token token = location.getToken();
+					System.out.println("問題のあった行:" + token.beginLine + "行," + token.beginColumn + "列," + token.endLine + "行," + token.endColumn + "列");
+					e.printStackTrace();
+					
+				}
+			
+			//グローバル変数の宣言でエラーが起こった際の表示
 			} catch (InterpreterRuntimeException e) {
 				
 				System.out.println("/******************エラーメッセージ******************/");
@@ -314,7 +331,7 @@ public class C0Interpreter extends InterpreterImplementation {
 				e.printStackTrace();
 				
 			}
-		
+			
 		//意味解析時のエラーメッセージの出力
 		} else {
 			
