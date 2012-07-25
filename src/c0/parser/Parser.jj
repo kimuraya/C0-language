@@ -34,6 +34,18 @@ SPECIAL_TOKEN: {
 	<WHITESPACE: ([" ", "\f", "\n", "\r", "\t"])+>
 }
 
+//ブロックコメント
+//"*/"を検出したら、最初の状態に戻る
+MORE: { <"/*"> : IN_BLOCK_COMMENT }
+<IN_BLOCK_COMMENT> MORE: { <~[]> }
+<IN_BLOCK_COMMENT> SPECIAL_TOKEN: { <BLOCK_COMMENT: "*/"> : DEFAULT }
+
+//一行コメント
+//"//"、改行以外の文字（0回以上の繰り返し）、改行文字（省略可能）
+SPECIAL_TOKEN: {
+	<LINE_COMMENT: "//" (~["\n", "\r"])* ("\n" | "\r\n" | "\r")?>
+}
+
 //文のキーワード
 TOKEN: {
 	  <INT      : "int">
@@ -63,12 +75,6 @@ TOKEN: {
 	<INTEGER: ["1"-"9"] (["0"-"9"])*
 			| "0"
 	>
-}
-
-//一行コメント
-//"//"、改行以外の文字（0回以上の繰り返し）、改行文字（省略可能）
-SPECIAL_TOKEN: {
-	<LINE_COMMENT: "//" (~["\n", "\r"])* ("\n" | "\r\n" | "\r")?>
 }
 
 //文字列リテラル

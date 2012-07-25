@@ -13,45 +13,53 @@ public interface C0LanguageConstants {
   /** RegularExpression Id. */
   int WHITESPACE = 1;
   /** RegularExpression Id. */
-  int INT = 2;
+  int BLOCK_COMMENT = 4;
   /** RegularExpression Id. */
-  int BOOLEAN = 3;
+  int LINE_COMMENT = 5;
   /** RegularExpression Id. */
-  int VOID = 4;
+  int INT = 6;
   /** RegularExpression Id. */
-  int IF = 5;
+  int BOOLEAN = 7;
   /** RegularExpression Id. */
-  int ELSE = 6;
+  int VOID = 8;
   /** RegularExpression Id. */
-  int WHILE = 7;
+  int IF = 9;
   /** RegularExpression Id. */
-  int FOR = 8;
+  int ELSE = 10;
   /** RegularExpression Id. */
-  int RETURN = 9;
+  int WHILE = 11;
   /** RegularExpression Id. */
-  int BREAK = 10;
+  int FOR = 12;
   /** RegularExpression Id. */
-  int TRUE = 11;
+  int RETURN = 13;
   /** RegularExpression Id. */
-  int FALSE = 12;
+  int BREAK = 14;
   /** RegularExpression Id. */
-  int IDENTIFIER = 13;
+  int TRUE = 15;
   /** RegularExpression Id. */
-  int INTEGER = 14;
+  int FALSE = 16;
   /** RegularExpression Id. */
-  int LINE_COMMENT = 15;
+  int IDENTIFIER = 17;
   /** RegularExpression Id. */
-  int STRING = 19;
+  int INTEGER = 18;
+  /** RegularExpression Id. */
+  int STRING = 22;
 
   /** Lexical state. */
   int DEFAULT = 0;
   /** Lexical state. */
-  int IN_STRING = 1;
+  int IN_BLOCK_COMMENT = 1;
+  /** Lexical state. */
+  int IN_STRING = 2;
 
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
     "<WHITESPACE>",
+    "\"/*\"",
+    "<token of kind 3>",
+    "\"*/\"",
+    "<LINE_COMMENT>",
     "\"int\"",
     "\"boolean\"",
     "\"void\"",
@@ -65,10 +73,9 @@ public interface C0LanguageConstants {
     "\"false\"",
     "<IDENTIFIER>",
     "<INTEGER>",
-    "<LINE_COMMENT>",
     "\"\\\"\"",
-    "<token of kind 17>",
-    "<token of kind 18>",
+    "<token of kind 20>",
+    "<token of kind 21>",
     "\"\\\"\"",
     "\"(\"",
     "\")\"",
