@@ -8,4 +8,6 @@ int main() {
 		print("while body%n");
 		i++;
 	}
+	
+	return 0;
 }

@@ -9,4 +9,5 @@ int main() {
 		print("for body%n");
 	}
 	
+	return 0;
 }

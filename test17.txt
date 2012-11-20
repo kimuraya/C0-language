@@ -16,6 +16,7 @@ int main() {
 	bool = bool_func();
 	print("%b%n", bool);
 	
+	return 0;
 }
 
 void user_func() {

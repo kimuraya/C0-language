@@ -17,4 +17,5 @@ int main() {
 	//ifに付く文は複合文でなくても良い
 	if (i == 1) print("i = 1");
 	
+	return 0;
 }

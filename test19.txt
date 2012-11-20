@@ -17,4 +17,6 @@ int main() {
 	
 	print("%d%n", i);
 	print("%d%n", a);
+	
+	return 0;
 }

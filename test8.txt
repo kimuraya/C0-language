@@ -35,4 +35,6 @@ int main() {
 	bool = false || false;
 	print(bool);
 	print("%n");
+	
+	return 0;
 }

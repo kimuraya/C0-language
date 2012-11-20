@@ -14,4 +14,6 @@ int main() {
 		print("array[%d", i);
 		print("] = %d%n", array[i]);
 	}
+	
+	return 0;
 }

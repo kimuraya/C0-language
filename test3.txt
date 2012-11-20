@@ -2,4 +2,5 @@
 
 int main () {
 	print("文字列定数");
+	return 0;
 }

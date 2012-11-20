@@ -23,5 +23,8 @@ int main() {
 			break;
 		}
 	}
+	
 	print("%d%n", i);
+	
+	return 0;
 }

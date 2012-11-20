@@ -27,4 +27,6 @@ int main() {
 	print("後置減分%n");
 	print("i = %d%n", i--);
 	print("i = %d%n%n", i);
+	
+	return 0;
 }

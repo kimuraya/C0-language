@@ -8,6 +8,7 @@ int main() {
 	i = add(100, 1000); //戻り値のある関数
 	print(i); //標準関数print
 	
+	return 0;
 }
 
 void user_print() {

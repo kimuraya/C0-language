@@ -16,4 +16,6 @@ int main() {
 	print("i = %d%n", i);
 	print("%d%n", a);
 	print("%b%n", bool);
+	
+	return 0;
 }

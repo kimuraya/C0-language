@@ -9,4 +9,6 @@ int main() {
 	}
 	
 	print("%d%n", i);
+	
+	return 0;
 }
