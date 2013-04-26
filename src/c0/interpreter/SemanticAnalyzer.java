@@ -1407,7 +1407,7 @@ public class SemanticAnalyzer implements Visitor {
 				break;
 			case LOGICAL_AND: //"&&"
 			case LOGICAL_OR: //"||"
-				this.logicalOperatorExpressionCheck(expression);
+				ret = this.logicalOperatorExpressionCheck(expression);
 				break;
 			case EQUIVALENCE: //"=="
 			case NOT_EQUIVALENCE: //"!="
