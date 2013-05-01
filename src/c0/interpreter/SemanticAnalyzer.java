@@ -1564,12 +1564,21 @@ public class SemanticAnalyzer implements Visitor {
 		
 		//左右のデータ型をチェックする
 		//整数の式
-		if ((leftDataType == DataType.INT) && (rightDataType == DataType.INT)) {
+		if (((leftDataType == DataType.INT) && (rightDataType == DataType.INT)) && 
+			(expression instanceof PlusNode || expression instanceof MinusNode || expression instanceof MulNode || 
+			 expression instanceof DivNode || expression instanceof ModNode)) {
 			
 			ret = DataType.INT;
 			
 		//真偽値の式
-		} else if ((leftDataType == DataType.BOOLEAN) && (rightDataType == DataType.BOOLEAN)) {
+		} else if (((leftDataType == DataType.BOOLEAN) && (rightDataType == DataType.BOOLEAN)) && 
+			(expression instanceof EquivalenceNode || expression instanceof NotEquivalenceNode)) {
+			
+			ret = DataType.BOOLEAN;
+			
+		} else if (((leftDataType == DataType.INT) && (rightDataType == DataType.INT)) && 
+			(expression instanceof EquivalenceNode || expression instanceof NotEquivalenceNode || expression instanceof LessThanNode ||
+			 expression instanceof LessThanOrEqualNode || expression instanceof GreaterThanNode || expression instanceof GreaterThanOrEqualNode)) {
 			
 			ret = DataType.BOOLEAN;
 			
