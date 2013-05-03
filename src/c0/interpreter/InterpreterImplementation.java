@@ -2019,18 +2019,22 @@ public class InterpreterImplementation implements Interpreter {
 		//String standardFunctionName = functionNode.getIdentifier().getStandardFunctionName(); //呼び出そうとしている関数名
 		String standardFunctionName = function.getStandardFunctionName(); //標準関数を実行するメソッド名
 		StandardFunction standardFunction = new StandardFunction(); //標準関数
-
+		standardFunction.setOperandStack(this.operandStack); //標準関数にオペランドスタックをセット
+		
 		//引数の式を計算する
-		for (ExpressionNode argument : arguments) {
-
-			//式の実行
-			this.evaluateExpression(argument);
-
-			//結果を変数として、コールスタックに詰める
-			StackElement result = this.operandStack.pop();
-			Value value = result.getValue();
-
-			valueList.add(value);
+		
+		if (arguments != null) {
+			for (ExpressionNode argument : arguments) {
+	
+				//式の実行
+				this.evaluateExpression(argument);
+	
+				//結果を変数として、コールスタックに詰める
+				StackElement result = this.operandStack.pop();
+				Value value = result.getValue();
+	
+				valueList.add(value);
+			}
 		}
 
 		//関数名からstandardFunctionNameを取り出し、名前でメソッドを呼び出す

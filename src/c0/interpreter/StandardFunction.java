@@ -3,6 +3,8 @@ package c0.interpreter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+import java.util.Stack;
 
 import c0.ast.DataTypeNode;
 import c0.ast.IdentifierNode;
@@ -11,12 +13,16 @@ import c0.util.GlobalScope;
 import c0.util.Identifier;
 import c0.util.IdentifierType;
 import c0.util.NodeType;
+import c0.util.StackElement;
+import c0.util.StackElementType;
 import c0.util.Value;
 
 /**
  * 標準関数を管理するクラス
  */
 public class StandardFunction {
+	
+	private Stack<StackElement> operandStack = null; //式の計算に使用する
 	
 	/**
 	 * グローバル領域に標準関数を追加する
@@ -90,6 +96,30 @@ public class StandardFunction {
 	}
 	
 	/**
+	 * ランダムな整数を生成する
+	 * @param valueList
+	 */
+	public void randFunction(LinkedList<Value> valueList) {
+		
+		Random random = new Random();
+		
+		//ランダムな値を設定
+		Value value = new Value();
+		value.setDataType(DataType.INT);
+		value.setInteger(random.nextInt());
+		
+		//オペランドスタックに値を詰める
+		StackElement stackElement = new StackElement();
+		stackElement.setStackElementType(StackElementType.LITERAL);
+		stackElement.setValue(value);
+
+		//オペランドスタックに値を詰める
+		this.operandStack.push(stackElement);
+		
+		return;
+	}
+	
+	/**
 	 * グローバル領域に追加する標準関数のリストを作成する
 	 * @return
 	 */
@@ -97,22 +127,46 @@ public class StandardFunction {
 		
 		List<Identifier> functionList = new ArrayList<Identifier>();
 		
-		//識別子の作成
+		//print関数の識別子の作成
 		Identifier printFunc = new Identifier("print"); //インタプリタ内で使用する関数名
 		printFunc.setIdentifierType(IdentifierType.FUNCTION);
 		printFunc.setStandardFunctionFlag(true); //標準関数である
 		printFunc.setStandardFunctionName("printFunction"); //ラッパーの名前を保存する
 		printFunc.setVariableArgumentFlag(true); //可変長引数を持つ関数である為、trueにする
 		
-		//識別子のノードの作製
-		IdentifierNode identifierNode = new IdentifierNode();
-		identifierNode.setIdentifier(printFunc);
-		identifierNode.setNodeType(NodeType.CALL);
-		identifierNode.setReturnDataType(new DataTypeNode(DataType.VOID, null));
-		printFunc.setFunctionNode(identifierNode);
+		//print関数の識別子のノードの作製
+		IdentifierNode printIdentifierNode = new IdentifierNode();
+		printIdentifierNode.setIdentifier(printFunc);
+		printIdentifierNode.setNodeType(NodeType.CALL);
+		printIdentifierNode.setReturnDataType(new DataTypeNode(DataType.VOID, null));
+		printFunc.setFunctionNode(printIdentifierNode);
 		
-		functionList.add(printFunc);
+		functionList.add(printFunc); //標準関数リストにprint関数を追加
+		
+		//rand関数の識別子の作成
+		Identifier randFunc = new Identifier("rand"); //インタプリタ内で使用する関数名
+		randFunc.setIdentifierType(IdentifierType.FUNCTION);
+		randFunc.setStandardFunctionFlag(true); //標準関数である
+		randFunc.setStandardFunctionName("randFunction"); //ラッパーの名前を保存する
+		randFunc.setVariableArgumentFlag(false); //可変長引数を持つ関数である為、trueにする
+		
+		//rand関数の識別子のノードの作製
+		IdentifierNode randIdentifierNode = new IdentifierNode();
+		randIdentifierNode.setIdentifier(printFunc);
+		randIdentifierNode.setNodeType(NodeType.CALL);
+		randIdentifierNode.setReturnDataType(new DataTypeNode(DataType.INT, null));
+		randFunc.setFunctionNode(randIdentifierNode);
+		
+		functionList.add(randFunc); //標準関数リストにrand関数を追加
 		
 		return functionList;
+	}
+
+	public Stack<StackElement> getOperandStack() {
+		return operandStack;
+	}
+
+	public void setOperandStack(Stack<StackElement> operandStack) {
+		this.operandStack = operandStack;
 	}
 }
