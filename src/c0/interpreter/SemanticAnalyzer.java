@@ -315,15 +315,19 @@ public class SemanticAnalyzer implements Visitor {
 					DataType dataType = this.expressionCheck(expression);
 					
 					//代入先と式のデータ型を比較する
-					if (!(dataType == DataType.INT) && (identifier.getDataType() == DataType.INT_ARRAY) || 
-						!(dataType == DataType.BOOLEAN) && (identifier.getDataType() == DataType.BOOLEAN_ARRAY)) {
+					if ((dataType == DataType.INT) && (identifier.getDataType() == DataType.INT_ARRAY) || 
+						(dataType == DataType.BOOLEAN) && (identifier.getDataType() == DataType.BOOLEAN_ARRAY)) {
 						
+						//ここで初期化のフラグを立てる
+						//識別子をシンボルテーブルから探す。式文の節にあるノードには、識別子の名前しか情報が無い為の処置
+						identifier.setAssignFlag(true);
+						
+					} else {
 						errorCount++;
 						String errorMessage = this.properties.getProperty("error.TheDataTypeOfTheValueToAssignToTheRight-handSideIsDifferent");
 						Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
 						errorMap.put(errorMessage, this.beingProcessedStatement);
 						this.errorMessages.put(errorCount, errorMap);
-						
 					}
 				}
 				
@@ -842,9 +846,14 @@ public class SemanticAnalyzer implements Visitor {
 		
 		if (dataType == DataType.INT_ARRAY || dataType == DataType.BOOLEAN_ARRAY) {
 			ExpressionNode elementNumberExpression = dataTypeNode.getElementNumber();
-			DataType elementNumberDataType = this.expressionCheck(elementNumberExpression);
 			
-			if (elementNumberDataType != DataType.INT) {
+			//不完全型の場合、添字の式は存在しない
+			DataType elementNumberDataType = null;
+			if (elementNumberExpression != null) {
+				elementNumberDataType = this.expressionCheck(elementNumberExpression);
+			}
+			
+			if ((elementNumberDataType != DataType.INT) && (elementNumberDataType != null)) {
 				
 				errorCount++;
 				String errorMessage = this.properties.getProperty("error.IsNotAnIntegerNumberOfElements");
