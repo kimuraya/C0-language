@@ -629,18 +629,21 @@ public class InterpreterImplementation implements Interpreter {
 		
 		//コールスタック（ローカル変数）から識別子を探す
 		//フレームポインタにぶつかるまでコールスタックを検索する
-		for (int i = this.callStack.size() - 1; this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
-
-			StackElement variableElement = this.callStack.get(i);
-
-			//目的の識別子が見つかった場合、その値を取り出す
-			LocalVariable localVariable = variableElement.getVariable();
-			String localVariableName = localVariable.getVariable().getName();
-
-			if (localVariableName.equals(search.getName())) {
-				searchFlag = true;
-				foundLocalVariable = localVariable;
-				break;
+		//グローバル変数の代入式など場合、処理をスキップする
+		if (this.callStack.size() != 0) {
+			for (int i = this.callStack.size() - 1; this.callStack.get(i).getStackElementType() != StackElementType.FRAME_POINTER; i--) {
+	
+				StackElement variableElement = this.callStack.get(i);
+	
+				//目的の識別子が見つかった場合、その値を取り出す
+				LocalVariable localVariable = variableElement.getVariable();
+				String localVariableName = localVariable.getVariable().getName();
+	
+				if (localVariableName.equals(search.getName())) {
+					searchFlag = true;
+					foundLocalVariable = localVariable;
+					break;
+				}
 			}
 		}
 

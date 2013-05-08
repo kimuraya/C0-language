@@ -996,38 +996,42 @@ public class SemanticAnalyzer implements Visitor {
 		
 		boolean ret = false;
 		
-		//入れ子の内側から外側の複合文を調べる
-		SymbolTable beingProcessedSymbolTable = this.beingProcessedBlock.getSymbolTable();
-		
-		//現在処理中の複合文にある識別子を検索する
-		if (beingProcessedSymbolTable.searchSymbol(identifierNode.getIdentifier().getName())) {
-			ret = true;
-		}
-		
-		//処理中の関数の引数を調べる
-		if (!ret) {
+		//グローバル変数の処理中は、この処理を飛ばす（グローバル変数の処理中、処理中の複合文は存在しない）
+		if (this.beingProcessedBlock != null) {
 			
-			List<ParameterNode> parameters = this.beingProcessedFunction.getParameters();
+			//入れ子の内側から外側の複合文を調べる
+			SymbolTable beingProcessedSymbolTable = this.beingProcessedBlock.getSymbolTable();
 			
-			if (parameters != null) {
-				if(this.searchParameter(parameters, identifierNode)) {
-					ret = true;
+			//現在処理中の複合文にある識別子を検索する
+			if (beingProcessedSymbolTable.searchSymbol(identifierNode.getIdentifier().getName())) {
+				ret = true;
+			}
+			
+			//処理中の関数の引数を調べる
+			if (!ret) {
+				
+				List<ParameterNode> parameters = this.beingProcessedFunction.getParameters();
+				
+				if (parameters != null) {
+					if(this.searchParameter(parameters, identifierNode)) {
+						ret = true;
+					}
 				}
 			}
-		}
-		
-		if (!ret) {
-			//存在しない場合、外側にある複合文への検索を試みる
-			//関数本体の複合文にもない場合、関数内に識別子が存在しないと判断し、処理を打ち切る
-			//関数本体のouterNestBlockはnull
-			for (BlockNode blockNode = this.beingProcessedBlock.getOuterNestBlock(); blockNode != null; blockNode = blockNode.getOuterNestBlock()) {
-				
-				SymbolTable symbolTable = blockNode.getSymbolTable();
-				
-				//現在処理中の複合文にある識別子を検索する
-				if (symbolTable.searchSymbol(identifierNode.getIdentifier().getName())) {
-					ret = true;
-					break;
+			
+			if (!ret) {
+				//存在しない場合、外側にある複合文への検索を試みる
+				//関数本体の複合文にもない場合、関数内に識別子が存在しないと判断し、処理を打ち切る
+				//関数本体のouterNestBlockはnull
+				for (BlockNode blockNode = this.beingProcessedBlock.getOuterNestBlock(); blockNode != null; blockNode = blockNode.getOuterNestBlock()) {
+					
+					SymbolTable symbolTable = blockNode.getSymbolTable();
+					
+					//現在処理中の複合文にある識別子を検索する
+					if (symbolTable.searchSymbol(identifierNode.getIdentifier().getName())) {
+						ret = true;
+						break;
+					}
 				}
 			}
 		}
@@ -1077,8 +1081,18 @@ public class SemanticAnalyzer implements Visitor {
 		Identifier ret = null; //シンボルテーブルから検索された識別子
 		boolean foundFlag = false; //見つかっているならtrue
 		
+		SymbolTable beingProcessedSymbolTable = null;
+		
+		//グローバル変数の処理
+		if(this.beingProcessedBlock == null) {
+			beingProcessedSymbolTable = this.globalScope.getGlobalSymbolTable();
+		}
+		
+		//main文などの複合文の処理
 		//処理中の関数のLocalScopeから識別子を検索
-		SymbolTable beingProcessedSymbolTable = this.beingProcessedBlock.getSymbolTable();
+		if(this.beingProcessedBlock != null) {
+			beingProcessedSymbolTable = this.beingProcessedBlock.getSymbolTable();
+		}
 		
 		//複合文にある識別子を検索する
 		if (beingProcessedSymbolTable.searchSymbol(identifierNode.getIdentifier().getName())) {
