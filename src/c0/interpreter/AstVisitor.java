@@ -389,9 +389,19 @@ public class AstVisitor implements Visitor {
 
 	@Override
 	public void visit(ForNode forNode) {
-		forNode.getInitializeExpression().accept(this);
-		forNode.getConditionalExpression().accept(this);
-		forNode.getUpdateExpression().accept(this);
+		
+		if (forNode.getInitializeExpression() != null) {
+			forNode.getInitializeExpression().accept(this);
+		}
+		
+		if (forNode.getConditionalExpression() != null) {
+			forNode.getConditionalExpression().accept(this);
+		}
+		
+		if (forNode.getUpdateExpression() != null) {
+			forNode.getUpdateExpression().accept(this);
+		}
+		
 		forNode.getBodyStatement().accept(this);
 	}
 

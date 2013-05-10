@@ -70,31 +70,39 @@ public class ForNode extends StatementNode {
 		this.printFileNameAndLine(depth, indentFlag);
 		
 		//初期化式の出力
-		if (indentFlag) {
-			this.printIndent(depth);
+		if (this.initializeExpression != null) {
+			
+			if (indentFlag) {
+				this.printIndent(depth);
+			}
+			
+			System.out.println("initializeExpression");
+			
+			this.initializeExpression.dump(depth, true);
 		}
-		
-		System.out.println("initializeExpression");
-		
-		this.initializeExpression.dump(depth, true);
 		
 		//条件式の出力
-		if (indentFlag) {
-			this.printIndent(depth);
+		if (this.conditionalExpression != null) {
+			
+			if (indentFlag) {
+				this.printIndent(depth);
+			}
+			
+			System.out.println("conditionalExpression");
+			
+			this.conditionalExpression.dump(depth, true);
 		}
-		
-		System.out.println("conditionalExpression");
-		
-		this.conditionalExpression.dump(depth, true);
 		
 		//更新式の出力
-		if (indentFlag) {
-			this.printIndent(depth);
+		if (this.updateExpression != null) {
+			if (indentFlag) {
+				this.printIndent(depth);
+			}
+			
+			System.out.println("updateExpression");
+			
+			this.updateExpression.dump(depth, true);
 		}
-		
-		System.out.println("updateExpression");
-		
-		this.updateExpression.dump(depth, true);
 		
 		//文の出力
 		if (indentFlag) {

@@ -375,32 +375,40 @@ public class InterpreterImplementation implements Interpreter {
 		ExecuteStatementResult ret = new ExecuteStatementResult();
 		ret.setStatementResultFlag(StatementResultFlag.NORMAL_STATEMENT_RESULT);
 		ForNode forNode = (ForNode) statementNode;
+		StackElement stackElement = null;
+		Value value = new Value();
 
 		//初期化式を実行
 		ExpressionNode initializeExpression = forNode.getInitializeExpression();
-		this.evaluateExpression(initializeExpression);
-
-		//オペランドスタックから計算結果を破棄する
-		StackElement stackElement = null;
-		if (!this.operandStack.isEmpty()) {
-			stackElement = this.operandStack.pop();
+		
+		if (initializeExpression != null) {
+			
+			this.evaluateExpression(initializeExpression);
+			
+			//オペランドスタックから計算結果を破棄する
+			if (!this.operandStack.isEmpty()) {
+				stackElement = this.operandStack.pop();
+			}
 		}
-
+		
 		//条件式を実行
 		ExpressionNode conditionalExpression = forNode.getConditionalExpression();
-		this.evaluateExpression(conditionalExpression);
 		
-		//オペランドスタックから計算結果を取り出す
-		Value value = new Value();
-		if (!this.operandStack.isEmpty()) {
-			stackElement = this.operandStack.pop();
-			value = stackElement.getValue();
-		}
-		
-		//計算結果が真偽値でなければ、例外を出す
-		if(value.getDataType() != DataType.BOOLEAN) {
-			String errorMessage = this.properties.getProperty("error.ConditionalExpressionError");
-			throw new InterpreterRuntimeException(errorMessage, statementNode);
+		if (conditionalExpression != null) {
+			
+			this.evaluateExpression(conditionalExpression);
+			
+			//オペランドスタックから計算結果を取り出す
+			if (!this.operandStack.isEmpty()) {
+				stackElement = this.operandStack.pop();
+				value = stackElement.getValue();
+			}
+			
+			//計算結果が真偽値でなければ、例外を出す
+			if(value.getDataType() != DataType.BOOLEAN) {
+				String errorMessage = this.properties.getProperty("error.ConditionalExpressionError");
+				throw new InterpreterRuntimeException(errorMessage, statementNode);
+			}
 		}
 
 		//文を実行
@@ -408,13 +416,15 @@ public class InterpreterImplementation implements Interpreter {
 		while (value.isBool() && ret.getStatementResultFlag() == StatementResultFlag.NORMAL_STATEMENT_RESULT) {
 
 			//条件式を取り出し、実行する
-			conditionalExpression = forNode.getConditionalExpression();
-			this.evaluateExpression(conditionalExpression);
-
-			//オペランドスタックから計算結果を取り出す
-			if (!this.operandStack.isEmpty()) {
-				stackElement = this.operandStack.pop();
-				value = stackElement.getValue();
+			if (conditionalExpression != null) {
+				conditionalExpression = forNode.getConditionalExpression();
+				this.evaluateExpression(conditionalExpression);
+	
+				//オペランドスタックから計算結果を取り出す
+				if (!this.operandStack.isEmpty()) {
+					stackElement = this.operandStack.pop();
+					value = stackElement.getValue();
+				}
 			}
 
 			//文を実行する
@@ -438,11 +448,15 @@ public class InterpreterImplementation implements Interpreter {
 
 			//後置き式を実行
 			ExpressionNode updateExpression = forNode.getUpdateExpression();
-			this.evaluateExpression(updateExpression);
-
-			//オペランドスタックから計算結果を破棄する
-			if (!this.operandStack.isEmpty()) {
-				stackElement = this.operandStack.pop();
+			
+			if (updateExpression != null) {
+				
+				this.evaluateExpression(updateExpression);
+	
+				//オペランドスタックから計算結果を破棄する
+				if (!this.operandStack.isEmpty()) {
+					stackElement = this.operandStack.pop();
+				}
 			}
 		}
 
