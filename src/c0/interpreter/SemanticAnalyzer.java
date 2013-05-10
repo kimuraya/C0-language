@@ -68,7 +68,8 @@ public class SemanticAnalyzer implements Visitor {
 	private StatementNode  beingProcessedStatement = null; //現在処理中の文
 	private Properties properties = null; //エラーメッセージ
 	private Integer errorCount = 1; //エラーの数
-	private boolean loopFlag = false;
+	private int loopCnt = 0; //ループの内側を解析しているかを示す。0であれば、ループの内側にはいない。数値は検出したループの数を示す
+	private boolean breakFlag = false; //break文が問題ない位置にある場合、true
 	
 	public SemanticAnalyzer(GlobalScope globalScope) {
 		super();
@@ -696,9 +697,15 @@ public class SemanticAnalyzer implements Visitor {
 		
 		whileNode.getConditionalExpression().accept(this);
 		
-		this.loopFlag = true; //ループの内側を解析している
+		this.loopCnt++;
+		this.breakFlag = true;
 		whileNode.getBodyStatement().accept(this);
-		this.loopFlag = false; //ループの解析が終わった為、フラグを落とす
+		this.loopCnt--;
+		
+		//whileの本文でループに遭遇していなければ、フラグを落とす
+		if (loopCnt == 0) {
+			this.breakFlag = false;
+		}
 	}
 
 	/**
@@ -724,9 +731,15 @@ public class SemanticAnalyzer implements Visitor {
 		forNode.getConditionalExpression().accept(this);
 		forNode.getUpdateExpression().accept(this);
 		
-		this.loopFlag = true; //ループの内側を解析している
+		this.loopCnt++;
+		this.breakFlag = true;
 		forNode.getBodyStatement().accept(this);
-		this.loopFlag = false; //ループの解析が終わった為、フラグを落とす
+		this.loopCnt--;
+		
+		//forの本文でループに遭遇していなければ、フラグを落とす
+		if (loopCnt == 0) {
+			this.breakFlag = false;
+		}
 	}
 
 	/**
@@ -739,7 +752,7 @@ public class SemanticAnalyzer implements Visitor {
 		this.beingProcessedStatement = breakNode;
 		
 		//ループの内側でない場合、警告文を出す
-		if (!this.loopFlag) {
+		if (this.breakFlag == false) {
 			errorCount++;
 			String errorMessage = this.properties.getProperty("error.TheBreakStatementHasNotBeenWrittenOnTheInsideOfTheLoop");
 			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
