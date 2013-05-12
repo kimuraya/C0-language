@@ -719,12 +719,16 @@ public class SemanticAnalyzer implements Visitor {
 		
 		//条件式のチェック
 		ExpressionNode conditionalExpression = forNode.getConditionalExpression();
-		if (!this.conditionalExpressionCheck(conditionalExpression)) {
-			errorCount++;
-			String errorMessage = this.properties.getProperty("error.ConditionalExpressionError");
-			Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
-			errorMap.put(errorMessage, this.beingProcessedStatement);
-			this.errorMessages.put(errorCount, errorMap);
+		
+		if (forNode.getConditionalExpression() != null) {
+			
+			if (!this.conditionalExpressionCheck(conditionalExpression)) {
+				errorCount++;
+				String errorMessage = this.properties.getProperty("error.ConditionalExpressionError");
+				Map<String, StatementNode> errorMap = new LinkedHashMap<String, StatementNode>();
+				errorMap.put(errorMessage, this.beingProcessedStatement);
+				this.errorMessages.put(errorCount, errorMap);
+			}
 		}
 		
 		if (forNode.getInitializeExpression() != null) {

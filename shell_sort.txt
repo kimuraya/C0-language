@@ -1,0 +1,125 @@
+//配列の要素数
+int element_cnt = 10;
+
+//ソートする配列
+int[element_cnt] array;
+
+/*main文*/
+/*シェルソートを呼び出し、結果を表示して終了する*/
+int main () {
+	
+	int i = 0;
+	
+	//配列の各要素にランダムな値を入力
+	for (i = 0; i < element_cnt; i++) {
+		array[i] = rand() % 100;
+	}
+
+	//ソート前の配列を表示
+	print("ソート前の配列%n");
+	for (i = 0; i < element_cnt; i++) {
+		print("%d ",array[i]);
+	}
+	print("%n");
+
+	//シェルソートの呼び出し
+	shell_sort(array, element_cnt);
+
+	//結果の表示
+	print("ソート後の配列%n");
+	for (i = 0; i < element_cnt; i++) {
+		print("%d ",array[i]);
+	}
+	print("%n");
+
+	print("処理を終了します。%n");
+	
+	return 0;
+}
+
+/* シェルソート */
+
+void shell_sort(int[] a, int n) {
+	
+	int h; //hソート用の増分
+	int sort_of_element; //ソートの対象になる要素
+	int inserting_element; //挿入位置
+	int tmp; //作業用一時領域
+	int i; //ループ用変数
+
+	//前処理として、幾つずつ離れた要素を整列するか、配列の大きさに応じた値を出す
+	//配列の大きさに応じて、hずつ離れた要素を整列する
+    for (h = 1; h < n/9; h = h * 3 + 1);
+
+	//hが1になるまでループ
+    for (; h > 0; h = h / 3) {
+    	
+    	//挿入ソートの処理
+		for (sort_of_element = h; sort_of_element < n; sort_of_element ++) {
+			
+			//hの現在地の表示
+    		print("hの現在値　：　%d%n",h);
+			
+		    inserting_element = sort_of_element;
+			
+		    while (inserting_element >= h && (a[inserting_element-h] > a[inserting_element])) {
+		    	
+		    	//挿入位置と挿入位置-hの要素を交換する
+				tmp = a[inserting_element];
+		    	a[inserting_element] = a[inserting_element-h];
+		    	a[inserting_element-h] = tmp;
+		    	
+		    	//挿入位置の値からhを引き、チェックする添え字を後ろへずらす
+		    	//交換の度に挿入位置が、hの値分だけずれる
+				inserting_element = inserting_element - h;
+		    	
+		    	//途中結果の表示
+		    	print("↑　ソート中の配列　：　%d番目の要素を%d番目を交換%n", inserting_element + h, inserting_element);
+		    	
+		    	//配列の添え字の表示
+		    	print("配列の添え字%n");
+		    	for(i = 0; i < n; i++) {
+		    		print("%d",i);
+		    		
+		    		//空白の挿入
+		    		if (i <= 10) {
+		    			print("  ");
+		    		}
+		    		
+		    		else if (i > 10) {
+		    			print(" ");
+		    		}
+		    	}
+		    	print("%n");
+		    	
+				for (i = 0; i < n; i++) {
+					print("%d ",a[i]);
+				}
+				print("%n");
+		    }
+			//途中結果の表示
+			print("ソート中の配列　：　%d番目の要素まで、ソートが終了%n", sort_of_element);
+			
+			//配列の添え字の表示
+			print("配列の添え字%n");
+		    for(i = 0; i < n; i++) {
+		    	print("%d",i);
+		    	
+		    	//空白の挿入
+		    	if (i <= 10) {
+		    		print("  ");
+		    	}
+		    	
+		    	else if (i > 10) {
+		    		print(" ");
+		    	}
+		    }
+		    	print("%n");
+			
+			for (i = 0; i < n; i++) {
+				print("%d ",a[i]);
+			}
+			print("%n");
+		}
+	}
+}

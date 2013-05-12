@@ -1,0 +1,118 @@
+//配列の要素数
+int element_cnt = 10;
+
+//ソートする配列
+int[element_cnt] array;
+
+/*main文*/
+/*クイックソートを呼び出し、結果を表示して終了する*/
+int main () {
+	
+	int i = 0;
+	
+	//配列の各要素にランダムな値を入力
+	for (i = 0; i < element_cnt; i++) {
+		array[i] = rand() % 100;
+	}
+
+	//ソート前の配列を表示
+	print("ソート前の配列%n");
+	for (i = 0; i < element_cnt; i++) {
+		print("%d ",array[i]);
+	}
+	print("%n");
+
+	//クイックソートの呼び出し
+	quick_sort(array, element_cnt);
+
+	//結果の表示
+	print("ソート後の配列%n");
+	for (i = 0; i < element_cnt; i++) {
+		print("%d ",array[i]);
+	}
+	print("%n");
+
+	print("処理を終了します。%n");
+	
+	return 0;
+}
+
+/* 再帰版クイックソート */
+
+/*分割処理*/
+/* 配列a[left]～a[r]を分割する。枢軸の添え字を返す */
+int partition(int[] a, int left, int right)
+{
+    int i;
+	int j;
+	int pivot;
+	int tmp;
+
+    /* ポインタiとjを初期化する */
+    i = left - 1;
+    j = right;
+	
+    /* いちばん右端の要素を枢軸にする */
+    pivot = a[right];
+	
+	//枢軸を基準に、配列を右側と左側に分ける処理
+    /* ポインタiとjがぶつかるまで、値の交換とポインタの移動を繰り返す */
+    while(true) {
+		/* pivotより大きな要素が見つかるまで、ポインタiを左へ進める */
+		while (a[++i] < pivot);
+	    	
+		/* pivotより小さな要素が見つかるまで、ポインタjを右へ進める */
+		while (i < --j && pivot < a[j]);
+	    	
+		/* ポインタiとjがぶつかったらループを抜ける */
+    	if (i >= j) {
+		    break;
+    	}
+	    	
+		/* 上記のwhile文で見つかった、iの指す要素とjの指す要素を交換する */
+    	/*大きな要素を右側へ、小さな要素を左へ*/
+		tmp = a[i];  
+    	a[i] = a[j];
+    	a[j] = tmp;
+    }
+	
+	//ポインタの移動と値の交換が終わったら、
+	//枢軸とポインタiが指す要素（枢軸よりも大きい）を交換する
+    /* a[i]と枢軸を交換する */
+    tmp = a[i];  
+	a[i] = a[right];  
+	a[right] = tmp;
+	
+    return i;
+}
+
+
+/* 実際にクイックソートを行う関数 */
+void quick_sort_1(int[] a, int left, int right)
+{
+	//枢軸
+    int v;
+
+    /* 整列する要素が１つなら、何もしないでリターンする */
+	//分割できなくなったら
+	if (left >= right) {
+		return;
+	}
+
+	/*分割処理を呼び出す*/
+    /* 枢軸vを基準に分割する */
+    v = partition(a, left, right);
+
+    /* 左の部分配列a[left]～a[v-1]を整列する */
+    quick_sort_1(a, left, v-1);
+
+    /* 右の部分配列a[v+1]～a[right]を整列する */
+    quick_sort_1(a, v+1, right);
+}
+
+
+/* クイックソート */
+void quick_sort(int[] a, int n)
+{
+    quick_sort_1(a, 0, n - 1);
+}

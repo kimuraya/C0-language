@@ -1,0 +1,95 @@
+//配列の要素数
+int element_cnt = 10;
+
+//ソートする配列
+int[element_cnt] array;
+
+/*main文*/
+/*バブルソートを呼び出し、結果を表示して終了する*/
+int main () {
+	
+	int i = 0;
+	
+	//配列の各要素にランダムな値を入力
+	for (i = 0; i < element_cnt; i++) {
+		array[i] = rand() % 100;
+	}
+
+	//ソート前の配列を表示
+	print("ソート前の配列%n");
+	for (i = 0; i < element_cnt; i++) {
+		print("%d ",array[i]);
+	}
+	print("%n");
+
+	//バブルソートの呼び出し
+	bubble_sort(array, element_cnt);
+
+	//結果の表示
+	print("ソート後の配列%n");
+	for (i = 0; i < element_cnt; i++) {
+		print("%d ",array[i]);
+	}
+	print("%n");
+
+	print("処理を終了します。%n");
+	
+	return 0;
+}
+
+/*バブルソート*/
+void bubble_sort(int[] array, int n)
+{
+    int sorting_element; //整列される要素を指す添え字
+	int least_element; //未整列の配列にある最小値を指す添え字
+	int tmp; //作業用の一時領域
+	int i; //ループのカウンタ用
+
+	//ソート全体を管理するループ
+	//0から順に、配列の添え字sorting_elementが指す要素に、
+	//ループが回る度に、未整列の配列から見つかった最小の値を代入していく
+	//全体のループが一回転するごとに、整列済みの配列の範囲（添え字sorting_element-1の範囲）が一つ増える
+	//整列済みの配列の範囲が配列の要素数に達したら、ソート全体が終了する
+	for (sorting_element = 0; sorting_element < n - 1; sorting_element++) {
+		
+		//未整列の配列から、最小の要素を探し、整列済みの配列の一番後ろに付けるループ
+    	//未整列の配列の要素を全てスキャンしながら、整列を行う
+		//least_elementが指す配列の要素を、最小値として未整列の配列の一番左へ（添え字sorting_element）流す
+		//配列の一番後ろから、未整列の配列にある最小値を、整列済みの配列の一番後ろに付けるまでループする
+		//least_elementの初期値は、ソートする配列の一番後ろの要素を指す添え字
+		//ソート全体を管理するforループの中にある為、外のループが終わる度、配列の一番後ろを指す
+		for (least_element = n - 1; least_element > sorting_element; least_element --) {
+			
+			//least_element（ループ中で見つけた最小値）の添え字の要素より、least_element-1の添え字の要素が大きい場合（新たな最小値が見つかった場合）、
+			//添え字least_elementの要素と添え字least_element-1の要素を入れ替える
+			//入れ替えが終わると、新たに見つかった最小値を元にソートを続ける
+			//least_elementは、その時点（一番最後の要素から）で見つかった配列の最小要素
+			//sorting_element（整列される要素を指す添え字）よりもleast_element（現在処理中の添え字）が大きい限り、
+			//ソートを繰り返す。
+			
+			//最小値が見つかった時の処理
+			if (array[least_element-1] > array[least_element]) {
+				
+				//最小値を左右で交換
+				tmp = array[least_element];
+				array[least_element] = array[least_element-1]; 
+				array[least_element-1] = tmp;
+
+				//途中結果（ソート中の配列）の表示
+				print("ソート中の配列　：　%d番目の要素を%d番目の要素と入れ替えた%n", least_element, least_element - 1);
+				for (i = 0; i < element_cnt; i++) {
+					print("%d ",array[i]);
+				}
+				print("%n");
+			}
+		}
+
+		//途中結果（ソートが1回終わった後）の表示
+		print("ソート中の配列　：　%d番目の要素まで、ソートが終了%n", sorting_element);
+		for (i = 0; i < element_cnt; i++) {
+			print("%d ",array[i]);
+		}
+		print("%n");
+
+	}
+}
