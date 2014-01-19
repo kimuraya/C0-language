@@ -4,20 +4,16 @@ int main() {
 	boolean bool = false;
 	
 	bool = 1 < 3;
-	print(bool);
-	print("%n");
+	print("%b%n", bool);
 	
 	bool = 1 > 3;
-	print(bool);
-	print("%n");
+	print("%b%n", bool);
 	
 	bool = 5 >= 1;
-	print(bool);
-	print("%n");
+	print("%b%n", bool);
 	
 	bool = 5 <= 1;
-	print(bool);
-	print("%n");
+	print("%b%n", bool);
 	
 	return 0;
 }

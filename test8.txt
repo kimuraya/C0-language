@@ -5,36 +5,28 @@ int main() {
 	boolean bool;
 	
 	bool = true && true;
-	print(bool);
-	print("%n");
+	print("%b%n", bool);
 	
 	bool = true && false;
-	print(bool);
-	print("%n");
+	print("%b%n", bool);
 	
 	bool = false && true;
-	print(bool);
-	print("%n");
+	print("%b%n", bool);
 	
 	bool = false && false;
-	print(bool);
-	print("%n");
+	print("%b%n", bool);
 	
 	bool = true || true;
-	print(bool);
-	print("%n");
+	print("%b%n", bool);
 	
 	bool = true || false;
-	print(bool);
-	print("%n");
+	print("%b%n", bool);
 	
 	bool = false || true;
-	print(bool);
-	print("%n");
+	print("%b%n", bool);
 	
 	bool = false || false;
-	print(bool);
-	print("%n");
+	print("%b%n", bool);
 	
 	return 0;
 }

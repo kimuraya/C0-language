@@ -13,9 +13,22 @@ int main() {
 	i = i + 10;
 
 	//標準関数printを使って、変数や定数を表示できます
-	print("i = %d%n", i);
-	print("%d%n", a);
-	print("%b%n", bool);
+	print("i = %d%n", i); //int型の整数を表示
+	print("%d%n", a); //グローバル変数を表示
+	print("%b%n", bool); //boolean型の整数を表示
+	
+	//10進定数の表示
+	print(100);
+	print("%n");
+	
+	//真偽値定数の表示
+	print(true);
+	print("%n");
+	print(false);
+	print("%n");
+	
+	//文字列定数の表示
+	print("文字列定数");
 	
 	return 0;
 }

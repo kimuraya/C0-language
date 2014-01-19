@@ -6,7 +6,9 @@ int main() {
 	
 	user_print(); //戻り値のない関数
 	i = add(100, 1000); //戻り値のある関数
-	print(i); //標準関数print
+	print("%d%n", i); //標準関数print
+	i = rand(); //標準関数rand。整数型の乱数を生成する
+	print("%d%n", i);
 	
 	return 0;
 }
